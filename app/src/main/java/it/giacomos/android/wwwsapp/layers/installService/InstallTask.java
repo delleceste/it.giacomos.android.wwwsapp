@@ -57,7 +57,6 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
 			
 			try {
 				Thread.sleep(2550);
-				print TASK IN PARALLELO! Se no aspetta quell'altro!
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

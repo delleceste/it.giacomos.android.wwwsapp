@@ -20,6 +20,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,7 +39,7 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 
 	static class ViewHolder {
 		public TextView title, desc;
-		public Button buttonInstallRemove, buttonUpgrade;
+		public ImageButton buttonInstall, buttonUpgrade, buttonDelete;
 		public ImageView image;
 		public ProgressBar progressBar;
 		public TextView installedVerTextView, availableVerTextView;
@@ -100,8 +101,9 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			mViewHolder.title  = (TextView) itemView.findViewById(R.id.title);
 			mViewHolder.desc = (TextView) itemView.findViewById(R.id.description);
 			mViewHolder.image = (ImageView) itemView.findViewById(R.id.icon);
-			mViewHolder.buttonInstallRemove = (Button) itemView.findViewById(R.id.button);
-			mViewHolder.buttonUpgrade = (Button) itemView.findViewById(R.id.buttonUpgrade);
+			mViewHolder.buttonInstall = (ImageButton) itemView.findViewById(R.id.buttonInstall);
+			mViewHolder.buttonUpgrade = (ImageButton) itemView.findViewById(R.id.buttonUpgrade);
+            mViewHolder.buttonDelete = (ImageButton) itemView.findViewById(R.id.buttonDelete);
 			mViewHolder.progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
 			mViewHolder.installedVerTextView = (TextView) itemView.findViewById(R.id.tvInstalledVersion);
 			mViewHolder.availableVerTextView = (TextView) itemView.findViewById(R.id.tvAvailableVersion);
@@ -117,9 +119,15 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		mViewHolder.title.setText(d.title);
 		mViewHolder.desc.setText(d.short_desc);
 		mViewHolder.image.setBackgroundDrawable(d.icon);
+        mViewHolder.buttonInstall.setImageResource(android.R.drawable.ic_menu_add);
+        mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, R.string.install);
 		
 		if(d.install_progress < 100)
 		{
+            mViewHolder.buttonInstall.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+            mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, R.string.cancel_button);
+			mViewHolder.buttonUpgrade.setVisibility(View.GONE);
+            mViewHolder.buttonDelete.setVisibility(View.GONE);
 			String installingVersion = context.getString(R.string.installing_version) + " ";
 			String downloadingVersion = context.getString(R.string.downloading_version) + " ";
 			mViewHolder.availableVerTextView.setVisibility(View.GONE);
@@ -132,7 +140,6 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 						String.valueOf(d.available_version) + "[" + d.install_progress + "%]");
 			mViewHolder.progressBar.setVisibility(View.VISIBLE);
 			mViewHolder.progressBar.setProgress(d.install_progress);
-			mViewHolder.buttonInstallRemove.setText(R.string.cancel_button);
 		}
 		else
 		{
@@ -154,26 +161,31 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 
 			if(d.installed)
 			{
-				mViewHolder.buttonInstallRemove.setText(R.string.delete);
+                mViewHolder.buttonInstall.setVisibility(View.GONE);
+                mViewHolder.buttonDelete.setVisibility(View.VISIBLE);
 				mViewHolder.installedVerTextView.setVisibility(View.VISIBLE);
 			}
 			else if(!d.installed)
 			{
-				mViewHolder.buttonInstallRemove.setText(R.string.install);
+                mViewHolder.buttonInstall.setVisibility(View.VISIBLE);
+                mViewHolder.buttonDelete.setVisibility(View.GONE);
 				mViewHolder.installedVerTextView.setVisibility(View.GONE);
+
 			}
 			/* upgrade ? */
+            Log.e("LayerListAdapter.getView", "install prog  " + d.install_progress);
 			if(d.available_version > d.installed_version && d.installed)
 				mViewHolder.buttonUpgrade.setVisibility(View.VISIBLE);
 			else
 				mViewHolder.buttonUpgrade.setVisibility(View.GONE);
 		}
 
-		mViewHolder.buttonInstallRemove.setOnClickListener(this);
+		mViewHolder.buttonInstall.setOnClickListener(this);
 		mViewHolder.buttonUpgrade.setOnClickListener(this);
-		mViewHolder.buttonInstallRemove.setTag(position);
+        mViewHolder.buttonDelete.setOnClickListener(this);
+		mViewHolder.buttonInstall.setTag(position);
 		mViewHolder.buttonUpgrade.setTag(position);
-
+        mViewHolder.buttonDelete.setTag(position);
 		return itemView;
 	}
 
@@ -236,26 +248,22 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 	public void onClick(View v) 
 	{
 		/* same action for upgrade or install) */
-		if(v.getId() == R.id.button || v.getId() == R.id.buttonUpgrade)
-		{
 			Log.e("onClick", " clicked on id " + v.getId());
-			Button b = (Button) v;
+            ImageButton b = (ImageButton) v;
 			LayerItemData d = this.getItem(Integer.parseInt(b.getTag().toString()));
+
 			if(!d.isValid())
 				return;
-			if( (b.getText().toString().compareTo(context.getString(R.string.install)) == 0) 
-					|| v.getId() == R.id.buttonUpgrade)
+			if(v.getId() == R.id.buttonInstall && (int) v.getTag(R.id.listItemInstallOrCancelButtonState) == R.string.install)
 			{
 				mLayerActionListener.onActionRequested(d.name, ACTION_DOWNLOAD);
 			}
-			else if(b.getText().toString().compareTo(context.getString(R.string.cancel_button)) == 0)
+			else if(v.getId() == R.id.buttonInstall && (int) v.getTag(R.id.listItemInstallOrCancelButtonState) == R.string.cancel_button )
 			{
 				mLayerActionListener.onActionRequested(d.name, ACTION_CANCEL_DOWNLOAD);
 			}
-			else if(b.getText().toString().compareTo(context.getString(R.string.delete)) == 0)
-			{
-				mLayerActionListener.onActionRequested(d.name, ACTION_REMOVE);
-			}
-		}
+			else if(v.getId() == R.id.buttonDelete) {
+                mLayerActionListener.onActionRequested(d.name, ACTION_REMOVE);
+            }
 	}
 }

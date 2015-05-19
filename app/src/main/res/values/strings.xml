@@ -748,6 +748,9 @@ Please note: requests devoid of the full name and date will be ignored.\n\n</str
     
     <string name="available_version">Available version</string>
     <string name="installed_version">Installed version</string>
-    
+    <string name="install_version">Install version</string>
+    <string name="installing_version">Installing version</string>
+    <string name="downloading_version">Downloading version</string>
+    <string name="network_connection_needed">A network connection is needed to perform this operation</string>
     
 </resources>

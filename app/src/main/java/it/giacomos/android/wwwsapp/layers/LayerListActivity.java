@@ -32,7 +32,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 /**
  * An activity representing a list of Layers. This activity has different
@@ -77,6 +79,7 @@ ServiceStateChangedBroadcastReceiverListener
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		mDataCache = new FileUtils();
 		mDataCache.initDir("layerlistcache", this);
 		mLayerListAdapter = new LayerListAdapter(this, this);
@@ -122,12 +125,12 @@ ServiceStateChangedBroadcastReceiverListener
 		 * because this activity may be resumed while a download is in progress.
 		 */
 		registerReceiver(m_networkStatusMonitor, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-		LocalBroadcastManager.getInstance(this).registerReceiver(mServiceBroadcastReceiver, 
-				new IntentFilter(SERVICE_STATE_CHANGED_INTENT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(mServiceBroadcastReceiver,
+                new IntentFilter(SERVICE_STATE_CHANGED_INTENT));
 		mServiceBroadcastReceiver.registerListener(this);
 		
-		LocalBroadcastManager.getInstance(this).registerReceiver(mLayerListServiceStateChangedBroadcastReceiver, 
-				new IntentFilter(LIST_DOWNLOAD_SERVICE_STATE_CHANGED_INTENT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(mLayerListServiceStateChangedBroadcastReceiver,
+                new IntentFilter(LIST_DOWNLOAD_SERVICE_STATE_CHANGED_INTENT));
 		mLayerListServiceStateChangedBroadcastReceiver.registerListener(this);
 
 		reload();
@@ -174,7 +177,7 @@ ServiceStateChangedBroadcastReceiverListener
 	}
 
 	/**
-	 * Callback method from {@link LayerListFragment.Callbacks} indicating that
+	 * Callback method indicating that
 	 * the item with the given ID was selected.
 	 */
 	@Override
@@ -263,7 +266,7 @@ ServiceStateChangedBroadcastReceiverListener
 	@Override
 	public void onActionRequested(String layerName, int action)
 	{
-		if(action == LayerListAdapter.ACTION_DOWNLOAD)
+		if(action == LayerListAdapter.ACTION_DOWNLOAD && m_networkStatusMonitor.isConnected())
 		{
 				Log.e("LayerListActivity.onActionRequested", "starting download service LayerInstallService " + layerName);
 				Intent intent = new Intent(this, LayerInstallService.class);
@@ -285,6 +288,10 @@ ServiceStateChangedBroadcastReceiverListener
 				reload();
 			}
 		}
+        else if(action == LayerListAdapter.ACTION_DOWNLOAD && !m_networkStatusMonitor.isConnected())
+        {
+            MyAlertDialogFragment.MakeGenericInfo(R.string.network_connection_needed, this);
+        }
 		
 	}
 
@@ -300,21 +307,22 @@ ServiceStateChangedBroadcastReceiverListener
 	}
 	
 	@Override
-	public void onStateChanged(String layerName, InstallTaskState s, int percent) 
+	public void onInstallServiceStateChanged(String layerName, InstallTaskState s, int percent)
 	{
-		Log.e("LayerListActivity.onStateChanged", " +++++ RECEIVED BROADCAST ++++: " + layerName + ", " + s + "% " + percent);
+		Log.e("LayerListActivity.onInstallServiceStateChanged", " +++++ RECEIVED BROADCAST ++++: " + layerName + ", " + s + "% " + percent);
 		if(!layerName.isEmpty())
 			mLayerListAdapter.updateProgress(layerName, percent, s);
 		
 		if(percent == 100)
 			reload();
+        setProgressBarIndeterminateVisibility(percent < 100);
 	}
 
 	@Override
-	public void onStateChanged(String layerName, float version,
-			LayerListDownloadServiceState s, int percent, String errorMessage) 
+	public void onLayerListServiceStateChanged(String layerName, float version,
+                                               LayerListDownloadServiceState s, int percent, String errorMessage)
 	{
-		Log.e("LayerListActivity.onStateChanged", " +++++ RECEIVED BROADCAST ++++: " + layerName + ", " + s + "% " + percent + " -- errpr " + errorMessage);
+		Log.e("LLA.onInstallServiceStateChanged", " +++++ RECEIVED BROADCAST ++++: " + layerName + ", " + s + "% " + percent + " -- error " + errorMessage);
 		if(s == LayerListDownloadServiceState.CANCELLED)
 			this.onLayerFetchCancelled(percent);
 		else if(s == LayerListDownloadServiceState.DOWNLOADING)
@@ -324,8 +332,17 @@ ServiceStateChangedBroadcastReceiverListener
 		else if(s == LayerListDownloadServiceState.ERROR)
 			this.onLayerListDownloadError(errorMessage);
 		else
-			Log.e("LayerListActivity.onStateChanged", "!!! should not be here: "
+			Log.e("LayerListActivity.onInstallServiceStateChanged", "!!! should not be here: "
 					+ layerName + ", state " + s + " percent "+ percent + " error "
 					+ errorMessage);
+
+        setProgressBarIndeterminateVisibility(s == LayerListDownloadServiceState.DOWNLOADING);
+        ProgressBar pb = (ProgressBar) findViewById(id.layerListProgressBar);
+        if(s == LayerListDownloadServiceState.DOWNLOADING)
+            pb.setVisibility(View.VISIBLE);
+        else
+            pb.setVisibility(View.GONE);
+        pb.setMax(100);
+        pb.setProgress(percent);
 	}
 }

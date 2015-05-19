@@ -32,7 +32,7 @@ public class ServiceStateChangedBroadcastReceiver extends BroadcastReceiver {
 			String layerName = intent.getStringExtra("layerName");
 			InstallTaskState state = (InstallTaskState) intent.getSerializableExtra("serviceStateChanged");
 			int percent = intent.getIntExtra("percent", 0);
-			mServiceStateChangedBroadcastReceiverListener.onStateChanged(layerName, state, percent);
+			mServiceStateChangedBroadcastReceiverListener.onInstallServiceStateChanged(layerName, state, percent);
 		}
 
 	}

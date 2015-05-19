@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -124,7 +125,7 @@ public class LayerInstallService extends Service implements InstallTaskListener
 				InstallTask task = new InstallTask(this, this, layerName);
 				mNotificationIdMap.put(layerName, mNotificationIdx++);
 				mInstallTasks.put(layerName, task);
-				task.execute();
+				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				mUpdateNotification(layerName, InstallTaskState.DOWNLOADING, 0);
 			}
 		}

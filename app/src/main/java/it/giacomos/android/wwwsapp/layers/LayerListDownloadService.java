@@ -78,7 +78,7 @@ public class LayerListDownloadService extends Service implements LayerFetchTaskL
 		if(mLayerFetchTask != null && mLayerFetchTask.getStatus() != AsyncTask.Status.FINISHED)
 			mLayerFetchTask.cancel(true);
 		mLayerFetchTask = new LayerFetchTask(this, mAppVersionCode, mAppLang, this);
-		mLayerFetchTask.execute();
+		mLayerFetchTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 	
 	private void mNotifyStateChanged(String layer, float version, int percent)

@@ -34,8 +34,8 @@ public class LayerListServiceStateChangedBroadcastReceiver extends BroadcastRece
 			int percent = intent.getIntExtra("percent", 0);
 			float version = intent.getFloatExtra("version", -1.0f);
 			String error = intent.getStringExtra("error");
-			mServiceStateChangedBroadcastReceiverListener.onStateChanged(layerName,
-						version, state, percent, error);
+			mServiceStateChangedBroadcastReceiverListener.onLayerListServiceStateChanged(layerName,
+					version, state, percent, error);
 		}
 	}
 }
