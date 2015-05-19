@@ -1,0 +1,286 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Manifest Merging:
+-----------------
+Your project uses libraries that provide manifests, and your Eclipse
+project did not explicitly turn on manifest merging. In Android Gradle
+projects, manifests are always merged (meaning that contents from your
+libraries' manifests will be merged into the app manifest. If you had
+manually copied contents from library manifests into your app manifest
+you may need to remove these for the app to build correctly.
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* CHANGELOG
+* LICENSE
+* WWWsAppActivity.apk
+* WebcamsList.xml
+* artwork/
+* artwork/+1.xcf
+* artwork/.directory
+* artwork/banner.xcf
+* artwork/banner_pro.xcf
+* artwork/camera-web_off.xcf
+* artwork/camera-web_on.xcf
+* artwork/camera_web.xcf
+* artwork/camera_web_off.xcf
+* artwork/camera_web_on.xcf
+* artwork/camera_web_on_2.xcf
+* artwork/center_map.xcf
+* artwork/circle_borderless_marker.xcf
+* artwork/circle_borderless_marker_big.xcf
+* artwork/circle_borderless_marker_bigger.xcf
+* artwork/circle_borderless_redmarker.xcf
+* artwork/circle_borderless_violet_marker.xcf
+* artwork/circle_borderless_yellow_marker.xcf
+* artwork/circle_marker.xcf
+* artwork/cloud.bmp.png
+* artwork/cloud.png
+* artwork/cloud.svg
+* artwork/cloud_small.png
+* artwork/cloud_small_2.xcf
+* artwork/cloud_statusbar.xcf
+* artwork/configure_info.xcf
+* artwork/daily_observations.xcf
+* artwork/disable_notification_service.odg
+* artwork/disable_notification_service.png
+* artwork/drop.xcf
+* artwork/drop_off.xcf
+* artwork/drop_on.xcf
+* artwork/fvg_background2.bmp.png
+* artwork/fvg_background2.xcf
+* artwork/fvg_background_bw.xcf
+* artwork/gauge.xcf
+* artwork/gauge_off.xcf
+* artwork/gauge_on.xcf
+* artwork/ic_launcher_statusbar_message.xcf
+* artwork/ic_launcher_statusbar_rain_filled.xcf
+* artwork/ic_launcher_statusbar_report.xcf
+* artwork/ic_launcher_statusbar_report_new.xcf
+* artwork/ic_launcher_statusbar_request.xcf
+* artwork/ic_launcher_statusbar_request_new.xcf
+* artwork/ic_notification_expired.xcf
+* artwork/last_observations.xcf
+* artwork/logo_arpa.png
+* artwork/logo_cielo_azzurro.png
+* artwork/logo_cielo_azzurro.xcf
+* artwork/logo_cielo_azzurro_grigio.png
+* artwork/logo_cielo_azzurro_grigio.xcf
+* artwork/logo_nuovo.png
+* artwork/logo_nuovo.xcf
+* artwork/meteo_fvg_W.jpg
+* artwork/radar.xcf
+* artwork/rain_map.xcf
+* artwork/rain_off.xcf
+* artwork/rain_on.xcf
+* artwork/report_actionbar_icon.odg
+* artwork/report_activity.odg
+* artwork/report_activity_land.odg
+* artwork/report_activity_land.png
+* artwork/report_done.odg
+* artwork/report_done.png
+* artwork/report_done_land.odg
+* artwork/report_map_tilt.odg
+* artwork/report_map_tilt.png
+* artwork/report_map_tilt.xcf
+* artwork/report_map_tilt_land.xcf
+* artwork/report_map_tilt_port.xcf
+* artwork/request_dialog.odg
+* artwork/request_done.odg
+* artwork/request_long_press.odg
+* artwork/request_notification.odg
+* artwork/request_notification.png
+* artwork/scala_vmi_4.xcf
+* artwork/sea_temp.xcf
+* artwork/snow_button.xcf
+* artwork/sun.bmp.png
+* artwork/sun.svg
+* artwork/sun.xcf
+* artwork/temp_max_off.xcf
+* artwork/temp_max_on.xcf
+* artwork/temp_med_off.xcf
+* artwork/temp_med_on.xcf
+* artwork/temp_min_off.xcf
+* artwork/temp_min_on.xcf
+* artwork/temp_off.xcf
+* artwork/temp_on.xcf
+* artwork/thermo.xcf
+* artwork/tutorial_menu_launch_tutorial.odg
+* artwork/tutorial_menu_launch_tutorial.png
+* artwork/tutorial_report_map_tilt.png
+* artwork/tutorial_report_notification.odg
+* artwork/tutorial_report_notification.png
+* artwork/uccello_white_on_black.xcf
+* artwork/weather-sky_0.xcf
+* artwork/weather-snow-rain.xcf
+* artwork/weather-snow-rain_1.xcf
+* artwork/weather-snow-rain_2.xcf
+* artwork/weather_abundant_showers.xcf
+* artwork/weather_clear.xcf
+* artwork/weather_clouds.bmp.png
+* artwork/weather_clouds.png
+* artwork/weather_clouds.xcf
+* artwork/weather_clouds_nite.xcf
+* artwork/weather_few_clouds.png
+* artwork/weather_few_clouds.svg
+* artwork/weather_few_clouds.xcf
+* artwork/weather_few_clouds_2.xcf
+* artwork/weather_few_clouds_night.xcf
+* artwork/weather_few_clouds_nite.xcf
+* artwork/weather_intense_showers.xcf
+* artwork/weather_mist.xcf
+* artwork/weather_mist_14.xcf
+* artwork/weather_mist_15.xcf
+* artwork/weather_none_available.xcf
+* artwork/weather_particular_snow_10.xcf
+* artwork/weather_particular_snow_11.xcf
+* artwork/weather_particular_snow_12.xcf
+* artwork/weather_particular_snow_small_13.xcf
+* artwork/weather_particular_snow_smaller_10.xcf
+* artwork/weather_particular_snow_smaller_12.xcf
+* artwork/weather_rain2_36.xcf
+* artwork/weather_rain_36.xcf
+* artwork/weather_rain_6.xcf
+* artwork/weather_rain_7.xcf
+* artwork/weather_rain_8.xcf
+* artwork/weather_rain_9.xcf
+* artwork/weather_rain_cloud_36.xcf
+* artwork/weather_rain_cloud_6.xcf
+* artwork/weather_rain_cloud_7.xcf
+* artwork/weather_rain_cloud_8.xcf
+* artwork/weather_rain_cloud_9.xcf
+* artwork/weather_showers.xcf
+* artwork/weather_showers_1.xcf
+* artwork/weather_showers_2.xcf
+* artwork/weather_showers_night.xcf
+* artwork/weather_sky_0_nite.xcf
+* artwork/weather_sky_0_nite_map.xcf
+* artwork/weather_sky_3.xcf
+* artwork/weather_sky_4.png
+* artwork/weather_sky_4.xcf
+* artwork/weather_snow.xcf
+* artwork/weather_snow_10.xcf
+* artwork/weather_snow_11.xcf
+* artwork/weather_snow_12.xcf
+* artwork/weather_snow_rain_night.xcf
+* artwork/weather_snow_rain_night_1.xcf
+* artwork/weather_snow_rain_night_2.xcf
+* artwork/weather_snowflake.xcf
+* artwork/weather_storm.xcf
+* artwork/weather_storm_1.xcf
+* artwork/weather_storm_13.xcf
+* artwork/weather_storm_2.xcf
+* artwork/weather_storm_night_1.xcf
+* artwork/weather_storm_night_2.xcf
+* artwork/weather_variable.xcf
+* artwork/weather_variable_nite.xcf
+* artwork/weather_variable_showers.xcf
+* artwork/weather_variable_showers_1.xcf
+* artwork/weather_variable_showers_2.xcf
+* artwork/weather_variable_showers_night.xcf
+* artwork/weather_variable_showers_night_1.xcf
+* artwork/weather_variable_showers_night_2.xcf
+* artwork/weather_wind_16.xcf
+* artwork/weather_wind_25.xcf
+* artwork/weather_wind_34.xcf
+* artwork/weather_wind_35.xcf
+* artwork/weather_wind_calm.xcf
+* artwork/webcam_download.xcf
+* artwork/wind.xcf
+* json_webcam.json
+* lgpl-3.0.txt
+* license.txt
+* proguard-project.txt
+* proguard/
+* proguard/mapping.txt
+* proguard/seeds.txt
+* proguard/usage.txt
+* screenshots/
+* screenshots/Settings-device-calculations-highlighted.png
+* screenshots/Settings-device-calculations.png
+* screenshots/daily.png
+* screenshots/drawer.png
+* screenshots/home.png
+* screenshots/measure.png
+* screenshots/meteo.fvg-3.0-dopodomani.png
+* screenshots/meteo.fvg-3.0-home.png
+* screenshots/newToday.png
+* screenshots/newTodayEvolution.png
+* screenshots/newTodayEvolution.xcf
+* screenshots/radar-menu.png
+* screenshots/radar.png
+* screenshots/rainAlertNotification.png
+* screenshots/report-activity.png
+* screenshots/report_map_tilt.png
+* screenshots/report_map_with_active_users.png
+* screenshots/segnalazione-post-menu.png
+* screenshots/segnalazione-richiesta-dialog.png
+* screenshots/segnalazione-richiesta.png
+* screenshots/segnalazioni.png
+* screenshots/todayCoast.png
+* screenshots/todayEvolutionMountains.png
+* screenshots/tomorrow.png
+* screenshots/tomorrow_Zones.png
+* screenshots/webcam.png
+* xml_webcams_out.xml
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:22.1.1
+android-support-v7-appcompat.jar => com.android.support:appcompat-v7:22.1.1
+
+Replaced Libraries with Dependencies:
+-------------------------------------
+The importer recognized the following library projects as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the source files in your project were of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the library replacement in the import wizard and try
+again:
+
+android-support-v7-appcompat => [com.android.support:appcompat-v7:22.1.1]
+google-play-services_lib => [com.google.android.gms:play-services:+]
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app/src/main/AndroidManifest.xml
+* assets/ => app/src/main/assets/
+* libs/presage-lib-1.6.0.jar => app/libs/presage-lib-1.6.0.jar
+* lint.xml => app/lint.xml
+* proguard.cfg => app/proguard.cfg
+* res/ => app/src/main/res/
+* src/ => app/src/main/java/
+* src/com/android/vending/billing/IInAppBillingService.aidl => app/src/main/aidl/com/android/vending/billing/IInAppBillingService.aidl
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)
