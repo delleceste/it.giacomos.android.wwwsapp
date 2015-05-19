@@ -1,0 +1,753 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Hello world!</string>
+    <string name="app_broadcast_receiver">Meteo.FVG.BootReceiver</string>
+    <string name="version">version</string>
+    <string name="data_source">Data source: http://www.meteo.fvg.it</string>
+    <string name="author">&#169; 2015</string>
+    <string name="author_web">http://www.giacomos.it</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="hours">ore</string>
+    <string name="offline">Offline</string>
+    <string name="forecast_map_avail_afternoon">Map available\nin the afternoon</string>
+    <string name="forecast_map_error">Data download error</string>
+    <string name="downloadingToast">Downloading data&#8230;</string>
+    <string name="netUnavailableToast">Network is unavailable.\nData will be updated as\nsoon as network goes up</string>
+    <string name="completingDownloadToast">Completing data download&#8230;</string>
+    <string name="netErrorToast">There was a download error</string>
+    <string name="situation">Situation</string>
+    <string name="network_error">Network error</string>
+    <string name="dataExpiredToast">data is old&#8230; updating contents</string>
+    <string name="radarUpdateToast">updating radar&#8230;</string>
+    <string name="radarUpdatedOn">Radar image updated at</string>
+    <string name="radarImageOld">Radar image is older than four hours</string>
+    <string name="radarImageBlackWhiteHint">(So radar image is black and white)</string>
+    <string name="radarDownloadError">Error getting radar image</string>
+    <string name="radarAnimDownloadError">Error downloading radar animation data</string>
+    <string name="webcam_lists_downloaded">webcam list updated</string>
+    <string name="webcam_downloading"> downloading webcam image&#8230;</string>
+    <string name="webcam_download_task_canceled">canceling image download</string>
+    <string name="webcam_wait_for_image">please wait for image to load</string>
+    <string name="server_error">Server error</string>
+    <string name="xml_error">XML error</string>
+    <string name="lcation_service_error">There was an error obtaining the location service</string>
+    <string name="location_not_available">The current location is not available. Enable geolocalization</string>
+    <string name="location_disabled">The location service is disabled. Enable it through the system settings.
+        The displayed information will not be updated.</string>
+    <string name="enable_location_for_full_functionality">Enable location services for full functionality.</string>
+    <string name="data_missing">Data missing</string>
+    <string name="select_obs_type_daily">Select Daily Observation Type</string>
+    <string name="select_obs_type_latest">Select Latest Observation Type</string>
+    <string name="pos_accuracy">accuracy</string>
+    <string name="from">from</string>
+    <string name="close_button">Close</string>
+    <string name="center_map">Center map</string>
+    <string name="sat_view">Satellite view</string>
+    <string name="terrain_view">Terrain view</string>
+    <string name="map_normal_view">Classic view</string>
+    <string name="measure_mode">Measure mode</string>
+    <string name="radar_help">Radar info</string>
+    <string name="radar_animation">Animation</string>
+    <string name="info">Information</string>
+
+    <!-- hint toasts -->
+    <string name="hint_forecast_icons">Touch an icon to read further details, also in today, tomorrow and two days forecast!</string>
+    <string name="hint_tap_on_map_markers">Tap over an icon to get further details</string>
+    <string name="hint_move_to_measure_on_map">Long click on a marker and move to start measure</string>
+    <string name="hint_click_on_map_baloon_webcam_image">Tap on the image to open it on the image viewer</string>
+    <string name="hint_zone_longpress">Long press on the map to see the evolution over the day</string>
+    <string name="strip_detail_forecast_unavailable">Forecast per area unavailable in this page</string>
+
+    <string-array name="observation_types">
+        <item>Minimum Temperature</item>
+        <item>Maximum Temperature</item>
+        <item>Humidity</item>
+        <item>Wind</item>
+        <item>Rain</item>
+    </string-array>
+
+    <!-- MENU -->
+    <string name="menu_info">Application info</string>
+    <string name="menu_refresh">About data update</string>
+    <string name="menu_online_guide">Online documentation</string>
+    <string name="menu_author_info">Author Info</string>
+    <string name="menu_config_info">Technical details</string>
+    <string name="menu_settings">Settings&#8230;</string>
+    <string name="locality_unavailable">Locality unavailable</string>
+    <string name="ok_button">@android:string/ok</string>
+    <string name="cancel_button">@android:string/cancel</string>
+    <string name="popup_position_title">About your position</string>
+    <string name="popup_info_title">App info and copyright</string>
+    <string name="popup_data_update_title">Data automatic refresh</string>
+    <string name="error_message">Error message</string>
+
+    <!-- Drawer -->
+    <string-array name="drawer_text_items">
+        <item>Map</item>
+        <item>Layers</item>
+        <item>Suggest Hello World!</item>
+    </string-array>
+
+    <string name="drawer_open">Select a view</string>
+    <string name="drawer_close">Close drawer</string>
+
+    <!-- MEASURE MARKERS -->
+    <string name="drag_p0">Long click and then move P0</string>
+    <string name="drag_p1">Long click and then move P1</string>
+    <string name="dist_from_p0">Distance from P0: </string>
+    <string name="dist_from_p1">Distance from P1: </string>
+    <string name="meters">mt</string>
+    <string name="km">km</string>
+    <string name="my_location_layer_not_enabled">il livello my-location non è abilitato</string>
+
+    <!-- xml symbol map -->
+    <string name="sky">sky</string>
+    <string name="sky0">clear</string>
+    <string name="sky1">few clouds</string>
+    <string name="sky2">variable</string>
+    <string name="sky3">cloudy</string>
+    <string name="sky4">covered</string>
+    <string name="sky5">misty</string>
+    <string name="rain">rain</string>
+    <string name="rain6">weak</string>
+    <string name="rain7_abbrev">moder.</string>
+    <string name="rain8_abbrev">abund.</string>
+    <string name="rain9">intense</string>
+    <string name="rain36">very intense</string>
+    <string name="snow">snow</string>
+    <string name="snow10">moderate</string>
+    <string name="snow11">abundant</string>
+    <string name="snow12">intense</string>
+    <string name="storm">storm</string>
+    <string name="storms">storms</string>
+    <string name="mist">mist</string>
+    <string name="mist14">fog</string>
+    <string name="mist15">mist</string>
+    <string name="wind">wind</string>
+    <string name="wind16">N moderate</string>
+    <string name="wind17">NE moderate</string>
+    <string name="wind18">ENE moderate</string>
+    <string name="wind19">E moderate</string>
+    <string name="wind20">SE moderate</string>
+    <string name="wind21">S moderate</string>
+    <string name="wind22">SW moderate</string>
+    <string name="wind23">W moderate</string>
+    <string name="wind24">NW moderate</string>
+    <string name="wind25">N strong</string>
+    <string name="wind26">NE strong</string>
+    <string name="wind27">ENE strong</string>
+    <string name="wind28">E strong</string>
+    <string name="wind29">SE strong</string>
+    <string name="wind30">S strong</string>
+    <string name="wind31">SW strong</string>
+    <string name="wind32">W strong</string>
+    <string name="wind33">NW strong</string>
+    <string name="wind34">ENE very strong</string>
+    <string name="wind35">breeze</string>
+    <string name="evolution">evolution</string>
+    <string name="evolution04">evolution 04h</string>
+    <string name="evolution12">evolution 12h</string>
+    <string name="evolution20">evolution 20h</string>
+    <string name="evo0">clear</string>
+    <string name="evo1">variable</string>
+    <string name="evo2">covered</string>
+    <string name="evo3">variable. mod. rain</string>
+    <string name="evo4">variab. abund. rain</string>
+    <string name="evo5">variab. abund. rain\nand storms</string>
+    <string name="evo6">variab. storms</string>
+    <string name="evo7">covered mod. rain\nand snow</string>
+    <string name="evo8">variab. and snow</string>
+    <string name="evo9">covered mod. rain</string>
+    <string name="evo10">covered abund. rain</string>
+    <string name="evo11">covered intense rain</string>
+    <string name="evo12">covered abund. rain\nand storms</string>
+    <string name="evo13">covered with storms</string>
+    <string name="evo14">covered abund.rain and snow</string>
+    <string name="evo15">covered and snow</string>
+
+    <!-- radar animation -->
+    <string name="radarAnimationTaskCancelled">task cancelled</string>
+    <string name="radarAnimationBuffering">buffering data&#8230;</string>
+    <string name="radarAnimationPausedAfterRotation">animation paused after rotation</string>
+    <string name="radarAnimationOffline">offline animation may not be up to date</string>
+    <string name="radarAnimationImageUnavailable">Image unavailable</string>
+    <string name="radarAnimationLocalTimeFromUTC">Local time = UTC +</string>
+
+    <!-- report activity -->
+    <string name="report_activity_name">Report the weather</string>
+    <string name="reportDialogTitle">Report the weather</string>
+    <string name="reportNotificationService">Notification service</string>
+    <string name="reportNotificationServiceSettings">Configure notifications</string>
+    <string name="reportDialogMessage">Report the weather in your area</string>
+    <string name="reportDialogSendButton">Report!</string>
+    <string name="reportDialogCancelButton">Cancel</string>
+    <string name="reportName">Name</string>
+    <string name="reportSky">Sky</string>
+    <string name="reportWind">Wind</string>
+    <string name="reportTemp">Temperature</string>
+    <string name="reportOk">Report has been successfully published</string>
+    <string name="reportDataSentOk">Data has been correctly sent</string>
+    <string name="reportError">There was an error posting your request :-(</string>
+    <string name="reportMustInsertUserName">Insert a user name to start</string>
+    <string name="reportNoneAvailable">No recent reports available</string>
+    <string name="reportComment">Comment</string>
+    <string name="reportUpdate">Refresh</string>
+    <string name="reportHelp">Reports tutorial</string>
+    <string name="reportUpdateToast">Updating reports</string>
+    <string name="reportAtMost1FieldFilled">Impossible to publish an empty report</string>
+    <string name="reportNeedToBeOnline">Internet connection unavailable</string>
+    <string name="reportMovedTooFar">You moved too far from the point where you started the report procedure</string>
+    <string name="reportSkyMustBeValid">It\'s compulsory to indicate the sky conditions!</string>
+    <string name="reportSkyMustBeValidTitle">Missing sky conditions</string>
+    <string name="cb_sky_right">Sky conditions are correct</string>
+    <string name="reportSkyCorrectMustBeChecked">You must confirm that the preset sky conditions are correct!</string>
+    <string name="reportSkyCorrectMustBeCheckedTitle">Confirm sky conditions</string>
+
+    <!-- report request -->
+    <string name="reportRequestIncludeLocationName">Include location name</string>
+    <string name="reportDialogRequestSendButton">Send request</string>
+    <string name="reportDialogRequestTitle">Request report for </string>
+    <string name="reportDialogRequestLocationUnavailable">-</string>
+    <string name="reportRequest">New report request&#8230;</string>
+    <string name="reportLocality">Locality</string>
+    <string name="reportRequested">Report requested</string>
+    <string name="reportRequestPublished">Report request published</string>
+    <string name="reportTouchBaloonToRequest">Touch this baloon to make a request.\nTouch on another point of the map to remove the marker</string>
+    <string name="reportRequestCorrectlySent">report request sent</string>
+    <string name="reportTouchBaloonToCancel">Touch the baloon to cancel this request</string>
+    <string name="reportTouchBaloonToReport">Touch the baloon to reply to </string>
+    <string name="reportRemoveConfirm">Are you sure you want to remove the request?</string>
+    <string name="thereAreNReports">Number of reports: </string>
+    <string name="reportTouchBaloonToRemove">Touch the baloon to remove the report</string>
+    <string name="reportRequestPublishedOn">Report request published on </string>
+    <string name="reportLookingForLocality">searching for locality name&#8230;</string>
+    <string name="reportPointTooCloseToMyLocation">You cannot make a request in a range within 500m from your position</string>
+    <string name="notificationServiceStarted">Notification service started</string>
+    <string name="notificationServiceStopped">Notification service stopped</string>
+    <string name="notificationServiceWillStartOnNetworkAvailable">Notification service will be started upon network connection</string>
+    <string name="include_locality">Include locality</string>
+    <string name="locality_unavailable_dash">-</string>
+    <string name="users_poked">users asked for a notification</string>
+
+    <!-- report tutorial activity and terms and conditions -->
+    <string name="tutorial_publish_report">Publish report</string>
+    <string name="tutorial_publish_request">Publish request</string>
+    <string name="tutorial_notification_service">Notification service</string>
+    <string name="tutorial_terms_conditions">Terms and conditions</string>
+    <string name="tutorial_back">Back to Meteo.FVG</string>
+
+    <!-- notification area -->
+    <string name="notificationNewReportRequest">Report request from </string>
+    <string name="notificationNewReportArrived">New report from </string>
+    <string name="notificationRainAlert">It may rain in a while</string>
+    <string name="notificationRainModerate">Abundant rain approaching </string>
+    <string name="notificationRainIntense">Intense rain approaching </string>
+
+    <!-- active user data -->
+    <string name="activeUser">Active user</string>
+    <string name="activeUsers">active users</string>
+    <string name="inTheLast10Min">in the last 10 min.</string>
+    <string name="inTheLast20Min">in the last 20 min.</string>
+    <string name="inTheLastHour">in the last hour</string>
+    <string name="activeUserSeemdAvailableInThisZone">a user seemed to be active\nin this area.</string>
+    <string name="activeUsersSeemdAvailableInThisZone"> users seemed to be active\nin this area.</string>
+    <string name="touchBaloonToMakeRequestInThisArea">Touch to make a request in this area</string>
+    <string name="active_users">active users</string>
+    <string name="grouped_in">grouped in</string>
+    <string name="markers">markers</string>
+
+    <string-array name="report_sky_textitems">
+        <item>don\'t report</item>
+        <item>clear</item>
+        <item>few clouds</item>
+        <item>variable</item>
+        <item>cloudy</item>
+        <item>covered</item>
+        <item>weak rain</item>
+        <item>moderate rain</item>
+        <item>abundant rain</item>
+        <item>intense rain</item>
+        <item>very intense rain</item>
+        <item>moderate snow</item>
+        <item>abundant snow</item>
+        <item>intense snow</item>
+        <item>storms</item>
+        <item>mist</item>
+        <item>fog</item>
+    </string-array>
+    <string-array name="report_wind_textitems">
+        <item>don\'t report</item>
+        <item>no wind</item>
+        <item>breeze</item>
+        <item>moderate</item>
+        <item>strong</item>
+        <item>very strong</item>
+    </string-array>
+
+    <string name="popup_data_update_info">
+<![CDATA[
+       <h6>Data update policy</h6>
+        <p>
+        Observations and forecast data is taken from 
+        <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a>.
+        <br/>
+        Data is automatically refreshed by the application so that the displayed information
+        will always be fairly up to date. There is no need for a <cite>refresh</cite> button to force a
+        data download on user demand.
+        
+        </p>
+        <h6>How it works</h6>
+        <p>
+        Data is refreshed when: <br/>
+        - more than N seconds have elapsed since the last download 
+        (for the value of N see Menu -> Technical details, <cite>Data Update Policy</cite> chapter)
+        <strong>and</strong>:<br/>
+        - the network becomes available after being down <strong>or</strong> the application is brought to the foreground
+          <strong>or</strong> the device changes its orientation (the application is restarted by Android).
+          
+          <br/>
+        - <strong>Note</strong>: the <strong>radar</strong> image is refreshed <cite>each time the radar button is pressed
+          </cite>.
+        </p>
+        
+          
+        <p>
+        When the application is stopped, the current data is saved, and it is restored when the application is 
+        brought to the foreground again.
+         
+         <br/>
+         
+         As a consequence, <cite> the data displayed when the application starts may not be up to date,
+         at least until the network becomes available and the new data downloaded</cite> from the 
+         <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a> web site.
+         
+         
+        </p>
+			]]>
+    </string>
+
+    <!-- App info and copyright notes -->
+
+    <string name="popup_app_info">
+<![CDATA[
+	    <h6>Source of data</h6>
+	    <p>Graphical and textual information is provided by  
+	        <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a>
+	        
+	    </p>
+	    
+	    <h6>Author</h6>
+	    
+	    <p>Copyright &#169; 2015 Giacomo Strangolino</p>
+	    
+	    <p>
+	    
+	    The <strong>Meteo.FVG for Android</strong> application has been developed by Giacomo Strangolino.
+	    <br/>
+	    
+	    - <a href="http://www.giacomos.it">http://www.giacomos.it</a>
+	    
+	    <br/>
+	    <br/>
+	    
+	    - <a href="http://www.giacomos.it/android/meteofvg/index.html">Ulteriori informazioni e guida online</a><br/>
+	    
+	    </p>
+	    
+	    <p>
+	    
+
+	    The <cite>Meteo.FVG for Android</cite> application makes use of icons taken from:
+	    
+	    <br/>
+	    
+	    - <a href="http://www.oxygen-icons.org">KDE oxygen icons</a>
+	    	
+	    <br/>
+	    
+	    - <a href="http://findicons.com/icon/547662/radar_utilities?width=48">findicons.com radar icon</a> (Creative Commons Attribution License);
+	    
+	    <br/>	
+	    	
+	     - <a href="http://icons.mysitemyway.com/free-clipart-icons/1/sparkling-eye-icon-id/125439/style-id/905/matte-white-square-icons/people-things/">
+	     http://icons.mysitemyway.com/free-clipart-icons (observations icon)</a> (Royalty Free Stock Icon/Clipart (Id:125439));
+	    	
+	     <br/>		
+	    
+	    - <a href="http://www.icons-land.com">www.icons-land.com</a>
+	     	
+	     <br/>		
+	    - <a href="http://www.iconspedia.com/icon/black-water-sea-icon-31955.html">www.iconspedia.com</a>
+	    
+	     <br/>		
+	    - <a href="http://www.iconfinder.com/icondetails/15233/128/antenna_radar_radio_satelite_icon">www.iconfinder.com</a>, licence: <cite>Free for commercial
+	       use</cite>, designed by <a href="http://www.woothemes.com">WooThemes</a>.
+	          <br/>	
+	          
+	     <br/>		
+	    - <a href="http://www.mricons.com/icon/112032/128/lightning-power-weather-icon">www.mricons.com</a>, license <cite>GPL</cite>, 
+	    	designer <a href="http://code.google.com/u/newmooon/">Newmoon</a>, 
+	    	icon set <a href="http://code.google.com/p/ultimate-gnome/">Ultimate Gnome</a>.
+	    	
+	    <br/>		
+	    - <a href="http://en.xn--icne-wqa.com/images/icones/1/4/weather-snow-2.png">weather-snow-icon</a>, 
+	     <a href="http://en.xn--icne-wqa.com/license.php">license: public domain</a>.
+		     	
+	    - <a 
+	    href="http://icondatabase.net/icons/vanessaem/frosted-miui/frosted-miui-comgoogleandroidappsmaps-icon">www.icondatabase.net</a>, 
+	    	 (<a href="http://icondatabase.net/about/rules">free icons</a>).
+	    
+	    
+	    </p>
+	    
+	       <p>
+	    
+		The application Meteo.FVG for Android, from version 2.0.0 on, makes use of the Google Maps API v2.
+	    
+	    - <a href="https://developers.google.com/maps/documentation/android/">Google Maps API v2</a>
+	    	
+	    </p>
+	    
+	    <p>
+	    Thanks to Nicola Sodomaco and Gabriele Persi for Elettra and Padriciano Area Science Park 
+	    webcam images.
+	    </p>
+	    
+	    
+	    <p>
+	    
+	   
+	   	This application has been released under the terms of the <a href="http://www.gnu.org/licenses/lgpl-3.0.txt">LGPLv3</a> license.
+	   	A copy of the license is included in the application package. The name of the file is <cite>lgpl-3.0.txt</cite>.
+	    
+	    </p>
+	    
+	    <h6>Disclaimer</h6>
+	    
+	    <p>
+	    Albeit the application has been designed to update forecast and observation data from <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a>
+	    each time it is brought to the foreground by the operating system, after a given period of time aimed at limiting bandwidth usage, the author
+	    does not guarantee that the displayed data is actually up to date and synchronized with respect to the information published on the 
+	    <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a> web site. 
+	      			
+	    </p>
+	    
+	    <strong>Important</strong>
+	    <p>
+	    Meteo.FVG does not provide textual information for three and four days forecast map.
+	    Part of the information is thus missing from the 3 and 4 days forecast map.
+	    In particular <strong>snow indication may be incomplete or missing, mist and wind symbols are missing</strong>.
+	    </p>
+	    
+	    <p>
+	    
+	    The correct parsing of the text files obtained from <a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a> is not
+	    guaranteed.
+	    <br/>
+	    
+	    For this reason, <cite><a href="http://www.meteo.fvg.it"> http://www.meteo.fvg.it</a> is not responsible for partially 
+	    or completely wrong or missing information on this application</cite>.
+	    <br/>
+
+	    
+	    The geographical position marked in the maps and the consistency of the <cite>locality</cite> and <cite>address</cite>
+	    displayed on the observations and forecast map with respect to the actual position of the device are not guaranteed to be correct.
+	    In particular, they depend on the <cite>location provider</cite> currently in use, <cite>network, wi-fi or GPS</cite>. 
+	    Each one of the three mentioned providers gives more accuracy, in ascending order.
+
+	    </p>
+	    
+	    <p>
+	    The application is intended for instruction, entertainment and meteorological news reading, taking into account the two disclaimers above.
+	    The application is neither purposed to be used in the design of installations, systems, equipments of any kind or products, nor it is 
+	    addressed to professional use.
+	    
+	    Especially, the meteorological observations and forecasts must not be deemed reliable when it comes to organizing excursions, trips,
+	    explorations, setting up yards or works of any kind. Unusual, severe or unseasonal weather cannot be predicted by this application.
+	    
+	    </p>
+	
+	]]>
+    </string>
+    <string name="radar_info">
+<![CDATA[
+	    <h6>Radar map</h6>
+	    
+This radar map (VMI, acronym of Vertical Maximum Intensity) represents the maximum reflectivity value present on the vertical of every point.
+
+The VMI can be used for a general monitoring, because it allows to distinguish very well the areas in which occur important 
+phenomena and to classify them basing on their typology (fronts, convective systems, etc).
+
+The riflectivity Z is directly correlated to the density, and therefore to the content of water, of the cloud. Values of Z over 10-15 dBZ usually (but not necessarily) mean a precipitation at the ground. 
+The precipitation becomes intense in the areas where the reflectivity 
+is over 40 dBZ and very intense when the values reach and come through the 50 dBZ (typically in correspondence to storms).	
+
+<br/>
+		The coloured scale representing the <cite>dBZ</cite> values can be observed on the right of the circle that encloses the radar image.
+
+<br/>
+Source <a href="http://www.meteo.fvg.it/EN/RAD/StrutturaRadar.php"> http://www.meteo.fvg.it</a> 
+
+
+]]>
+    </string>
+    <string name="tutorial_report">Publish a report</string>
+    <string name="tutorial_request">Publish a report request</string>
+    <string name="tutorial_notification">Report notifications</string>
+    <string name="tutorial_notifications">Notifications</string>
+    <string name="title_scenario_list">Scenarios</string>
+    <string name="title_scenario_detail">Scenario Detail</string>
+    <string name="reports_terms_and_conditions">Weather reports terms and conditions of use</string>
+    <string name="special_reports">Special</string>
+    <string name="special_reports_title">Automatic report publishing for individuals</string>
+    <string name="special_reports_text">
+<![CDATA[
+        Have you got a personal weather station and want to
+        automatically publish data? Contact the author by 
+        <a href="mailto:delleceste@gmail.com?subject=Info about automatic report publishing for individuals">email</a>.
+        If you are a private individual user, it is free.
+        ]]>
+    </string>
+    <string name="special_reports_for_companies_title">Automatic report publishing for business</string>
+    <string name="special_reports_for_companies_text">
+<![CDATA[
+        Are you a touristic enterprise and want to publish meteorological data 
+        on Meteo.FVG in behalf of your customers? Contact the author by
+        <a href="mailto:delleceste@gmail.com?subject=Info about automatic report publishing for companies">email</a> to get information about 
+        costs and terms of use.
+        ]]>
+    </string>
+    <string name="report_terms_and_conditions_text">
+<![CDATA[
+		
+		<h6>Disclaimer</h6>
+		<p>The author of the Android applications named "Meteo.FVG", "Meteo.FVG Pro" and "Meteo.FVG prova", 
+		Giacomo Strangolino, has no responsibility about the contents of the <strong>reports</strong> section.</p>
+		<p>The same goes for the official source of meteorological data 
+		<a href="http://www.meteo.fvg.it">Meteo.FVG</a>, who is not involved at all with the contents of the 
+		<strong>Reports</strong> section.</p>
+		<p>The author is not responsible for any kind of damage that may derive from incomplete, wrong, outdated,
+		imprecise or ambiguous reports. The author is not responsible for any kind of economical damage to
+		turistic, sports or any other kind of facility.</p>
+		<p>The author is not responsible for any unwanted, unappropriate, offensive comments published by 
+		the user.</p>
+		<p>The author can remotely block the application execution on a device from which offensive 
+		contents are sent.</p>
+		
+		<h6><cite>Active</cite> users map</h6>
+		<p>
+		Since version <cite>2.6.1</cite>, the Reports map, when tilted with an angle 
+		greater than 10 degrees, shows a little circular marker in correspondance of
+		each user whose report background service has been active in the last hour.
+		This kind of data is absolutely anonymous. No user data is collected or shown,
+		even the nick name chosen by the user itself. In order to correlate data into the
+		Meteo.FVG online database (in the context of the web server, not inside the app), only the 
+		Android device id is stored (because it is a unique identifier of every device).
+		If you do not want to make part of the <cite>active</cite> users, turn the 
+		Report service off from the Reports section, drop down menu, Notification Service.
+		</p>
+		
+		<p>The author can modify or remove any report which is deemed offensive or whose content is not 
+		pertinent to the context.</p>
+		<p>The author can remove and report any offensive content inside a comment or spam messages.</p>
+		<p>Any user can report unappropriate comments to <a href="mailto:delleceste@gmail.com>the author</a>.</p>
+		
+		<p>The author is not responsible for any misbehaviour of a device running the application Meteo.FVG,
+		included battery drain and/or poor power efficiency of the device itself. Disable the notification 
+		service if you notice a decrease of the battery life.</p>
+
+
+
+]]>
+    </string>
+    <string name="report_accept_terms_and_conditions">I accept the terms and conditions</string>
+    <string name="report_recall_from_menu">NOTE: you can recall this from the "Reports" section,
+        drop down menu in the action bar, "Reports tutorial".</string>
+    <string name="report_carefully_read_all">NOTE: carefully read through all the sections in this tutorial.</string>
+    <string name="tutorial_start_report">Click on the pencil icon in the action bar on the tpo 
+        to start reporting the weather in your area.
+        You can report the sky observations, the temprature, the wind strength and add a comment.
+        It is also possible to indicate the locality, if it is available.</string>
+    <string name="tutorial_report_done">After filling in the report form, a weather icon will appear
+        on the map at your location. Click on the icon to see the details and to remove the
+        report. The report will remain valid for 3 hours and will be visible to all users.
+        To change your report, you must first remove it and
+        publish another one.</string>
+    <string name="tutorial_request_long_press">Long press on a point on the map to start. 
+        Long press the marker to move it.</string>
+    <string name="tutorial_request_dialog">Just confirm your request. You can disable the location name.</string>
+    <string name="tutorial_request_done">The users within a radius of 3 kilometers around the marker 
+        will be notified if possible. If somebody replies, you will be notified too. Your request will
+        remain valid for 3 hours.</string>
+    <string name="tutorial_notifcation_request">Requests\n\nWhen a user asks for a weather report in your area 
+        within 3 km you receive a notification in the status bar. Activate it to directly go to the weather 
+        reports section and reply to her. A request lasts for 3 hours and is represented by a blue marker.</string>
+    <string name="tutorial_report_notification">Replies\n\nSomeone replied to your report request. 
+            Activate the notification to watch the report. Click on the weather icon to see the 
+            detailed report.</string>
+    <string name="tutorial_disable_notification_service">How to disable notifications</string>
+    <string name="tutorial_howto_disable_notifications">The notification service checks for 
+        new notifications every five minutes. 
+        Disable or enable the service in the Reports section 
+        from the drop down menu.\n
+        NOTE I: if the device goes to "sleep" (this normally happens right after screen goes off), the
+        notification service is not run. This is a design compromise solution aimed at balancing 
+        utility and battery usage.\n
+        NOTE II: when network is off, the notification service does not run. As a consequence, no
+        battery power is used as far as notifications are concerned.</string>
+    <string name="tutorial_menu_launch_tutorial">Go to the Reports section, open the drop down menu on the top right corner and select Report Tutorial to read this guide once again</string>
+    <string name="tutorial_report_notification_title">New report notification</string>
+    <string name="tutorial_request_notification_title">New request notification</string>
+    <string name="tutorial_report_notification_text">A user in an area within 3km from the poin of your request has replied. Scroll down the status bar and click on the Meteo.FVG icon to read the report</string>
+    <string name="title_activity_tutorial_presentation">TutorialPresentationActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="tutorial_tab1_title">Terms of use</string>
+    <string name="tutorial_tab2_title">Reports</string>
+    <string name="tutorial_tab3_title">Requests</string>
+    <string name="tutorial_tab4_title">Notifications</string>
+    <string name="tutorial_tab5_title">Special</string>
+    <string name="quickstart_publish1">Long press on a point in the map to start the request. 
+        An orange marker will appear. Long press on the marker to change its position. Click on the baloon
+        to start the request procedure.</string>
+    <string name="quickstart_publish_from_active_user">You can start the request procedure
+        by tilting the map (touch it with two fingers and drag it downwards) and touching
+        a point where users are active.</string>
+    <string name="quickstart_publish2">Once successfully published, the marker turns to green.
+        You can touch the marker and follow the instructions to remove your request.
+        The request will stay valid for 3 hours.</string>
+
+    <!-- TRIAL -->
+
+    <string name="title_activity_buy_pro">Buy Meteo.FVG</string>
+    <string name="trial_version">Trial version</string>
+    <string name="days_left">days left.</string>
+    <string name="trial_version_expiring">Trial version is expiring! </string>
+    <string name="touch_to_buy">Touch here to buy Meteo.FVG!</string>
+    <string name="buy_now_from_activity_settings">Buy Now!</string>
+    <string name="learn_more">Learn More&#8230;</string>
+    <string name="buy">Buy!</string>
+    <string name="buy_pro_title">Buy Meteo.FVG!</string>
+    <string name="button_text_buy_now">Buy now!</string>
+    <string name="bt_no_buy_now">Not now, thanks!</string>
+    <string name="trial_expired">Trial version has expired!</string>
+    <string name="buy_now_promotional_text">Buy Meteo.FVG now at the special price of 1,50 euros, 
+        enjoy its fantastic features and support its future development!</string>
+    <string name="thanks_for_purchasing">Thanks for purchasing Meteo.FVG!</string>
+    <string name="purchase_ok_title">Meteo.FVG successfully bought</string>
+    <string name="whats_new">What\'s new?</string>
+    <string name="purchase_whats_new_txt">"This is a completely renewed application and is 
+the result of two years of work. It features:\n
+- faster download of data;\n
+- google maps code rewritten with new API v2;\n
+- radar animation;\n
+- meteorological conditions reports: you can be a meteo reporter;\n
+- user interface completely rewritten for Android 4.</string>
+    <string name="authorized_to_get_promo">I\'ve been previously authorized by the author to get this version for free&#42;</string>
+    <string name="request_authorization_for_free">Request activation now!</string>
+    <string name="contributed_to_devel">"I contributed to the development of 
+the app through the Android.Meteo.FVG Google+ community&#42;&#42; "</string>
+    <string name="previously_authorized_footnote">* You must have been previously authorized by the author. This request is not aimed at requesting authorization. Unauthorized requests will be ignored and blacklisted.</string>
+    <string name="contributed_to_devel_footnote">** Please indicate your name and the date of your comment on G+ in the precompiled email message.</string>
+    <string name="activation_mail_title">        Activation request for Android Meteo.FVG by </string>
+    <string name="activation_mail_text_1">"Hello.\nI kindly request the authorization
+to activate Meteo.FVG for Android for free.
+I have read and accepted all the conditions of use of the application.
+My android id is as follows:\n\n</string>
+    <string name="activation_mail_text_2">\nThanks.\n\nMy full name: \n\n
+Date: \n\n
+Please note: requests devoid of the full name and date will be ignored.\n\n</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="note_prova_users">NOTE: Meteo.FVG PROva users may have their trial period shorter or even expired</string>
+    <string name="pref_enable_notification_service">Enable notification service</string>
+    <string name="pref_enab_notif_service_summary">Globally enables the notification service</string>
+    <string name="pref_service_sleep_interval">Interval between notification checks (minutes)</string>
+    <string name="pref_service_sleep_interval_summary">The service wakes up every time this interval elapses</string>
+    <string name="pref_service_enabled_on">The service is enabled and will run when network is available</string>
+    <string name="pref_service_enabled_off">The service is disabled</string>
+    <string name="pref_service_running">The service is enabled and running</string>
+    <string name="pref_"></string>
+    <string name="pref_rain_notifications">Rain approaching alerts</string>
+    <string name="pref_sleep_interval_dialog">Notifications check interval</string>
+    <string name="pref_sleep_interval_message">Set the number of minutes between one notification check and the next</string>
+    <string name="pref_rain_alert_enable">Rain alerts are enabled</string>
+    <string name="pref_rain_alert_off">Rain alerts are disabled</string>
+    <string name="pref_rain_notification_enable">Notify when it\'s possible that it\'s going to rain</string>
+    <string name="pref_rain_notification_enable_summary">If enabled, you will be notified if rain is close to your position within a radius</string>
+    <string name="pref_rain_notif_interval">Minutes between rain alerts</string>
+    <string name="pref_rain_notif_interval_summary">Two different rain alerts will not be shown unless 
+	    this interval has elab</string>
+    <string name="pref_rain_notif_interval_dialog_message">Select the minimum interval, in minutes, 
+	    that must elapse between two subsequent rain alert notifications. The number must be between 1 and 180</string>
+    <string name="pref_rain_notif_interval_dialog_title">Minutes between rain alert notifications</string>
+    <string name="pref_default_service_sleep_interval_mins">5</string>
+    <string name="pref_default_rain_alerts_interval_mins">5</string>
+    <string name="pref_service_sleep_interval_summary_checks_every">The service looks for updates every</string>
+    <string name="pref_rain_alert_summary_checks_every">Rain alerts will be notified no more than once every</string>
+    <string name="minutes">minutes</string>
+    <string name="notifications">Notifications</string>
+    <string name="notificationIntervalBetween0And180">Interval must be an integer between 0 and 180</string>
+    <string name="dialogNotificationServiceEnableMovedToSettings">		Notification service options moved to Menu->Settings</string>
+    <string name="important_dialog_message">meteo.fvg web site has been updated. The app may not work properly.
+	    The radar is out of order.</string>
+    <string name="unregisteredApp">The application is not registered with Google Cloud Message service.
+	    Please restart the application when you\'re online, wait a moment and try again.</string>
+    <string name="news_alert_title">News</string>
+    <string name="news_alert_text">There are news about Meteo.FVG. Touch to read</string>
+    <string name="gcm_registered_ok">Correctly registered with Google Cloud Messaging for notification service</string>
+    <string name="gcm_registered_failed">Failed to register with Google Cloud Messaging for notification service.\n
+        Will try next time you start the application</string>
+    <string name="pref_internal_rain_calc_checkbox">The phone calculates probability for rain alerts. This choice is faster, calculations are performed as soon as a new radar image is available. Recommended</string>
+    <string name="pref_internal_rain_calc_checkbox_off">The rain possibility is calculated by the remote Meteo.FVG server. Notifications may arrive late, depending on the time interval set for the service. For slow devices.</string>
+    <string name="pref_use_internal_rain_detection">Use the device to calculate the rain probability. Note: this service is implemented
+	    by the application author. Data is not taken from Osmer/Meteo.FVG</string>
+    <string name="pref_use_internal_rain_detection_summary">It is recommended that the rain possibility detection is calculated by the device. This guarantees the most fast and up to date notifications</string>
+    <string name="title_activity_rain_detect">RainDetectActivity</string>
+    <string name="personal_message_title">Title</string>
+    <string name="personal_message_date">Date</string>
+    <string name="title_activity_personal_message">Personal message</string>
+    <string name="service_stopped_app_blocked">Application blocked: stopping service</string>
+    <string name="open_geoloc_settings">Enable</string>
+    <string name="open_network_settings">Activate</string>
+    <string name="wait_for_location">Wait for location</string>
+    <string name="send_meteofvgapp_to">Share Meteo.FVG with</string>
+    <string name="send_meteofvgapp_subject">Try Meteo.FVG for Android</string>
+    <string name="send_meteofvgapp_text">Download the free app Meteo.FVG for Android from the Google Play Store.\n
+        If you like it, you can support the project purchasing the PRO version!\n\n
+        Download free app:\nhttps://play.google.com/store/apps/details?id=it.giacomos.android.wwwsapp\n\n
+        Download Meteo.FVG pro:\nhttps://play.google.com/store/apps/details?id=it.giacomos.android.wwwsapp.pro\n\n</string>
+    
+    
+    
+    <!--  HELLO WORLD -->
+    
+    
+    
+    
+    
+    <string name="title_activity_sign_in">SignInActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="sign_in">Sign in with your Google Account</string>
+    <string name="title_layer_list">Layers</string>
+    <string name="title_layer_detail">Layer Detail</string>
+
+    <string name="install">Install</string>
+    <string name="update">Update</string>
+    <string name="uptodate">Up to date</string>
+    <string name="update_to">Update to</string>
+    <string name="delete">Remove</string>
+    <string name="installing_layer">Installing layer</string>
+    <string name="downloading_layer">Downloading layer</string>
+    <string name="download_in_progressr">Download in progress&#8230;</string>
+    <string name="download_cancelled">Downloading layer</string>
+    <string name="successfully_installed_layer">Successfully installed layer </string>
+    <string name="download_error">Downloading layer</string>
+    <string name="error_installing_layer">Error installing layer</string>
+    <string name="error_downloading_layer">Error downloading layer</string>
+    
+    <string name="available_version">Available version</string>
+    <string name="installed_version">Installed version</string>
+    
+    
+</resources>

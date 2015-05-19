@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+   <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="vertical" > 
+
+<LinearLayout
+    android:id="@+id/layoutReportConditions"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <TextView
+        android:id="@+id/tvTutorialReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/reports_terms_and_conditions"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/tvRecallTutorialFromMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/tutorial_textview_background_green_border"
+        android:scrollbars="vertical"
+        android:text="@string/report_recall_from_menu"
+        android:textStyle="bold|italic" />
+
+    <TextView
+        android:id="@+id/TextViewTermsConditionsReadAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/tutorial_textview_background_red_border"
+        android:padding="8dp"
+        android:scrollbars="vertical"
+        android:text="@string/report_carefully_read_all"
+        android:textStyle="bold|italic" />
+
+    <CheckBox
+        android:id="@+id/cbAcceptTermsAndConditions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/tutorial_textview_background_red_border"
+        android:text="@string/report_accept_terms_and_conditions" />
+    
+    <TextView
+        android:id="@+id/tvTermsConditionsCompanies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tutorial_textview_background"
+        android:padding="8dp"
+        android:scrollbars="vertical" />
+
+</LinearLayout>
+
+</ScrollView>

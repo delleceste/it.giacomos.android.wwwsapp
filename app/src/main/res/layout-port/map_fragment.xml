@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+	   
+	 <fragment  xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/mapview"
+            android:name="it.giacomos.android.wwwsapp.widgets.map.OMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            >
+               
+       
+        <include layout="@layout/map_layout" />
+    </fragment>

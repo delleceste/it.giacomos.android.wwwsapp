@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="vertical" > 
+   
+    <LinearLayout
+       android:id="@+id/layout_tutorial_report"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvAuthorizedToGetPromo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/tutorial_notifications"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/tvPublishReport1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.00"
+                android:background="@drawable/tutorial_textview_background_black_grad"
+                android:drawableLeft="@drawable/ic_launcher_statusbar_request"
+                android:drawablePadding="5dp"
+                android:drawableRight="@drawable/map_pin_blue"
+                android:padding="8dp"
+                android:text="@string/tutorial_notifcation_request" />
+
+            <TextView
+                android:id="@+id/tvPublishReport2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.00"
+                android:background="@drawable/tutorial_textview_background_black_grad"
+                android:drawableLeft="@drawable/ic_launcher_statusbar_report"
+                android:drawablePadding="5dp"
+                android:padding="8dp"
+                android:text="@string/tutorial_report_notification" />
+
+        </LinearLayout>
+    
+    </LinearLayout>
+    
+    </ScrollView>

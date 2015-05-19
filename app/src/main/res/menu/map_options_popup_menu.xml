@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    
+    <!-- 
+    			android:textOff="@string/sat_view"
+				android:textOn="@string/sat_view"
+				android:textOff="@string/center_map"
+				android:textOn="@string/center_map" 
+				android:textOff="@string/measure_mode"
+				android:textOn="@string/measure_mode"
+				android:textOff="@string/radar_help"
+				android:textOn="@string/radar_help" 
+    
+     -->
+  
+<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"       		
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/radar_animation"
+        		android:id="@+id/radarAnimationAction" />	 
+        		                 		
+
+ <item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"       		
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/reportUpdate"
+        		android:id="@+id/reportUpdateAction" />	     	
+        		
+ 	<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"       		
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/reportHelp"
+        		android:id="@+id/reportHelpAction" />    		
+    
+<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"       		
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/center_map"
+        		android:id="@+id/centerMapButton" />		
+			
+<group android:id="@+id/group_map_mode">
+				<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content" 
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/map_normal_view"
+        		android:id="@+id/mapNormalViewButton" 
+        		android:checkable="true"
+        		/>
+			<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content" 
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/terrain_view"
+        		android:id="@+id/terrainViewButton" 
+        		android:checkable="true"
+        		/>
+
+			<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content" 
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/sat_view"
+        		android:id="@+id/satelliteViewButton" 
+        		android:checkable="true"
+        		/>
+			
+			</group>
+        		
+        	<item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/measure_mode"
+        		android:id="@+id/measureToggleButton"  
+        		android:checkable="true"/>
+        	
+         	 <item 
+         	    android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+				android:layout_marginLeft="2dp"
+        		android:layout_marginRight="2dp"
+				android:title="@string/radar_help"
+         	    android:id="@+id/radarInfoButton" 
+        		android:checkable="true"/> 
+</menu>

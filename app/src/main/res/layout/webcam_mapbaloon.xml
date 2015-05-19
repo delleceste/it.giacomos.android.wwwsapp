@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapbaloon"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+    android:orientation="vertical">
+
+
+
+    <ImageView
+        android:id="@+id/baloon_icon"
+        style="@style/ImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="10dp"
+        android:scaleType="centerInside"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:color="#0000FF00" />
+
+
+    <!-- WEBCAM associated text -->
+
+    <TextView
+        android:id="@+id/baloon_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textSize="5pt" />
+
+
+</LinearLayout>

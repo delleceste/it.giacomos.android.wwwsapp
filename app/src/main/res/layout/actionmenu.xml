@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:orientation="horizontal" >
+    
+    <ToggleButton 
+         	    android:layout_width="32dp"
+        		android:layout_height="32dp"       		
+				android:layout_marginLeft="2dp"
+				android:textOff=""
+				android:textOn=""
+        		android:background="@drawable/ic_menu_more_actionbar_icon" 
+        		android:layout_marginRight="2dp"
+	    		android:layout_gravity="center_horizontal|center_vertical"
+        		android:id="@+id/actionOverflow" />	
+        		
+       <it.giacomos.android.wwwsapp.widgets.AnimatedImageView 
+    
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_animation"
+    android:layout_width="32dp"
+    android:layout_height="32dp"
+    android:layout_gravity="center_horizontal|center_vertical"
+     >
+    
+</it.giacomos.android.wwwsapp.widgets.AnimatedImageView >
+    
+       
+</LinearLayout>

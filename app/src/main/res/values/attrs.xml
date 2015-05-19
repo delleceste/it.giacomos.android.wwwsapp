@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    
+    <declare-styleable name="FloatingActionButton">
+        <attr name="drawable" format="integer"/>
+        <attr name="fabcolor" format="color"/>
+        <attr name="shadowRadius" format="float"/>
+        <attr name="shadowDx" format="float"/>
+        <attr name="shadowDy" format="float"/>
+        <attr name="shadowColor" format="integer"/>
+    </declare-styleable>
+    
+    <declare-styleable name="OTextView">
+    </declare-styleable>
+    
+    
+    <declare-styleable name="ODoubleLayerImageView">
+    </declare-styleable>
+   
+    <declare-styleable name="NetworkTextView">
+    </declare-styleable>  
+    
+    <declare-styleable name="HomeTextView">
+    </declare-styleable>  
+        
+    <declare-styleable name="ForecastTextView">
+    </declare-styleable>
+    
+    <declare-styleable name="OViewFlipper">
+    </declare-styleable>
+    
+</resources>

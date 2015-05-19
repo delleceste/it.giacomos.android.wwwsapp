@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+   <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="vertical" > 
+    
+    <LinearLayout 
+       android:id="@+id/layout_tutorial_report"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvTutorial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/tutorial_publish_request"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/tvPublishRequest1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.00"
+                android:background="@drawable/tutorial_textview_background"
+                android:drawableLeft="@drawable/map_pin_orange"
+                android:drawablePadding="15dp"
+                android:padding="8dp"
+                android:text="@string/quickstart_publish1" />
+
+            <TextView
+                android:id="@+id/TextViewPublishFromActiveUsersMap"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.00"
+                android:background="@drawable/tutorial_textview_background"
+                android:drawablePadding="15dp"
+                android:drawableRight="@drawable/map_tilt_tutorial_icon"
+                android:padding="8dp"
+                android:text="@string/quickstart_publish_from_active_user" />
+
+            <TextView
+                android:id="@+id/tvPublishRequest2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1.00"
+                android:background="@drawable/tutorial_textview_background"
+                android:drawableRight="@drawable/map_pin_green"
+                android:padding="8dp"
+                android:text="@string/quickstart_publish2" />
+
+        </LinearLayout>
+    
+    </LinearLayout>
+    
+    </ScrollView>

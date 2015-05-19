@@ -1,0 +1,59 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+     android:key="Osmer.conf" >
+<PreferenceCategory 
+        android:title="@string/notifications"
+        android:key="Osmer.conf">
+    
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="NOTIFICATION_SERVICE_ENABLED"
+        android:summary="@string/pref_enab_notif_service_summary"
+        android:title="@string/pref_enable_notification_service" android:summaryOff="@string/pref_service_enabled_off" android:summaryOn="@string/pref_service_enabled_on" android:disableDependentsState="false" android:persistent="true"/>
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="5"
+        android:inputType="number"
+        android:key="SERVICE_SLEEP_INTERVAL_MINS"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_service_sleep_interval" android:summary="@string/pref_service_sleep_interval_summary" android:dialogMessage="@string/pref_sleep_interval_message" android:negativeButtonText="@string/cancel_button" android:positiveButtonText="@string/ok_button" android:dialogTitle="@string/pref_sleep_interval_dialog" android:dependency="NOTIFICATION_SERVICE_ENABLED" android:persistent="true"/>
+
+    <!--
+         NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it.
+    -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    
+    
+    <CheckBoxPreference android:summaryOff="@string/pref_rain_alert_off" 
+        android:defaultValue="true"
+        android:summaryOn="@string/pref_rain_alert_enable" 
+        android:title="@string/pref_rain_notification_enable" 
+        android:key="RAIN_NOTIFICATION_ENABLED" 
+        android:summary="@string/pref_rain_notification_enable_summary" 
+        android:dependency="NOTIFICATION_SERVICE_ENABLED" 
+        android:disableDependentsState="false" 
+        android:persistent="true"/>
+    
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="30"
+        android:inputType="number"
+        android:key="MIN_TIME_BETWEEN_NOTIFICATIONS_RainNotificationTag"
+        android:maxLines="1"
+        android:selectAllOnFocus="true" 
+        android:singleLine="true" android:title="@string/pref_rain_notif_interval" 
+        android:summary="@string/pref_rain_notif_interval_summary"
+        android:dialogMessage="@string/pref_rain_notif_interval_dialog_message" 
+        android:dialogTitle="@string/pref_rain_notif_interval_dialog_title" 
+        android:negativeButtonText="@string/cancel_button" android:positiveButtonText="@string/ok_button" 
+        android:dependency="RAIN_NOTIFICATION_ENABLED" android:persistent="true"/>
+    <CheckBoxPreference android:dependency="RAIN_NOTIFICATION_ENABLED" android:persistent="true" android:defaultValue="true" android:summaryOff="@string/pref_internal_rain_calc_checkbox_off" android:key="USE_INTERNAL_RAIN_DETECTION" android:summary="@string/pref_use_internal_rain_detection_summary" android:title="@string/pref_use_internal_rain_detection" android:summaryOn="@string/pref_internal_rain_calc_checkbox"/>
+
+    </PreferenceCategory>
+    
+</PreferenceScreen>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="4dp"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvPersonalMsgTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:background="@drawable/tutorial_textview_background_red_border"
+            android:gravity="center"
+            android:text="@string/personal_message_title"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/tvPersonalMessage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="4"
+            android:background="@drawable/tutorial_textview_background"
+            android:padding="8dp"
+            android:text="TextView" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/tutorial_textview_background" >
+
+            <TextView
+                android:id="@+id/tvPersonalMessageDateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/personal_message_date" />
+
+            <TextView
+                android:id="@+id/tvPersonalMessageDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="text" />
+
+          
+
+        </LinearLayout>
+
+  <Button
+      android:id="@+id/btClosePersonalActivity"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_margin="4dp"
+      android:layout_weight="1.00"
+      android:text="@string/close_button" />
+
+</LinearLayout>

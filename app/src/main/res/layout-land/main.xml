@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <!-- The main content view -->
+
+    <RelativeLayout
+        android:id="@+id/content_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <!--  NOTE: important wrap_content in width below so that the title is shown
+            when there is space -->
+            <LinearLayout
+                android:id="@+id/toolbar_vertical_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="vertical" >
+
+                <ProgressBar
+                    android:id="@+id/mainProgressBar"
+            		android:layout_gravity="top"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/accent"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/toolbar_horizontal_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal" >
+
+                    <Spinner
+                        android:id="@+id/toolbar_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    
+                </LinearLayout>
+                
+            </LinearLayout>
+            
+        </android.support.v7.widget.Toolbar>
+
+        <LinearLayout
+            android:id="@+id/content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            android:baselineAligned="false"
+            android:orientation="horizontal" >
+
+            <include layout="@layout/map_fragment" >
+            </include>
+
+       
+        </LinearLayout>
+
+        <it.giacomos.android.wwwsapp.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNewReport"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="false"
+            android:layout_alignParentLeft="false"
+            android:layout_margin="16dp"
+            android:drawable="@drawable/ic_menu_edit"
+            android:color="#e0e0e0" />
+    </RelativeLayout>
+
+    <!-- The navigation drawer -->
+
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#eeffffff"
+        android:choiceMode="singleChoice"
+        android:dividerHeight="0dp" />
+
+</android.support.v4.widget.DrawerLayout>

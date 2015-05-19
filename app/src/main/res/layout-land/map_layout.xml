@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+               
+   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mapRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/radarInfoTextView"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/rounded_text_box"
+            android:linksClickable="true"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            android:visibility="visible" />
+
+        <it.giacomos.android.wwwsapp.widgets.OAnimatedTextView
+            android:id="@+id/mapMessageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/rounded_text_box"
+            android:padding="5dp"
+            android:text="@string/radarUpdatedOn"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            android:visibility="visible" />
+  
+             <TextView
+            android:id="@+id/radarAnimTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"    
+        	android:gravity="center_horizontal"
+        	android:layout_alignParentTop="true"
+        	android:layout_centerHorizontal="true"
+        	android:layout_marginTop="12dp"
+        	android:layout_marginRight="6dp"
+        	android:layout_marginLeft="6dp"
+            android:padding="2dp"
+            android:textColor="@android:color/black"
+        	android:background="@drawable/rounded_text_box"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone" />    
+               
+         
+          <ProgressBar
+              android:id="@+id/mapProgressBar"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="43dp"
+              android:visibility="gone"  />
+        
+    </RelativeLayout>
+
+    

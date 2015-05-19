@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 'Google Inc.:Google APIs:22'
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "it.giacomos.android.wwwsapp"
+        minSdkVersion 14
+        targetSdkVersion 21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard.cfg'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.google.android.gms:play-services:+'
+    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile files('libs/presage-lib-1.6.0.jar')
+}

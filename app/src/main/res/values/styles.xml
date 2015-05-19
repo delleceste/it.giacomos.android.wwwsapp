@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- your theme inherits from the material theme -->
+  <style name="OsmerActivityTheme" parent="@style/Theme.AppCompat.Light">
+
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accent</item>
+	<item name="windowActionBar">false</item>
+  </style>
+  
+      <!-- your theme inherits from the material theme -->
+  <style name="OtherActivitiesTheme" parent="@style/Theme.AppCompat.Light">
+
+    <item name="colorPrimary">@color/primary</item>
+    <item name="colorPrimaryDark">@color/primary_dark</item>
+    <item name="colorAccent">@color/accent</item>
+  </style>
+    
+  
+  <style name="Presage.Theme.Transparent" parent="android:Theme">
+    <item name="android:windowIsTranslucent">true</item>
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:windowContentOverlay">@null</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="android:backgroundDimEnabled">false</item>
+</style>
+  
+  
+  
+</resources>
