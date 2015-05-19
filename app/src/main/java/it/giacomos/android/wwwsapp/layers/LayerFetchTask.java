@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -15,46 +14,41 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItemData>> {
+public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, Boolean> {
 
 	private LayerFetchTaskListener mListener;
 	private String mErrorMsg, mAppLang;
-	private int mProgress, mTotal, mAppVersionCode;
-	ArrayList<LayerItemData> mLayerData;
+	private int mTotal, mAppVersionCode;
 	private Context mContext;
 
 	public LayerFetchTask(LayerFetchTaskListener listener, 
 			int appVersionCode, String lang, Context ctx)
 	{
 		mContext = ctx;
-		mTotal = mProgress = 0;
+		mTotal = 0;
 		mListener = listener;
-		mLayerData = new ArrayList<LayerItemData>();
 		mAppVersionCode = appVersionCode;
 		mAppLang = lang;
 		mErrorMsg = "";
 	}
 
-	public synchronized ArrayList<LayerItemData>getData()
-	{
-		return mLayerData;
-	}
-
 	@SuppressLint("NewApi")
 	@Override
-	protected synchronized ArrayList<LayerItemData> doInBackground(Void ...parame) 
+	protected synchronized Boolean doInBackground(Void ...parame) 
 	{
+		boolean success = false;
 		try{
 			int nRead;
+			int progress = 0;
+			int total = 0;
+			int percent = 0;
 			byte[] bytes;
 			FileUtils cache = new FileUtils();
 			Urls myUrls = new Urls();
@@ -63,6 +57,7 @@ public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItem
 			conn.setDoOutput(true);
 
 			String xml = "";
+			
 			String data = URLEncoder.encode("lang", "UTF-8") + "=" + URLEncoder.encode (mAppLang, "UTF-8");
 			data += "&" + URLEncoder.encode("app_version", "UTF-8") + "=" + URLEncoder.encode(String.valueOf(mAppVersionCode), "UTF-8");
 
@@ -77,7 +72,7 @@ public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItem
 				xml += currentLine + "\n";
 			
 			/* check if layer list did not change */
-			String prevXml = cache.loadFromStorage(LayerListActivity.CACHE_LIST_DIR + "layerlist.xml", mContext);
+//			String prevXml = cache.loadFromStorage(LayerListActivity.CACHE_LIST_DIR + "layerlist.xml", mContext);
 //			if(prevXml.compareTo(xml) == 0)
 //			{
 //				Log.e("LayerFetchTask.doInBackground", "* xml layer list didn't change since last check");
@@ -90,8 +85,8 @@ public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItem
 			{
 				XmlParser parser = new XmlParser();
 				ArrayList<LayerItemData> d = parser.parseLayerList(xml);
-				mTotal = d.size();
-				Log.e("LayerFetchtask", "detected " + mTotal + " layers from " + xml + " query " + data);
+				total = d.size();
+				Log.e("LayerFetchtask", "detected " + total + " layers from " + xml + " query " + data);
 				url = new URL(myUrls.layerDescUrl());
 				for(LayerItemData i : d)
 				{
@@ -150,35 +145,34 @@ public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItem
 	        		{
 	        			cache.saveBitmapToStorage(mBitmapBytes, LayerListActivity.CACHE_LIST_DIR + layer_name + ".bmp", mContext);
 	        			Log.e("LayerFetchTask.doInBackground", " creating bitmap drawable for " + bitmap + 
-	        					": " + bitmap.getWidth() + "x" + bitmap.getHeight() + " size " + bitmap.getAllocationByteCount());
-	        			//itemData.icon = new BitmapDrawable(mContext.getResources(), bitmap);
+	        					": " + bitmap.getWidth() + "x" + bitmap.getHeight());
 	        		}
-	        			
-					mLayerData.add(itemData);
+	        		progress++;
+	        		
 					conn.disconnect();
 	        		byteBuffer.flush();
 	        		inputStream.close();
-					publishProgress(mLayerData.size(), mTotal);				
+	        		percent = (int) Math.round((float) progress / (float) total * 100.0);
+	        		Log.e("LayerFetchTask.doInBackground", " publishing progress " + percent);
+	        		this.publishProgress(new LayerFetchTaskProgressData(i.name, i.available_version, percent));
 				}
-			}
-			if(isCancelled())
-			{
-				mListener.onLayerFetchCancelled(mLayerData.size(), mTotal);
+				if(!isCancelled())
+					success =  true;
 			}
 		}
 		catch (UnsupportedEncodingException e) 
 		{
+			success = false;
 			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
 		} 
 		catch (IOException e) 
 		{
+			success = false;
 			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
 		}
-		Log.e("LayerFetchTask", " safely leaving do in bav");
-		return mLayerData;
-
+		Log.e("LayerFetchTask", " Done!error : " + mErrorMsg);
+		
+		return success;
 	}
 
 	/** Invokes the onTextUpdate method of TextUpdateListener.
@@ -187,28 +181,23 @@ public class LayerFetchTask extends AsyncTask<Void, Integer, ArrayList<LayerItem
 	 * Error message is passed if an error occurred.
 	 */
 	@Override
-	public void onPostExecute(ArrayList<LayerItemData> data)
+	public void onPostExecute(Boolean success)
 	{
-		mListener.onLayersUpdated(data, mErrorMsg);
-		if(data != null)
-			mListener.onLayerFetchProgress(data.size(), mTotal);
+		mListener.onLayersUpdated(success, mErrorMsg);
+		/* call onLayerFetchProgress with an empty LayerFetchTaskProgressData */
+		// mListener.onLayerFetchProgress(new LayerFetchTaskProgressData(), 100);
 	}
 
 	@Override
-	public void onCancelled(ArrayList<LayerItemData> partialData)
+	public void onCancelled()
 	{
-		int size;
-		if(partialData != null)
-			size = partialData.size();
-		else 
-			size = 0;
-		mListener.onLayerFetchProgress(size, mTotal);
+		mListener.onLayerFetchCancelled();
 	}
 
 	@Override
-	public void onProgressUpdate(Integer... values)
+	public void onProgressUpdate(LayerFetchTaskProgressData... values)
 	{
-		mListener.onLayerFetchProgress(values[0], mTotal);
+		mListener.onLayerFetchProgress(values[0]);
 	}
 
 	String errorMessage() 

@@ -8,15 +8,26 @@ public class ServiceStateChangedBroadcastReceiver extends BroadcastReceiver {
 
 	private ServiceStateChangedBroadcastReceiverListener mServiceStateChangedBroadcastReceiverListener;
 	
-	public ServiceStateChangedBroadcastReceiver(ServiceStateChangedBroadcastReceiverListener li)
+	public ServiceStateChangedBroadcastReceiver()
+	{
+		
+	}
+	
+	public void registerListener(ServiceStateChangedBroadcastReceiverListener li)
 	{
 		mServiceStateChangedBroadcastReceiverListener = li;
 	}
 	
+	public void unregisterListener()
+	{
+		mServiceStateChangedBroadcastReceiverListener = null;
+	}
+	
+	
 	@Override
 	public void onReceive(Context context, Intent intent) 
 	{
-		if(intent.hasExtra("serviceStateChanged"))
+		if(mServiceStateChangedBroadcastReceiverListener != null && intent.hasExtra("serviceStateChanged"))
 		{
 			String layerName = intent.getStringExtra("layerName");
 			InstallTaskState state = (InstallTaskState) intent.getSerializableExtra("serviceStateChanged");

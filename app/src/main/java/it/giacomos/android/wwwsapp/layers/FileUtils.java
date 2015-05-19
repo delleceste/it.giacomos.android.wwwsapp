@@ -155,5 +155,27 @@ public class FileUtils
 			return mDeleteRecursive(layerDir); /* true */
 		return false;
 	}
+
+	public boolean containsLayerInstallation(File f) 
+	{
+		if(f.isDirectory())
+		{
+			String layerName = f.getName();
+			String layerAbsolutepath = f.getAbsolutePath();
+			String xmlUiName = layerName + "_ui.xml";
+			String manifestName = layerName + "_manifest.xml";
+			File xmlF = new File(layerAbsolutepath + "/" + xmlUiName);
+			File maniF = new File(layerAbsolutepath + "/" + manifestName);
+			if( xmlF.exists() && maniF.exists())
+				
+			{
+				Log.e("containsLayerInstallation", xmlUiName + " and " + manifestName + " exist");
+				return true;
+			}
+			else
+				Log.e("containsLayerInstallation", layerAbsolutepath + "/" + xmlUiName + " and " + layerAbsolutepath + "/" + manifestName + " DONT exist");
+		}
+		return false;
+	}
 	
 }

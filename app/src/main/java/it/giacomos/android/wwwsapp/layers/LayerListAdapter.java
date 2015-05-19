@@ -1,9 +1,18 @@
 package it.giacomos.android.wwwsapp.layers;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 
 import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.layers.installService.InstallTaskState;
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,15 +61,16 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		}
 		return null;
 	}
-
+	
 	public void update(LayerItemData d)
 	{
 		LayerItemData otherD = findItemData(d.name);
 		if(otherD != null)
 		{
 			Log.e("LayerListAdapter.update", " layer " + d.name + " found. UPDATING");
-			otherD.selectiveCopyFrom(d);
-			notifyDataSetChanged();
+			boolean dataChanged = otherD.selectiveCopyFrom(d);
+			if(dataChanged)
+				notifyDataSetChanged();
 		}
 		else
 		{
@@ -69,10 +79,16 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		}
 	}
 
+	public void updateProgress(String layerName, int installProgress, InstallTaskState instState)
+	{
+		LayerItemData d = findItemData(layerName);
+		if(d != null && d.updateProgress(installProgress, instState))
+			notifyDataSetChanged();
+	}
+	
 	@Override
 	public View getView(int position, View itemView, ViewGroup parent) 
 	{
-		Log.e("LayerListAdapter.getVIew", "ENTER");
 		ViewHolder  mViewHolder = null; 
 
 		if(itemView == null)
@@ -80,7 +96,6 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			itemView = inflater.inflate(R.layout.layer_list_item, parent, false);
-			Log.e("LayerListAdapter.getView", "inflated!");
 			mViewHolder = new ViewHolder();
 			mViewHolder.title  = (TextView) itemView.findViewById(R.id.title);
 			mViewHolder.desc = (TextView) itemView.findViewById(R.id.description);
@@ -101,36 +116,58 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		LayerItemData d = this.getItem(position);
 		mViewHolder.title.setText(d.title);
 		mViewHolder.desc.setText(d.short_desc);
-		if(d.install_progress < 100)
-			mViewHolder.progressBar.setVisibility(View.VISIBLE);
-		else
-			mViewHolder.progressBar.setVisibility(View.GONE);
-
-		mViewHolder.progressBar.setProgress(d.install_progress);
-		String updateTo = context.getString(R.string.update_to) + " ";
-		String instVersion = context.getString(R.string.installed_version) + " ";
-		mViewHolder.installedVerTextView.setText(instVersion + String.valueOf(d.installed_version));
-		if(d.available_version == d.installed_version)
-			mViewHolder.availableVerTextView.setText(R.string.uptodate);
-		else if(d.installed_version < d.available_version)
-			mViewHolder.availableVerTextView.setText(updateTo + String.valueOf(d.available_version));
-
 		mViewHolder.image.setBackgroundDrawable(d.icon);
-		if(d.installed)
+		
+		if(d.install_progress < 100)
 		{
-			mViewHolder.buttonInstallRemove.setText(R.string.delete);
+			String installingVersion = context.getString(R.string.installing_version) + " ";
+			String downloadingVersion = context.getString(R.string.downloading_version) + " ";
+			mViewHolder.availableVerTextView.setVisibility(View.GONE);
 			mViewHolder.installedVerTextView.setVisibility(View.VISIBLE);
+			if(d.installState == InstallTaskState.DOWNLOADING)
+				mViewHolder.installedVerTextView.setText(downloadingVersion + 
+						String.valueOf(d.available_version) + "[" + d.install_progress + "%]");
+			else if(d.installState == InstallTaskState.INSTALLING)
+				mViewHolder.installedVerTextView.setText(installingVersion + 
+						String.valueOf(d.available_version) + "[" + d.install_progress + "%]");
+			mViewHolder.progressBar.setVisibility(View.VISIBLE);
+			mViewHolder.progressBar.setProgress(d.install_progress);
+			mViewHolder.buttonInstallRemove.setText(R.string.cancel_button);
 		}
-		else if(!d.installed)
-		{
-			mViewHolder.buttonInstallRemove.setText(R.string.install);
-			mViewHolder.installedVerTextView.setVisibility(View.GONE);
-		}
-		/* upgrade ? */
-		if(d.available_version > d.installed_version)
-			mViewHolder.buttonUpgrade.setVisibility(View.VISIBLE);
 		else
-			mViewHolder.buttonUpgrade.setVisibility(View.GONE);
+		{
+			mViewHolder.progressBar.setVisibility(View.GONE);
+			mViewHolder.availableVerTextView.setVisibility(View.VISIBLE);
+
+			String updateTo = context.getString(R.string.update_to) + " ";
+			String instVersion = context.getString(R.string.installed_version) + " ";
+			String installVersion = context.getString(R.string.install_version) + " ";
+
+			mViewHolder.installedVerTextView.setText(instVersion + String.valueOf(d.installed_version));
+
+			if(d.available_version == d.installed_version && d.installed)
+				mViewHolder.availableVerTextView.setText(R.string.uptodate);
+			else if(d.installed_version < d.available_version && d.installed)
+				mViewHolder.availableVerTextView.setText(updateTo + String.valueOf(d.available_version));
+			else if(!d.installed)
+				mViewHolder.availableVerTextView.setText(installVersion + String.valueOf(d.available_version));
+
+			if(d.installed)
+			{
+				mViewHolder.buttonInstallRemove.setText(R.string.delete);
+				mViewHolder.installedVerTextView.setVisibility(View.VISIBLE);
+			}
+			else if(!d.installed)
+			{
+				mViewHolder.buttonInstallRemove.setText(R.string.install);
+				mViewHolder.installedVerTextView.setVisibility(View.GONE);
+			}
+			/* upgrade ? */
+			if(d.available_version > d.installed_version && d.installed)
+				mViewHolder.buttonUpgrade.setVisibility(View.VISIBLE);
+			else
+				mViewHolder.buttonUpgrade.setVisibility(View.GONE);
+		}
 
 		mViewHolder.buttonInstallRemove.setOnClickListener(this);
 		mViewHolder.buttonUpgrade.setOnClickListener(this);
@@ -140,6 +177,61 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		return itemView;
 	}
 
+	public ArrayList<String> dumpProgressToString()
+	{
+		ArrayList<String> repr = new ArrayList<String>();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		String encoded;
+		try {
+			for(int i = 0;  i < this.getCount(); i++)
+			{
+				LayerItemData l = this.getItem(i);
+				new ObjectOutputStream(out).writeObject(l.progressInformationToStringArray());
+				encoded = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT);
+				repr.add(encoded);
+				out.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return repr;
+	}
+	
+	public void restoreProgressFromString(ArrayList<String> progressState)
+	{
+		
+		for(int i = 0; i < progressState.size(); i++)
+		{
+			byte[] encodedData = Base64.decode(progressState.get(i).getBytes(), Base64.DEFAULT);
+			ObjectInputStream ois;
+			try {
+				ois = new ObjectInputStream(new ByteArrayInputStream(encodedData));
+				try {
+					String[] fields;
+					fields = (String []) ois.readObject();
+					if(fields.length == 5)
+					{
+						LayerItemData d = findItemData(fields[0]);
+						if(d != null)
+						{
+							Log.e("LayerListAdapter.restoreProgressFromString", "restoring from " + fields);
+							d.restoreProgressInformation(fields);
+						}
+					}
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ois.close();
+			} catch (StreamCorruptedException e) {
+				Log.e("LayerListAdapter.restoreProgressFromString", e.getLocalizedMessage());
+			} catch (IOException e) {
+				Log.e("LayerListAdapter.restoreProgressFromString", e.getLocalizedMessage());
+			}
+			
+		}
+	}
+	
 	@Override
 	public void onClick(View v) 
 	{
@@ -154,7 +246,11 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			if( (b.getText().toString().compareTo(context.getString(R.string.install)) == 0) 
 					|| v.getId() == R.id.buttonUpgrade)
 			{
-					mLayerActionListener.onActionRequested(d.name, ACTION_DOWNLOAD);
+				mLayerActionListener.onActionRequested(d.name, ACTION_DOWNLOAD);
+			}
+			else if(b.getText().toString().compareTo(context.getString(R.string.cancel_button)) == 0)
+			{
+				mLayerActionListener.onActionRequested(d.name, ACTION_CANCEL_DOWNLOAD);
 			}
 			else if(b.getText().toString().compareTo(context.getString(R.string.delete)) == 0)
 			{

@@ -83,8 +83,8 @@ public class LayerInstallService extends Service implements InstallTaskListener
 		{
 			if(intent.hasExtra("downloadLayer"))
 				addLayer(intent.getStringExtra("downloadLayer"));
-			else if(intent.hasExtra("cancelDownload"))
-				cancelInstall(intent.getStringExtra("cancelDownload"));
+			else if(intent.hasExtra("cancelDownloadLayer"))
+				cancelInstall(intent.getStringExtra("cancelDownloadLayer"));
 		}
 		return Service.START_STICKY;
 	}
@@ -170,6 +170,7 @@ public class LayerInstallService extends Service implements InstallTaskListener
 		Log.e("LayerInstallService.onInstallTaskCancelled", " cancelled download of " + layerName);
 		mNotifyStateChanged(layerName, InstallTaskState.DOWNLOAD_CANCELLED, 100);
 		mInstallTasks.remove(layerName);
+		mCheckIfCanStop();
 	}
 
 	@Override
@@ -181,6 +182,7 @@ public class LayerInstallService extends Service implements InstallTaskListener
 			mNotifyStateChanged(layerName, InstallTaskState.INSTALL_ERROR, 100);
 		mInstallTasks.remove(layerName);
 		mNotificationIdMap.remove(layerName); /* after notification */
+		mCheckIfCanStop();
 	}
 	
 	private void mNotifyStateChanged(String layerName, InstallTaskState state, int percent)
@@ -195,7 +197,7 @@ public class LayerInstallService extends Service implements InstallTaskListener
 		mUpdateNotification(layerName, state, percent);
 	}
 	
-	public void checkIfCanStop()
+	private void mCheckIfCanStop()
 	{
 		if(mInstallTasks.size() == 0)
 		{
