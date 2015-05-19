@@ -21,7 +21,7 @@ import android.widget.AbsListView;
 
 /**
  * Created by St??phane on 09/07/2014.
- * Test
+ *
  */
 class DirectionScrollListener implements AbsListView.OnScrollListener {
 
