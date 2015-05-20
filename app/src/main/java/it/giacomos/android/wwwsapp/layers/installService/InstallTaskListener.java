@@ -2,7 +2,7 @@ package it.giacomos.android.wwwsapp.layers.installService;
 
 public interface InstallTaskListener 
 {
-	public void onInstallTaskProgress(String layerName, int percent);
+	public void onInstallTaskProgress(String layerName, int percent, InstallTaskState state);
 		
 	public void onInstallTaskCancelled(String layerName);
 	

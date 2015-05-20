@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import it.giacomos.android.wwwsapp.dummy.DummyContent;
 import it.giacomos.android.wwwsapp.R;
 
 /**

@@ -12,7 +12,6 @@ import android.widget.TextView;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.R.id;
 import it.giacomos.android.wwwsapp.R.layout;
-import it.giacomos.android.wwwsapp.dummy.DummyContent;
 
 /**
  * A fragment representing a single Layer detail screen. This fragment is either

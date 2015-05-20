@@ -159,10 +159,10 @@ public class LayerInstallService extends Service implements InstallTaskListener
 	}
 
 	@Override
-	public void onInstallTaskProgress(String layerName, int percent) {
+	/** state distinguishes between downloading and installing */
+	public void onInstallTaskProgress(String layerName, int percent, InstallTaskState state) {
 		// TODO Auto-generated method stub
-		Log.e("LayerInstallService.onInstallTaskProgress", " downloading " + layerName + ": " + percent + "%");
-		mNotifyStateChanged(layerName, InstallTaskState.DOWNLOADING, percent);
+		mNotifyStateChanged(layerName, state, percent);
 	}
 
 	@Override
@@ -188,9 +188,9 @@ public class LayerInstallService extends Service implements InstallTaskListener
 	
 	private void mNotifyStateChanged(String layerName, InstallTaskState state, int percent)
 	{
-//		Log.e("GreenDisplayService.mNotifyTutorialActivityStateChanged", " notifying state changed to " + mState.getType());
+		Log.e("LayertInstallService.mNotifyStateChanged", " notifying state changed to " + state + " %  -> " + percent);
 		Intent stateChangedNotif = new Intent(LayerListActivity.SERVICE_STATE_CHANGED_INTENT);
-		stateChangedNotif.putExtra("serviceStateChanged", state);
+		stateChangedNotif.putExtra("serviceStateChanged", state.name());
 		stateChangedNotif.putExtra("percent", percent);
 		stateChangedNotif.putExtra("layerName", layerName);
 		LocalBroadcastManager.getInstance(this).sendBroadcast(stateChangedNotif);		
