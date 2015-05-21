@@ -83,18 +83,4 @@ public class Loader
 		}
 		return ret;
 	}
-
-	public ArrayList<LayerItemData> mergeInstalledAndAvailableLayers(
-			ArrayList<LayerItemData> installedLayers,
-			ArrayList<LayerItemData> availableLayers) 
-			{
-		ArrayList<LayerItemData> merged = new ArrayList<LayerItemData>();
-		for(LayerItemData installedLayer : availableLayers)
-		{
-
-		}
-
-
-		return merged;
-			}
 }

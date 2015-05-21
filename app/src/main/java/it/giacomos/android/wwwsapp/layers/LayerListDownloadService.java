@@ -55,10 +55,12 @@ public class LayerListDownloadService extends Service implements LayerFetchTaskL
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) 
 	{
-		mAppVersionCode = intent.getIntExtra("version", -1);
-		mAppLang = intent.getStringExtra("lang");
 		if(intent.hasExtra("download"))
+		{
+			mAppVersionCode = intent.getIntExtra("version", 0);
+			mAppLang = intent.getStringExtra("lang");
 			mDownloadLayersList();
+		}
 		else if(intent.hasExtra("cancel"))
 			mCancelDownload();
 		

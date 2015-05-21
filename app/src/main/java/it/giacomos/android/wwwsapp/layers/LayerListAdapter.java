@@ -158,6 +158,8 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 				mViewHolder.availableVerTextView.setText(updateTo + String.valueOf(d.available_version));
 			else if(!d.installed)
 				mViewHolder.availableVerTextView.setText(installVersion + String.valueOf(d.available_version));
+			else
+				mViewHolder.availableVerTextView.setText("la concha de la lora : " + d.available_version  + " installed " + d.installed_version);
 
 			if(d.installed)
 			{
@@ -254,7 +256,7 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 
 			if(!d.isValid())
 				return;
-			if(v.getId() == R.id.buttonInstall && (int) v.getTag(R.id.listItemInstallOrCancelButtonState) == R.string.install)
+			if(v.getId() == R.id.buttonInstall ||v.getId() == R.id.buttonUpgrade )
 			{
 				mLayerActionListener.onActionRequested(d.name, ACTION_DOWNLOAD);
 			}
@@ -265,5 +267,6 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			else if(v.getId() == R.id.buttonDelete) {
                 mLayerActionListener.onActionRequested(d.name, ACTION_REMOVE);
             }
+
 	}
 }

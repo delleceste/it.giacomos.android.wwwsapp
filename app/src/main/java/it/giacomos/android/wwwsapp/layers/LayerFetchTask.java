@@ -86,7 +86,7 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 				XmlParser parser = new XmlParser();
 				ArrayList<LayerItemData> d = parser.parseLayerList(xml);
 				total = d.size();
-				Log.e("LayerFetchtask", "detected " + total + " layers from " + xml + " query " + data);
+				Log.e("LayerFetchtask", "detected " + total + " layers from " + xml);
 				url = new URL(myUrls.layerDescUrl());
 				for(LayerItemData i : d)
 				{
@@ -99,7 +99,6 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 					conn.setDoOutput(true);
 					data = URLEncoder.encode("lang", "UTF-8") + "=" + URLEncoder.encode(mAppLang, "UTF-8");
 					data += "&" + URLEncoder.encode("layer", "UTF-8") + "=" + URLEncoder.encode(layer_name, "UTF-8");
-					Log.e("LayerFetchTask.doInBacgkruod", "fetching" + data);
 					wr = new OutputStreamWriter(conn.getOutputStream());
 					wr.write(data);
 					wr.flush();
@@ -109,7 +108,6 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 						xml += currentLine + "\n";
 						
 					cache.saveToStorage(xml.getBytes(), LayerListActivity.CACHE_LIST_DIR + layer_name + ".xml", mContext);
-					Log.e("LayerFetchTask.doInBacgkruod", "parsing layer XML" + xml);
 					LayerItemData itemData = parser.parseLayerDescription(xml);
 					if(itemData.available_version < 0)
 						itemData.available_version = i.available_version;

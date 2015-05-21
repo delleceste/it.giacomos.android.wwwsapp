@@ -28,7 +28,6 @@ public class XmlParser
 		DocumentBuilderFactory factory;
 		DocumentBuilder builder;
 		InputStream is;
-		LayerItemData ld = new LayerItemData();
 		factory = DocumentBuilderFactory.newInstance();
 		try {
 			builder = factory.newDocumentBuilder();
@@ -44,27 +43,28 @@ public class XmlParser
 						NodeList layers = dom.getElementsByTagName("layer");
 						for(int i = 0; i < layers.getLength(); i++)
 						{
+		                    LayerItemData ld = new LayerItemData();
 							Element layer = (Element) layers.item(i);
 							ld.name = layer.getAttribute("name");
 							try{
 								ld.available_version = Float.parseFloat(layer.getAttribute("version"));
+							    list.add(ld);
 							}
 							catch(NumberFormatException e)
 							{
-								Log.e("XmlParser.parseLayer NumberFormatException", "invalid float " + layer.getAttribute("version"));
+								Log.e("XmlParser.parseLayer", "invalid float " + layer.getAttribute("version"));
 								ld.available_version = -1;
 							}
-							list.add(ld);
 						}	
 					}
 				}
 				catch (SAXException e) 
 				{
-					Log.e("XmlParser.parseLayer SAXException: decode()", e.getLocalizedMessage());
+					Log.e("XmlParser.parseLayer", e.getLocalizedMessage());
 				} 
 				catch (IOException e) 
 				{	
-					Log.e("XmlParser.parseLayer: decode()", e.getLocalizedMessage());
+					Log.e("XmlParser.parseLayer", e.getLocalizedMessage());
 				}
 			} 
 			catch (UnsupportedEncodingException e) 

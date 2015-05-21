@@ -147,10 +147,12 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
             Log.e("InstallTask.doInBg", "2. installing layer " + mLayerName +  " into " + mInstallDirName);
 
             state = InstallTaskState.INSTALLING;
+            publishProgress(0);
 
             if(!unzip(mInstallDirName, fileName))
                 mErrorMsg = "Failed to extract layer \"" + mLayerName + "\" into " + mInstallDirName + ": " + mErrorMsg;
 
+            publishProgress(2);
             File extractedDir = new File(mInstallDirName);
             if(extractedDir.exists())
             {
@@ -184,13 +186,9 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
                                 FileOutputStream fos;
                                 iconName = iconName.replace(".png", "");
                                 filename = bmpDirName + "/" + iconName + ".bmp";
-                                int bytes = bmp.getByteCount();
-                                ByteBuffer bmpBuffer = ByteBuffer.allocate(bytes); //Create a new buffer
-                                bmp.copyPixelsToBuffer(bmpBuffer); //Move the byte data to the buffer
-                                byte[] array = bmpBuffer.array(); //Get the underlying array containing the data.
                                 File fout = new File(filename);
                                 fos = new FileOutputStream(fout);
-                                fos.write(array);
+                                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
                                 fos.close();
                                 step++;
                                 try {
