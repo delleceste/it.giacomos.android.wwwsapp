@@ -63,7 +63,7 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		return null;
 	}
 	
-	public void update(LayerItemData d)
+	public LayerItemData update(LayerItemData d)
 	{
 		LayerItemData otherD = findItemData(d.name);
 		if(otherD != null)
@@ -72,11 +72,13 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			boolean dataChanged = otherD.selectiveCopyFrom(d);
 			if(dataChanged)
 				notifyDataSetChanged();
+            return otherD;
 		}
 		else
 		{
 			Log.e("LayerListAdapter.update", " layer " + d.name + " not found. ADDING");
 			add(d);
+            return d;
 		}
 	}
 
@@ -114,8 +116,12 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 			mViewHolder  = (ViewHolder) itemView.getTag();
 		}
 
+
 		/* updates, if present */
 		LayerItemData d = this.getItem(position);
+		/* upgrade ? */
+        Log.e("LayerListAdapter.getView", "install prog  " + d.install_progress + " layer " + d.name + " installed " + d.installed);
+
 		mViewHolder.title.setText(d.title);
 		mViewHolder.desc.setText(d.short_desc);
 		mViewHolder.image.setBackgroundDrawable(d.icon);
@@ -174,8 +180,7 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 				mViewHolder.installedVerTextView.setVisibility(View.GONE);
 
 			}
-			/* upgrade ? */
-            Log.e("LayerListAdapter.getView", "install prog  " + d.install_progress);
+
 			if(d.available_version > d.installed_version && d.installed)
 				mViewHolder.buttonUpgrade.setVisibility(View.VISIBLE);
 			else
@@ -194,12 +199,13 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 	public ArrayList<String> dumpProgressToString()
 	{
 		ArrayList<String> repr = new ArrayList<String>();
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		String encoded;
 		try {
 			for(int i = 0;  i < this.getCount(); i++)
 			{
+		        ByteArrayOutputStream out = new ByteArrayOutputStream();
 				LayerItemData l = this.getItem(i);
+                Log.e("LayerListAdapter>dumping", "name " + l.name + " prog " + l.install_progress + " inst " + l.installed);
 				new ObjectOutputStream(out).writeObject(l.progressInformationToStringArray());
 				encoded = Base64.encodeToString(out.toByteArray(), Base64.DEFAULT);
 				repr.add(encoded);
@@ -227,9 +233,9 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 					{
 						LayerItemData d = findItemData(fields[0]);
 						if(d != null)
-						{
-							Log.e("LayerListAdapter.restoreProgressFromString", "restoring from " + fields);
+                        {
 							d.restoreProgressInformation(fields);
+                            Log.e("LayerListAdapter.restoreProgressFromString", "restored name " + d.name + " inst " + d.installed + " prog " + d.install_progress);
 						}
 					}
 				} catch (ClassNotFoundException e) {

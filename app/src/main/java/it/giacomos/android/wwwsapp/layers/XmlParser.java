@@ -79,6 +79,67 @@ public class XmlParser
 		return list;
 	}
 
+	public LayerItemData getDataFromList(String layerName, String xml)
+	{
+		LayerItemData d = null;
+		Document dom;
+		DocumentBuilderFactory factory;
+		DocumentBuilder builder;
+		InputStream is;
+		factory = DocumentBuilderFactory.newInstance();
+		try {
+			builder = factory.newDocumentBuilder();
+			try
+			{
+				is = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+				try
+				{
+					dom = builder.parse(is);
+					NodeList layerNodes = dom.getElementsByTagName("layers");
+					if(layerNodes.getLength() == 1)
+					{
+						NodeList layers = dom.getElementsByTagName("layer");
+						for(int i = 0; i < layers.getLength(); i++)
+						{
+							LayerItemData ld = new LayerItemData();
+							Element layer = (Element) layers.item(i);
+							if(layer.getAttribute("name").compareTo(layerName ) == 0)
+							{
+								d = new LayerItemData();
+								d.name = layerName;
+								try {
+									d.available_version = Float.parseFloat(layer.getAttribute("version"));
+								} catch (NumberFormatException e) {
+									Log.e("XmlParser.parseLayer", "invalid float " + layer.getAttribute("version"));
+									d.available_version = -1;
+								}
+								break;
+							}
+						}
+					}
+				}
+				catch (SAXException e)
+				{
+					Log.e("XmlParser.getDataFromList", e.getLocalizedMessage());
+				}
+				catch (IOException e)
+				{
+					Log.e("XmlParser.getDataFromList", e.getLocalizedMessage());
+				}
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				Log.e("XmlParser.getDataFromList", e.getLocalizedMessage());
+			}
+		}
+		catch (ParserConfigurationException e1)
+		{
+			Log.e("XmlParser.getDataFromList", e1.getLocalizedMessage());
+		}
+
+		return d;
+	}
+
 	public LayerItemData parseLayerDescription(String xml)
 	{		
 		Document dom;

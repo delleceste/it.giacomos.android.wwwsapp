@@ -47,9 +47,7 @@ import android.widget.ProgressBar;
  * The activity makes heavy use of fragments. The list of items is a
  * {@link LayerListFragment} and the item details (if present) is a
  * {@link LayerDetailFragment}.
- * <p>
- * This activity also implements the required
- * {@link LayerListFragment.Callbacks} interface to listen for item selections.
+ *
  */
 public class LayerListActivity extends Activity implements
 LayerListFragmentListener,
@@ -133,7 +131,7 @@ ServiceStateChangedBroadcastReceiverListener
                 new IntentFilter(LIST_DOWNLOAD_SERVICE_STATE_CHANGED_INTENT));
 		mLayerListServiceStateChangedBroadcastReceiver.registerListener(this);
 
-		reload();
+		loadLayers();
 		
 		if(mProgressRestoredFromInstanceState != null)
 			mLayerListAdapter.restoreProgressFromString(mProgressRestoredFromInstanceState);
@@ -232,7 +230,7 @@ ServiceStateChangedBroadcastReceiverListener
 
 	public void onLayerFetchCancelled(int percent) 
 	{
-		Log.e("LayerListActivity.onLayerFetchCancelled" , "Layer fetch was cancelled");
+		Log.e("LayerListActivity.onLayerFetchCancelled", "Layer fetch was cancelled");
 	}
 
 	@Override
@@ -285,7 +283,7 @@ ServiceStateChangedBroadcastReceiverListener
 			if(success)
 			{
 				Log.e("LayerListActivity", "REMOVED LAYER " + layerName);
-				reload();
+				reloadLayer(layerName);
 			}
 		}
         else if(action == LayerListAdapter.ACTION_DOWNLOAD && !m_networkStatusMonitor.isConnected())
@@ -295,7 +293,34 @@ ServiceStateChangedBroadcastReceiverListener
 		
 	}
 
-	private void reload() 
+    private void reloadLayer(String layerName)
+    {
+        Loader loader = new Loader();
+        /* find if layer is installed */
+        LayerItemData installedLayer = loader.findInstalledLayer(layerName, this);
+        /* find layer in the list of layers */
+        LayerItemData layer = loader.findCachedLayer(layerName, this);
+        /* if the layer is installed, update the install version and the install flag */
+
+        Log.e("reloadLayer", " name " + layer.name + " installed version " + layer.installed_version + " installed " + layer.installed);
+        if(layer != null) /* update the layer in the list */
+        {
+            /* update() Returns the modified (or new) layer in the adapter.
+             * We need to set the installed* fields on the returned object because they
+             * are not updated by the selective copy performed by update.
+             */
+            LayerItemData updatedLayer = mLayerListAdapter.update(layer);
+            updatedLayer.installed = (installedLayer != null);
+            if(updatedLayer.installed)
+                updatedLayer.installed_version = installedLayer.installed_version;
+            else
+                updatedLayer.installed_version = -1;
+
+            mLayerListAdapter.notifyDataSetChanged(); /* force reload */
+        }
+    }
+
+	private void loadLayers()
 	{
 		mLayerListAdapter.clear();
 		Loader loader = new Loader();
@@ -303,7 +328,7 @@ ServiceStateChangedBroadcastReceiverListener
 		ArrayList<LayerItemData> cachedData = loader.getCachedList(this);
 		layersList.addAll(cachedData);
 		for(LayerItemData lid : layersList)
-			mLayerListAdapter.update(lid);	
+			mLayerListAdapter.update(lid);
 	}
 	
 	@Override
@@ -314,7 +339,7 @@ ServiceStateChangedBroadcastReceiverListener
 			mLayerListAdapter.updateProgress(layerName, percent, s);
 		
 		if(percent == 100)
-			reload();
+			reloadLayer(layerName);
         setProgressBarIndeterminateVisibility(percent < 100);
 	}
 

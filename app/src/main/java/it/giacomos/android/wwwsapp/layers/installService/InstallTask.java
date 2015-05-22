@@ -121,14 +121,14 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
 
                     totBytesRead += bytesRead;
                     outputStream.write(buffer, 0, bytesRead);
-                    percentage = Math.round(totBytesRead * 100.0f / (float) contentLength);
+                    percentage = Math.round(totBytesRead * 99.0f / (float) contentLength);
                     if(percentage - previousPublishedPercentage >= 5)
                     {
                         publishProgress(percentage);
                         previousPublishedPercentage = percentage;
                     }
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(120);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

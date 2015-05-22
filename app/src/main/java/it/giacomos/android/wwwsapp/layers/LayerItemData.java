@@ -48,17 +48,19 @@ public class LayerItemData
 			changed = true;
 		}
 
-		if(install_progress != other.install_progress)
-		{
-			install_progress = other.install_progress;
-			changed = true;
-		}
+		Log.e("LayerItemData.selectiveCoy", "my install progress " + install_progress + " other " + other.install_progress);
 
-		if(installState != other.installState)
-		{
-			installState = other.installState;
-			changed = true;
-		}
+//		if(install_progress != other.install_progress)
+//		{
+//			install_progress = other.install_progress;
+//			changed = true;
+//		}
+//
+//		if(installState != other.installState)
+//		{
+//			installState = other.installState;
+//			changed = true;
+//		}
 
 		if(online != other.online)
 		{

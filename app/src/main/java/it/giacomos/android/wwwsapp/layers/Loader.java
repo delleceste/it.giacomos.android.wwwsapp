@@ -25,15 +25,15 @@ public class Loader
 			for(int i = 0; i < alist.size(); i++)
 			{
 				LayerItemData d = alist.get(i);
-				String title = d.name;
-				String s = cache.loadFromStorage(LayerListActivity.CACHE_LIST_DIR + title + ".xml", ctx);
+				String name = d.name;
+				String s = cache.loadFromStorage(LayerListActivity.CACHE_LIST_DIR + name + ".xml", ctx);
 				LayerItemData item = parser.parseLayerDescription(s);
 				/* there is no version in the descriptive xml file. But we have the version in the d variable,
 				 * which has been taken from layerlist.xml. The version information in layerlist.xml was directly
 				 * obtained by the database.
 				 */
 				item.available_version = d.available_version;
-				Bitmap bmp = cache.loadBitmapFromStorage(LayerListActivity.CACHE_LIST_DIR + title + ".bmp", ctx);
+				Bitmap bmp = cache.loadBitmapFromStorage(LayerListActivity.CACHE_LIST_DIR + name + ".bmp", ctx);
 				if(bmp != null)
 					item.icon = new BitmapDrawable(ctx.getResources(), bmp);
 				ret.add(item);
@@ -41,6 +41,24 @@ public class Loader
 		}
 		return ret;
 	}
+
+    public LayerItemData findCachedLayer(String layerName, Context ctx)
+    {
+        ArrayList<LayerItemData> layers = getCachedList(ctx);
+        for(LayerItemData lid : layers)
+            if(lid.name.compareTo(layerName) == 0)
+                return lid;
+        return null;
+    }
+
+    public LayerItemData findInstalledLayer(String layerName, Context ctx)
+    {
+        ArrayList<LayerItemData> installedLayers = getInstalledLayers(ctx);
+        for(LayerItemData lid: installedLayers)
+            if(lid.name.compareTo(layerName) == 0)
+                return lid;
+        return null;
+    }
 
 	public ArrayList<LayerItemData> getInstalledLayers(Context ctx)
 	{
