@@ -124,11 +124,11 @@ ServiceStateChangedBroadcastReceiverListener
 		 */
 		registerReceiver(m_networkStatusMonitor, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mServiceBroadcastReceiver,
-                new IntentFilter(SERVICE_STATE_CHANGED_INTENT));
+				new IntentFilter(SERVICE_STATE_CHANGED_INTENT));
 		mServiceBroadcastReceiver.registerListener(this);
 		
 		LocalBroadcastManager.getInstance(this).registerReceiver(mLayerListServiceStateChangedBroadcastReceiver,
-                new IntentFilter(LIST_DOWNLOAD_SERVICE_STATE_CHANGED_INTENT));
+				new IntentFilter(LIST_DOWNLOAD_SERVICE_STATE_CHANGED_INTENT));
 		mLayerListServiceStateChangedBroadcastReceiver.registerListener(this);
 
 		loadLayers();
@@ -290,7 +290,6 @@ ServiceStateChangedBroadcastReceiverListener
         {
             MyAlertDialogFragment.MakeGenericInfo(R.string.network_connection_needed, this);
         }
-		
 	}
 
     private void reloadLayer(String layerName)
@@ -310,12 +309,6 @@ ServiceStateChangedBroadcastReceiverListener
              * are not updated by the selective copy performed by update.
              */
             LayerItemData updatedLayer = mLayerListAdapter.update(layer);
-            updatedLayer.installed = (installedLayer != null);
-            if(updatedLayer.installed)
-                updatedLayer.installed_version = installedLayer.installed_version;
-            else
-                updatedLayer.installed_version = -1;
-
             mLayerListAdapter.notifyDataSetChanged(); /* force reload */
         }
     }

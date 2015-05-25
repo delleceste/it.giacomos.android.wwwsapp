@@ -71,6 +71,15 @@ public class LayerItemData
 		return changed;
 	}
 
+	public void setInstalled(float version)
+	{
+        if(version >= 0.0f) {
+            this.install_progress = 100;
+            this.installed_version = version;
+            this.installed = true;
+        }
+	}
+
 	/** This method updates only progress related variables */
 	public boolean updateProgress(int installProgress, InstallTaskState instState)
 	{
@@ -98,11 +107,16 @@ public class LayerItemData
 		if(progressInformation.length == 5)
 		{
 			name = progressInformation[0];
-			installState = InstallTaskState.valueOf(progressInformation[4]);
+            if(!installed)
+			    installState = InstallTaskState.valueOf(progressInformation[4]);
+            else
+                installState = InstallTaskState.INSTALL_COMPLETE;
 
 			try{
-				install_progress = Integer.parseInt(progressInformation[1]);
-				installed = Boolean.parseBoolean(progressInformation[2]);
+                if(!installed)
+				    install_progress = Integer.parseInt(progressInformation[1]);
+                if(!installed)
+				    installed = Boolean.parseBoolean(progressInformation[2]);
 				online = Boolean.parseBoolean(progressInformation[3]);
 			}
 			catch (NumberFormatException e)
