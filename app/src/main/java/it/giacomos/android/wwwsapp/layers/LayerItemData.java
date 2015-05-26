@@ -5,8 +5,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 
 public class LayerItemData 
-{		
-	public boolean selectiveCopyFrom(LayerItemData other)
+{
+    public static final int COPY_MODE_1 = 1;
+    public static final int COPY_MODE_2 = 2;
+
+	public boolean selectiveCopyFrom(LayerItemData other, int copyMode)
 	{
 		boolean changed = false;
 		if(other.name != null && !other.name.isEmpty() && name.compareTo(other.name) != 0)
@@ -50,17 +53,17 @@ public class LayerItemData
 
 		Log.e("LayerItemData.selectiveCoy", "my install progress " + install_progress + " other " + other.install_progress);
 
-//		if(install_progress != other.install_progress)
-//		{
-//			install_progress = other.install_progress;
-//			changed = true;
-//		}
-//
-//		if(installState != other.installState)
-//		{
-//			installState = other.installState;
-//			changed = true;
-//		}
+		if(copyMode == COPY_MODE_2 && install_progress != other.install_progress)
+		{
+			install_progress = other.install_progress;
+			changed = true;
+		}
+
+		if(copyMode == COPY_MODE_2 && installState != other.installState)
+		{
+			installState = other.installState;
+			changed = true;
+		}
 
 		if(online != other.online)
 		{

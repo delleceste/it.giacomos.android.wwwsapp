@@ -6,34 +6,26 @@ import java.util.Locale;
 import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.R.id;
-import it.giacomos.android.wwwsapp.R.layout;
 import it.giacomos.android.wwwsapp.layers.installService.InstallTaskState;
 import it.giacomos.android.wwwsapp.layers.installService.LayerInstallService;
 import it.giacomos.android.wwwsapp.layers.installService.ServiceStateChangedBroadcastReceiver;
 import it.giacomos.android.wwwsapp.layers.installService.ServiceStateChangedBroadcastReceiverListener;
 import it.giacomos.android.wwwsapp.network.NetworkStatusMonitor;
 import it.giacomos.android.wwwsapp.network.NetworkStatusMonitorListener;
-import it.giacomos.android.wwwsapp.network.state.Urls;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.app.DownloadManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 /**
@@ -225,7 +217,7 @@ ServiceStateChangedBroadcastReceiverListener
 				LayerListActivity.CACHE_LIST_DIR + layerName + ".xml", getApplicationContext());
 		d = parser.parseLayerDescription(xml);
 		d.available_version = version;
-		mLayerListAdapter.update(d);
+		mLayerListAdapter.update(d, LayerItemData.COPY_MODE_1);
 	}
 
 	public void onLayerFetchCancelled(int percent) 
@@ -308,7 +300,7 @@ ServiceStateChangedBroadcastReceiverListener
              * We need to set the installed* fields on the returned object because they
              * are not updated by the selective copy performed by update.
              */
-            LayerItemData updatedLayer = mLayerListAdapter.update(layer);
+            LayerItemData updatedLayer = mLayerListAdapter.update(layer, LayerItemData.COPY_MODE_2);
             mLayerListAdapter.notifyDataSetChanged(); /* force reload */
         }
     }
@@ -321,7 +313,7 @@ ServiceStateChangedBroadcastReceiverListener
 		ArrayList<LayerItemData> cachedData = loader.getCachedList(this);
 		layersList.addAll(cachedData);
 		for(LayerItemData lid : layersList)
-			mLayerListAdapter.update(lid);
+			mLayerListAdapter.update(lid, LayerItemData.COPY_MODE_1);
 	}
 	
 	@Override

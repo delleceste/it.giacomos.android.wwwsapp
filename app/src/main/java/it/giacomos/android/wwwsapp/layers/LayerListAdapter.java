@@ -62,14 +62,14 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		}
 		return null;
 	}
-	
-	public LayerItemData update(LayerItemData d)
+
+	public LayerItemData update(LayerItemData d, int copyMode)
 	{
 		LayerItemData otherD = findItemData(d.name);
 		if(otherD != null)
 		{
 			Log.e("LayerListAdapter.update", " layer " + d.name + " found. UPDATING");
-			boolean dataChanged = otherD.selectiveCopyFrom(d);
+			boolean dataChanged = otherD.selectiveCopyFrom(d, copyMode);
 			if(dataChanged)
 				notifyDataSetChanged();
             return otherD;
