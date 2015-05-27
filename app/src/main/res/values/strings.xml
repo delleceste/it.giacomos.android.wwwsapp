@@ -752,5 +752,9 @@ Please note: requests devoid of the full name and date will be ignored.\n\n</str
     <string name="installing_version">Installing version</string>
     <string name="downloading_version">Downloading version</string>
     <string name="network_connection_needed">A network connection is needed to perform this operation</string>
+
+    <string name="layer_fetch_cancelled">Layer download or installation cancelled</string>
+    <string name="Layer">Layer </string>
+    <string name="successfully_removed"> successfully removed</string>
     
 </resources>

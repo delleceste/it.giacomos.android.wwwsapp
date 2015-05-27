@@ -73,7 +73,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
             publishProgress(0);
 
             try {
-                Thread.sleep(2550);
+                Thread.sleep(0);
             } catch (InterruptedException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -128,7 +128,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
                         previousPublishedPercentage = percentage;
                     }
                     try {
-                        Thread.sleep(120);
+                        Thread.sleep(0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -192,7 +192,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
                                 fos.close();
                                 step++;
                                 try {
-                                    Thread.sleep(50);
+                                    Thread.sleep(0);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }

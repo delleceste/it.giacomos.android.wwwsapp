@@ -218,36 +218,39 @@ ServiceStateChangedBroadcastReceiverListener
 		d = parser.parseLayerDescription(xml);
 		d.available_version = version;
 		mLayerListAdapter.update(d, LayerItemData.COPY_MODE_1);
+
+        ProgressBar pb = (ProgressBar) findViewById(id.layerListProgressBar);
+        pb.setProgress(percent);
 	}
 
-	public void onLayerFetchCancelled(int percent) 
+	public void onLayerFetchCancelled(int percent)
 	{
-		Log.e("LayerListActivity.onLayerFetchCancelled", "Layer fetch was cancelled");
+		Log.e("LLA.onLayerFetchCancell", "Layer fetch was cancelled");
 	}
 
 	@Override
-	public void onNetworkBecomesAvailable() 
+	public void onNetworkBecomesAvailable()
 	{
 		PackageInfo pi;
 		try {
 			pi = getPackageManager().getPackageInfo(getPackageName(), 0);
-			Log.e("LayerListActivity.onNetworkBecomesAvailable", "net available: starting LayerListDownloadService if it's time " + pi.versionCode);
+			Log.e("LLA.onNetworkBecomesAv", "net available: starting LayerListDownloadService if it's time " + pi.versionCode);
 			Intent intent = new Intent(this, LayerListDownloadService.class);
 			intent.putExtra("version", pi.versionCode);
 			intent.putExtra("download", "true");
 			intent.putExtra("lang", Locale.getDefault().getLanguage());
 			startService(intent);
 		}
-		catch (NameNotFoundException e) 
+		catch (NameNotFoundException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onNetworkBecomesUnavailable() 
+	public void onNetworkBecomesUnavailable()
 	{
-		Log.e("LayerListActivity.onNetworkBecomesUnavailable", "net UNavailable: cancelling LayerListDownloadService ");
+		Log.e("LLA.onNetBecomesUnav", "net UNavailable: cancelling LayerListDownloadService ");
 		Intent intent = new Intent(this, LayerListDownloadService.class);
 		intent.putExtra("cancel", "true");
 		startService(intent);
@@ -258,7 +261,7 @@ ServiceStateChangedBroadcastReceiverListener
 	{
 		if(action == LayerListAdapter.ACTION_DOWNLOAD && m_networkStatusMonitor.isConnected())
 		{
-				Log.e("LayerListActivity.onActionRequested", "starting download service LayerInstallService " + layerName);
+				Log.e("LLA.onActionRequested", "starting download service LayerInstallService " + layerName);
 				Intent intent = new Intent(this, LayerInstallService.class);
 				intent.putExtra("downloadLayer", layerName);
 				startService(intent);
@@ -274,8 +277,10 @@ ServiceStateChangedBroadcastReceiverListener
 			boolean success = new FileUtils().uninstallLayer(layerName, this);
 			if(success)
 			{
-				Log.e("LayerListActivity", "REMOVED LAYER " + layerName);
+				Log.e("LLA.onActionRequested", "REMOVED LAYER " + layerName);
 				reloadLayer(layerName);
+                String msg = getString(R.string.Layer) + " \"" + layerName + "\" " + getString(R.string.successfully_removed);
+                MyAlertDialogFragment.MakeGenericInfo(msg, this);
 			}
 		}
         else if(action == LayerListAdapter.ACTION_DOWNLOAD && !m_networkStatusMonitor.isConnected())
@@ -291,18 +296,23 @@ ServiceStateChangedBroadcastReceiverListener
         LayerItemData installedLayer = loader.findInstalledLayer(layerName, this);
         /* find layer in the list of layers */
         LayerItemData layer = loader.findCachedLayer(layerName, this);
-        /* if the layer is installed, update the install version and the install flag */
 
         Log.e("reloadLayer", " name " + layer.name + " installed version " + layer.installed_version + " installed " + layer.installed);
-        if(layer != null) /* update the layer in the list */
+        if(installedLayer != null)
+            Log.e("reloadLayer", " INSTALLED name " + installedLayer.name + " installed version " + installedLayer.installed_version + " installed " + installedLayer.installed);
+
+        /* if the layer is installed, update the install version and the install flag */
+        if(installedLayer != null && layer  != null)
         {
-            /* update() Returns the modified (or new) layer in the adapter.
-             * We need to set the installed* fields on the returned object because they
-             * are not updated by the selective copy performed by update.
-             */
-            LayerItemData updatedLayer = mLayerListAdapter.update(layer, LayerItemData.COPY_MODE_2);
-            mLayerListAdapter.notifyDataSetChanged(); /* force reload */
+            installedLayer.selectiveCopyFrom(layer, LayerItemData.COPY_MODE_1);
+            mLayerListAdapter.update(installedLayer, LayerItemData.COPY_MODE_2);
         }
+        else
+            mLayerListAdapter.update(layer, LayerItemData.COPY_MODE_2);
+
+        Log.e("reloadLayer", " changed: "+ layer.name + " installed version " + layer.installed_version + " installed " + layer.installed);
+        mLayerListAdapter.notifyDataSetChanged(); /* force reload */
+
     }
 
 	private void loadLayers()
@@ -325,6 +335,8 @@ ServiceStateChangedBroadcastReceiverListener
 		
 		if(percent == 100)
 			reloadLayer(layerName);
+        if(s == InstallTaskState.DOWNLOAD_CANCELLED)
+            onActionRequested(layerName, LayerListAdapter.ACTION_REMOVE);
         setProgressBarIndeterminateVisibility(percent < 100);
 	}
 

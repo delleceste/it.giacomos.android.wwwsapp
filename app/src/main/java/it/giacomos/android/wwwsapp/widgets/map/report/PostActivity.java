@@ -2,25 +2,19 @@ package it.giacomos.android.wwwsapp.widgets.map.report;
 
 import java.util.HashMap;
 
-import it.giacomos.android.wwwsapp.widgets.map.report.IconTextSpinnerAdapter;
+import it.giacomos.android.wwwsapp.layers.FileUtils;
+import it.giacomos.android.wwwsapp.IconTextSpinnerAdapter;
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.preferences.Settings;
+
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -28,7 +22,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.Button;
 
 public class PostActivity extends AppCompatActivity implements OnClickListener, OnItemSelectedListener, OnCheckedChangeListener
@@ -54,8 +47,8 @@ public class PostActivity extends AppCompatActivity implements OnClickListener, 
 		setContentView(R.layout.post_activity_layout);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		
+
+		FileUtils fu = new FileUtils();
 		String [] values =   new String[1];
 		values[0] = "test";
 		addElement("EditText", "Prova",  values, false, 100);

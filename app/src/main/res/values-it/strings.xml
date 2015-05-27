@@ -937,6 +937,9 @@ mio android id è il seguente:\n\n
     <string name="install">Installa</string>
     <string name="update">Aggiorna</string>
     <string name="delete">Rimuovi</string>
+
+
+    <string name="no_layers_installed">No layers installed. Please start installing one or more layers.</string>
     
     
 </resources>

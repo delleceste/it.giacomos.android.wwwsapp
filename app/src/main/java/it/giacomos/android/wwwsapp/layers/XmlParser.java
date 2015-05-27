@@ -158,6 +158,8 @@ public class XmlParser
 					dom = builder.parse(is);
 					Element layer = dom.getDocumentElement(); 
 					ld.name = layer.getAttribute("name");
+					if(layer.hasAttribute("color"))
+						ld.color = layer.getAttribute("color");
 					if(!ld.name.isEmpty())
 					{
 						layer.normalize();

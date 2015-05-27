@@ -9,10 +9,12 @@
 
      <ProgressBar
               android:id="@+id/layerListProgressBar"
-              style="?android:attr/progressBarStyleSmall"
+              style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:visibility="gone" />
+              android:visibility="gone"
+         android:indeterminate="false"
+         android:max="100" />
           
     
 <fragment
@@ -20,8 +22,8 @@
     android:name="it.giacomos.android.wwwsapp.layers.LayerListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
     tools:context="it.giacomos.android.wwwsapp.LayerListActivity"
     tools:layout="@android:layout/list_content" />
 

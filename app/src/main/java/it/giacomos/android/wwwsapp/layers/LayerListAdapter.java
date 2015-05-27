@@ -2,7 +2,6 @@ package it.giacomos.android.wwwsapp.layers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.layers.installService.InstallTaskState;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,6 +37,7 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 	private final int LIST_ADAPTER_POS = 0;
 
 	static class ViewHolder {
+		public View coloredBorderLeft, coloredBorderTop;
 		public TextView title, desc;
 		public ImageButton buttonInstall, buttonUpgrade, buttonDelete;
 		public ImageView image;
@@ -100,6 +100,8 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			itemView = inflater.inflate(R.layout.layer_list_item, parent, false);
 			mViewHolder = new ViewHolder();
+			mViewHolder.coloredBorderLeft = itemView.findViewById(R.id.leftColoredBorder);
+			mViewHolder.coloredBorderTop = itemView.findViewById(R.id.topColoredBorder);
 			mViewHolder.title  = (TextView) itemView.findViewById(R.id.title);
 			mViewHolder.desc = (TextView) itemView.findViewById(R.id.description);
 			mViewHolder.image = (ImageView) itemView.findViewById(R.id.icon);
@@ -122,26 +124,31 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 		/* upgrade ? */
         Log.e("LayerListAdapter.getView", "install prog  " + d.install_progress + " layer " + d.name + " installed " + d.installed);
 
+		if(d.color != null && !d.color.isEmpty())
+		{
+			mViewHolder.coloredBorderTop.setBackgroundColor(Color.parseColor(d.color));
+			mViewHolder.coloredBorderLeft.setBackgroundColor(Color.parseColor(d.color));
+		}
 		mViewHolder.title.setText(d.title);
 		mViewHolder.desc.setText(d.short_desc);
 		mViewHolder.image.setBackgroundDrawable(d.icon);
         mViewHolder.buttonInstall.setImageResource(android.R.drawable.ic_menu_add);
-        mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, R.string.install);
+        mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, "Install");
 		
 		if(d.install_progress < 100)
 		{
             mViewHolder.buttonInstall.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
-            mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, R.string.cancel_button);
+            mViewHolder.buttonInstall.setTag(R.id.listItemInstallOrCancelButtonState, "Cancel");
 			mViewHolder.buttonUpgrade.setVisibility(View.GONE);
             mViewHolder.buttonDelete.setVisibility(View.GONE);
 			String installingVersion = context.getString(R.string.installing_version) + " ";
 			String downloadingVersion = context.getString(R.string.downloading_version) + " ";
 			mViewHolder.availableVerTextView.setVisibility(View.GONE);
 			mViewHolder.installedVerTextView.setVisibility(View.VISIBLE);
-			if(d.installState == InstallTaskState.DOWNLOADING)
+			if(d.installTaskState == InstallTaskState.DOWNLOADING)
 				mViewHolder.installedVerTextView.setText(downloadingVersion + 
 						String.valueOf(d.available_version) + "[" + d.install_progress + "%]");
-			else if(d.installState == InstallTaskState.INSTALLING)
+			else if(d.installTaskState == InstallTaskState.INSTALLING)
 				mViewHolder.installedVerTextView.setText(installingVersion + 
 						String.valueOf(d.available_version) + "[" + d.install_progress + "%]");
 			mViewHolder.progressBar.setVisibility(View.VISIBLE);
@@ -262,11 +269,11 @@ public class LayerListAdapter extends ArrayAdapter<LayerItemData> implements OnC
 
 			if(!d.isValid())
 				return;
-			if(v.getId() == R.id.buttonInstall ||v.getId() == R.id.buttonUpgrade )
+			if( (v.getId() == R.id.buttonInstall && ((String) v.getTag(R.id.listItemInstallOrCancelButtonState)).compareTo("Install") == 0) ||v.getId() == R.id.buttonUpgrade)
 			{
 				mLayerActionListener.onActionRequested(d.name, ACTION_DOWNLOAD);
 			}
-			else if(v.getId() == R.id.buttonInstall && (int) v.getTag(R.id.listItemInstallOrCancelButtonState) == R.string.cancel_button )
+			else if(v.getId() == R.id.buttonInstall && ((String) v.getTag(R.id.listItemInstallOrCancelButtonState)).compareTo("Cancel") == 0)
 			{
 				mLayerActionListener.onActionRequested(d.name, ACTION_CANCEL_DOWNLOAD);
 			}

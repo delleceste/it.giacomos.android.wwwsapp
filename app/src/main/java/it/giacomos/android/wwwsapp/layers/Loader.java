@@ -8,7 +8,8 @@ import java.util.Locale;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
+
+import it.giacomos.android.wwwsapp.layers.installService.InstallTaskState;
 
 public class Loader 
 {
@@ -93,6 +94,7 @@ public class Loader
 				LayerItemData item = parser.parseLayerDescription(s);
 				item.installed_version = parser.getVersionFromManifest(mani);
 				item.installed = true;
+				item.installTaskState = InstallTaskState.INSTALL_COMPLETE;
 				Bitmap bmp = cache.loadBitmapFromStorage(LayerListActivity.CACHE_LIST_DIR + fn + ".bmp", ctx);
 				if(bmp != null)
 					item.icon = new BitmapDrawable(ctx.getResources(), bmp);

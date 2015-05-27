@@ -1,23 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_alignParentTop="true"
-         android:orientation="vertical">
+         android:orientation="vertical"
+         android:layout_weight="20">
 
-         <LinearLayout
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="3dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/topColoredBorder"
+            android:background="#440000"/>
+
+        <LinearLayout
              android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:orientation="horizontal" >
+             android:layout_height="0dp"
+             android:orientation="horizontal"
+             android:layout_weight="20">
 
-             <ImageView
+            <TextView
+                android:layout_width="3dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/leftColoredBorder"
+                android:layout_gravity="center_vertical"
+                android:background="#660000"
+                />
+
+            <ImageView
                  android:id="@+id/icon"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_gravity="center"
-                 android:layout_margin="5dp" />
+                 android:layout_margin="5dp"
+                 />
 
-             <LinearLayout
+            <LinearLayout
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:layout_margin="5dp"
@@ -45,7 +66,9 @@
 
      <LinearLayout
          android:layout_width="match_parent"
-         android:layout_height="match_parent" >
+         android:layout_height="0dp"
+         android:layout_weight="20"
+         android:layout_marginLeft="3dp">
 
          <TextView
              android:id="@+id/tvInstalledVersion"
@@ -100,6 +123,7 @@
          android:indeterminate="false"
          android:max="100"
          android:visibility="visible" />
-     
-    </LinearLayout>   
+
+    </LinearLayout>
+
 

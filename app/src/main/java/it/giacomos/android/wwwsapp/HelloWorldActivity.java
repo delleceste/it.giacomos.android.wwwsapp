@@ -19,7 +19,10 @@ import it.giacomos.android.wwwsapp.floatingactionbutton.FloatingActionButton;
 import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
 import it.giacomos.android.wwwsapp.interfaceHelpers.MenuActionsManager;
 import it.giacomos.android.wwwsapp.interfaceHelpers.TitlebarUpdater;
+import it.giacomos.android.wwwsapp.layers.FileUtils;
+import it.giacomos.android.wwwsapp.layers.LayerItemData;
 import it.giacomos.android.wwwsapp.layers.LayerListActivity;
+import it.giacomos.android.wwwsapp.layers.Loader;
 import it.giacomos.android.wwwsapp.locationUtils.LocationInfo;
 import it.giacomos.android.wwwsapp.locationUtils.LocationService;
 import it.giacomos.android.wwwsapp.network.DownloadStatus;
@@ -50,6 +53,8 @@ import it.giacomos.android.wwwsapp.widgets.map.report.network.PostActionResultLi
 import it.giacomos.android.wwwsapp.widgets.map.report.network.PostReport;
 import it.giacomos.android.wwwsapp.widgets.map.report.network.PostType;
 import it.giacomos.android.wwwsapp.widgets.map.report.tutorialActivity.TutorialPresentationActivity;
+
+import android.graphics.Bitmap;
 import android.support.v4.view.MenuItemCompat;
 import android.app.Activity;
 import android.app.Notification;
@@ -130,6 +135,10 @@ OnItemSelectedListener /* main spinner */
 
 	private DownloadStatus mDownloadStatus;
 
+    private String mCurrentLayerName;
+
+    private IconTextSpinnerAdapter mLayersSpinnerAdapter;
+
 	public HelloWorldActivity()
 	{
 		super();
@@ -163,7 +172,6 @@ OnItemSelectedListener /* main spinner */
 				.addOnConnectionFailedListener(this)
 				.addApi(Plus.API)
 				.addScope(Plus.SCOPE_PLUS_PROFILE)
-				.addApi(LocationServices.API)
 				.build();
 			}
 
@@ -184,6 +192,12 @@ OnItemSelectedListener /* main spinner */
 			Presage.getInstance().setContext(this.getBaseContext());
 			Presage.getInstance().start();
 		}
+
+        if(savedInstanceState != null && !savedInstanceState.getString("layer").isEmpty())
+            mCurrentLayerName = savedInstanceState.getString("layer");
+        else
+            mCurrentLayerName = mSettings.getCurrentLayerName();
+
 	}
 
 	public void onResume()
@@ -192,6 +206,13 @@ OnItemSelectedListener /* main spinner */
 		//		Log.e("HelloWorldActivity.onResume", "onResume called");
 		if(!mGoogleServicesAvailable)
 			return;
+
+        Spinner layersSpin = (Spinner) findViewById(R.id.toolbar_spinner);
+        if(initLayersSpinner() == 0)
+            MyAlertDialogFragment.MakeGenericInfo(R.string.no_layers_installed, this);
+
+        if(this.mCurrentLayerName.isEmpty())
+            layersSpin.setSelection(0);
 
 		/* (re)connect the location update client */
 		mLocationService.connect();
@@ -382,6 +403,7 @@ OnItemSelectedListener /* main spinner */
 			return;
 		if(mGoogleApiClient != null && mGoogleApiClient.isConnected()) 
 			mGoogleApiClient.disconnect();
+        mLocationService.disconnect();
 	}
 
 	protected void onDestroy()
@@ -408,7 +430,24 @@ OnItemSelectedListener /* main spinner */
 			return;
 		if(mGoogleApiClient != null) /* first execution */
 			mGoogleApiClient.connect();
+        mLocationService.connect();
 	}
+
+    public int initLayersSpinner()
+    {
+        Loader layersLoader = new Loader();
+        FileUtils fu = new FileUtils();
+        ArrayList<LayerItemData> installedLayers = layersLoader.getInstalledLayers(this);
+        mLayersSpinnerAdapter = new IconTextSpinnerAdapter(this, R.layout.post_icon_text_spinner, this);
+        for(LayerItemData d : installedLayers)
+        {
+            Bitmap bmp = fu.loadBitmapFromStorage(LayerListActivity.CACHE_LIST_DIR + d.name + ".bmp", this);
+            mLayersSpinnerAdapter.add(d.name, bmp);
+        }
+        Spinner layersSpin = (Spinner ) findViewById(R.id.toolbar_spinner);
+        layersSpin.setAdapter(mLayersSpinnerAdapter);
+        return installedLayers.size();
+    }
 
 	public void init()
 	{
@@ -422,11 +461,14 @@ OnItemSelectedListener /* main spinner */
 		mCurrentViewType = ViewType.HOME;
 
 		mLocationService = new LocationService(getApplicationContext());
-		/* Set the number of pages that should be retained to either side of 
+		/* Set the number of pages that should be retained to either side of
 		 * the current page in the view hierarchy in an idle state
 		 */
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-		this.setSupportActionBar(toolbar);
+        this.setSupportActionBar(toolbar);
+
+        Spinner layersSpin = (Spinner) findViewById(R.id.toolbar_spinner);
+        layersSpin.setOnItemSelectedListener(this);
 
 		mProgressBar = (ProgressBar) findViewById (R.id.mainProgressBar);
 
@@ -778,6 +820,7 @@ OnItemSelectedListener /* main spinner */
 		else if(v.getId() == R.id.fabNewReport)
 		{
 			mReportConditionsAccepted = mSettings.reportConditionsAccepted();
+            mReportConditionsAccepted = true;
 			if(mReportConditionsAccepted)
 				startReportActivity();	
 		}
@@ -919,14 +962,14 @@ OnItemSelectedListener /* main spinner */
 
 	public void startReportActivity()
 	{
-		Location loc = this.mLocationService.getCurrentLocation();
+        Location loc = mLocationService.getCurrentLocation();
 		LocationInfo loci = mLocationService.getCurrentLocationInfo();
 		if(loc == null)
 			MyAlertDialogFragment.MakeGenericError(R.string.location_not_available, this, 
 					MyAlertDialogFragment.OPTION_OPEN_GEOLOCALIZATION_SETTINGS);
-		else if(!mDownloadStatus.isOnline)
-			MyAlertDialogFragment.MakeGenericError(R.string.reportNeedToBeOnline, this, 
-					MyAlertDialogFragment.OPTION_OPEN_NETWORK_SETTINGS);
+//		else if(!mDownloadStatus.isOnline)
+//			MyAlertDialogFragment.MakeGenericError(R.string.reportNeedToBeOnline, this,
+//					MyAlertDialogFragment.OPTION_OPEN_NETWORK_SETTINGS);
 		else
 		{
 		
@@ -934,6 +977,7 @@ OnItemSelectedListener /* main spinner */
 			if(loci != null)
 			{
 				i.putExtra("locality", loci.locality);
+				i.putExtra("layer", "meteo");
 			}
 			this.startActivityForResult(i, REPORT_ACTIVITY_FOR_RESULT_ID);
 		}
@@ -1173,9 +1217,9 @@ OnItemSelectedListener /* main spinner */
 	
 
 	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int position,
-			long id) {
-		
+	public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+    {
+		Log.e("HWActivity", "spinner selection " + position + " view " + view);
 	}
 
 	@Override

@@ -51,7 +51,15 @@ public class LayerItemData
 			changed = true;
 		}
 
-		Log.e("LayerItemData.selectiveCoy", "my install progress " + install_progress + " other " + other.install_progress);
+		if(other.color != null && !other.color.isEmpty() && color.compareTo(other.color) != 0)
+		{
+			color = other.color;
+			changed = true;
+		}
+
+		Log.e("LayerItemData.selectiveCoy", "my install progress " + install_progress + " other " + other.install_progress + " other.installed "
+		 + other.installed + " me instaleld "  + installed + " copy mode " + copyMode + " my install state " + installTaskState + " other instrall state "
+		 + other.installTaskState);
 
 		if(copyMode == COPY_MODE_2 && install_progress != other.install_progress)
 		{
@@ -59,9 +67,21 @@ public class LayerItemData
 			changed = true;
 		}
 
-		if(copyMode == COPY_MODE_2 && installState != other.installState)
+        if(copyMode == COPY_MODE_2 && installed != other.installed)
 		{
-			installState = other.installState;
+            installed = other.installed;
+			changed = true;
+		}
+
+		if(copyMode == COPY_MODE_2 && installTaskState != other.installTaskState)
+		{
+			installTaskState = other.installTaskState;
+			changed = true;
+		}
+
+		if(copyMode == COPY_MODE_2 && installed_version != other.installed_version)
+		{
+            installed_version = other.installed_version;
 			changed = true;
 		}
 
@@ -74,15 +94,6 @@ public class LayerItemData
 		return changed;
 	}
 
-	public void setInstalled(float version)
-	{
-        if(version >= 0.0f) {
-            this.install_progress = 100;
-            this.installed_version = version;
-            this.installed = true;
-        }
-	}
-
 	/** This method updates only progress related variables */
 	public boolean updateProgress(int installProgress, InstallTaskState instState)
 	{
@@ -92,10 +103,10 @@ public class LayerItemData
 			install_progress = installProgress;
 			changed = true;
 		}
-		if(installState != instState)
+		if(installTaskState != instState)
 		{
 			changed = true;
-			installState = instState;
+			installTaskState = instState;
 		}
 		return changed;
 	}
@@ -111,9 +122,9 @@ public class LayerItemData
 		{
 			name = progressInformation[0];
             if(!installed)
-			    installState = InstallTaskState.valueOf(progressInformation[4]);
+			    installTaskState = InstallTaskState.valueOf(progressInformation[4]);
             else
-                installState = InstallTaskState.INSTALL_COMPLETE;
+                installTaskState = InstallTaskState.INSTALL_COMPLETE;
 
 			try{
                 if(!installed)
@@ -133,10 +144,11 @@ public class LayerItemData
 	public LayerItemData()
 	{
 		name = short_desc = author = date = install_date = "";
+		color = "#ffffff";
 		installed_version = available_version = -1.0f;
 		install_progress = 100;
 		installed = online = false;
-		installState = InstallTaskState.NONE;
+		installTaskState = InstallTaskState.NONE;
 	}
 
 	public void setIcon(BitmapDrawable b)
@@ -153,15 +165,16 @@ public class LayerItemData
 		data[1] = String.valueOf(install_progress);
 		data[2] = String.valueOf(installed);
 		data[3] = String.valueOf(online);
-		data[4] = installState.name();
+		data[4] = installTaskState.name();
 		return data;
 	}
 
 	public boolean installed, online;
 	public String name, title, short_desc, long_desc, author;
+	public String color;
 	public float installed_version, available_version;
 	public int install_progress;
 	public String date, install_date;
 	public BitmapDrawable icon;
-	public InstallTaskState installState;
+	public InstallTaskState installTaskState;
 }

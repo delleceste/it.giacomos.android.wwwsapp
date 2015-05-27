@@ -24,7 +24,21 @@ public class IconTextSpinnerAdapter extends ArrayAdapter<String> {
 			String[] strings, Activity activity) 
 	{
 		super(context, resource, strings);
+		arr_images = new ArrayList<Bitmap>();
 		mActivity = (Activity) activity;
+	}
+
+    public IconTextSpinnerAdapter(Context context, int resource , Activity activity)
+	{
+		super(context, resource);
+		arr_images = new ArrayList<Bitmap>();
+		mActivity = (Activity) activity;
+	}
+
+	public void add(String item, Bitmap icon)
+	{
+		this.add(item);
+		arr_images.add(icon);
 	}
 
 	@Override

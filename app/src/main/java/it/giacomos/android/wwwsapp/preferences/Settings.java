@@ -592,4 +592,9 @@ public class Settings
 		e.putLong("ADS_LAST_SHOWN_TIME_MILLIS", System.currentTimeMillis());
 		e.commit();
 	}
+
+	public String getCurrentLayerName()
+	{
+		return mSharedPreferences.getString("CURRENT_LAYER_NAME", "");
+	}
 }
