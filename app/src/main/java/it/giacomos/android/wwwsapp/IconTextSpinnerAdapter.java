@@ -1,4 +1,4 @@
-package it.giacomos.android.wwwsapp.widgets.map.report;
+package it.giacomos.android.wwwsapp;
 
 import it.giacomos.android.wwwsapp.R;
 import android.app.Activity;
@@ -12,11 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 public class IconTextSpinnerAdapter extends ArrayAdapter<String> {
 
 	private Activity mActivity;
 
-	private Bitmap arr_images[];
+	private ArrayList<Bitmap> arr_images;
 
 	public IconTextSpinnerAdapter(Context context, int resource,
 			String[] strings, Activity activity) 
@@ -35,7 +37,7 @@ public class IconTextSpinnerAdapter extends ArrayAdapter<String> {
 		return getCustomView(position, convertView, parent);
 	}
 
-	public void setImages(Bitmap [] imgs)
+	public void setImages(ArrayList<Bitmap> imgs)
 	{
 		arr_images = imgs;
 	}
@@ -47,10 +49,10 @@ public class IconTextSpinnerAdapter extends ArrayAdapter<String> {
 		TextView label=(TextView)row.findViewById(R.id.text);
 		label.setText(getItem(position));
 
-		if(arr_images != null && arr_images.length > position)
+		if(arr_images != null && arr_images.size() > position)
 		{
 			ImageView icon = (ImageView) row.findViewById(R.id.icon);
-			icon.setImageBitmap(arr_images[position]);
+			icon.setImageBitmap(arr_images.get(position));
 		}
 
 		return row;
