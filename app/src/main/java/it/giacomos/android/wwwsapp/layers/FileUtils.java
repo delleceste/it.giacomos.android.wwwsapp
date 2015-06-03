@@ -22,7 +22,6 @@ public class FileUtils
 		
 	}
 
-	/* restore all data from the storage */
 	public String loadFromStorage(String filename, Context ctx) 
 	{
 		long startT = System.currentTimeMillis();

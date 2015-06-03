@@ -144,6 +144,8 @@ OnItemSelectedListener /* main spinner */
 		super();
 	}
 
+	private ArrayList<LayerChangedListener> mLayerChangedListeners;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -446,6 +448,7 @@ OnItemSelectedListener /* main spinner */
         }
         Spinner layersSpin = (Spinner ) findViewById(R.id.toolbar_spinner);
         layersSpin.setAdapter(mLayersSpinnerAdapter);
+		layersSpin.setOnItemSelectedListener(this);
         return installedLayers.size();
     }
 
@@ -466,9 +469,6 @@ OnItemSelectedListener /* main spinner */
 		 */
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
-
-        Spinner layersSpin = (Spinner) findViewById(R.id.toolbar_spinner);
-        layersSpin.setOnItemSelectedListener(this);
 
 		mProgressBar = (ProgressBar) findViewById (R.id.mainProgressBar);
 
@@ -930,6 +930,16 @@ OnItemSelectedListener /* main spinner */
 		mCurrentFragmentId = id;
 	}
 
+	public void addLayerChangedListener(LayerChangedListener l)
+	{
+		this.mLayerChangedListeners.add(l);
+	}
+
+	public void removeLayerChangedListener(LayerChangedListener l)
+	{
+		mLayerChangedListeners.remove(l);
+	}
+
 	public void switchView(ViewType id) 
 	{
 		mCurrentViewType = id;
@@ -972,12 +982,15 @@ OnItemSelectedListener /* main spinner */
 //					MyAlertDialogFragment.OPTION_OPEN_NETWORK_SETTINGS);
 		else
 		{
-		
+            Spinner layerSp = (Spinner) findViewById(R.id.toolbar_spinner);
+		    String layer = mLayersSpinnerAdapter.getItem(layerSp.getSelectedItemPosition());
 			Intent i = new Intent(this, PostActivity.class);
 			if(loci != null)
 			{
 				i.putExtra("locality", loci.locality);
-				i.putExtra("layer", "meteo");
+				i.putExtra("layer", layer);
+                i.putExtra("latitude", loc.getLatitude());
+                i.putExtra("longitude", loc.getLongitude());
 			}
 			this.startActivityForResult(i, REPORT_ACTIVITY_FOR_RESULT_ID);
 		}
@@ -1220,9 +1233,18 @@ OnItemSelectedListener /* main spinner */
 	public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
 		Log.e("HWActivity", "spinner selection " + position + " view " + view);
+        String layerName = mLayersSpinnerAdapter.getItem(position);
+		for(LayerChangedListener l : mLayerChangedListeners)
+			l.onLayerChanged(layerName);
+        switchToLayer(layerName);
 	}
 
-	@Override
+    public  void switchToLayer(String layerName)
+    {
+
+    }
+
+    @Override
 	public void onNothingSelected(AdapterView<?> parent) {
 		// TODO Auto-generated method stub
 		
