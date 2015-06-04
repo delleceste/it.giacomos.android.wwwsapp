@@ -1,16 +1,8 @@
 package it.giacomos.android.wwwsapp.widgets.map.report;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
-import it.giacomos.android.wwwsapp.layers.FileUtils;
-import it.giacomos.android.wwwsapp.IconTextSpinnerAdapter;
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.layers.LayerItemData;
 
 import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
@@ -19,33 +11,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Button;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 public class PostActivity extends AppCompatActivity implements OnClickListener, OnItemSelectedListener, OnCheckedChangeListener
 {
     private String mLocality;
     private double mLatitude, mLongitude;
     private HashMap<Integer, Integer> mOptionViewsHash;
+    private ReportUiHelper mReportUIHelper;
 
     public PostActivity()
     {
@@ -73,9 +49,12 @@ public class PostActivity extends AppCompatActivity implements OnClickListener, 
             mLongitude = i.getDoubleExtra("longitude", -1.0);
             if (layer != null && mLatitude >= 0 && mLongitude >= 0)
             {
-                mOptionViewsHash = new ReportUiBuilder(this).build(layer, locality);
+                mReportUIHelper = new ReportUiHelper(this);
+                mOptionViewsHash = mReportUIHelper.build(layer, locality);
             }
         }
+        else
+            Log.e("onCreate", " intent is null");
 
     }
 
@@ -92,6 +71,7 @@ public class PostActivity extends AppCompatActivity implements OnClickListener, 
 
         if (view.getId() == R.id.buttonOk)
         {
+            boolean ok = mReportUIHelper.verify();
             Intent intent = new Intent();
             intent.putExtra("comment", "-");
             intent.putExtra("latitude", mLatitude);

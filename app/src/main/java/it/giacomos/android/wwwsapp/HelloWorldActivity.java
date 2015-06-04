@@ -443,7 +443,7 @@ OnItemSelectedListener /* main spinner */
         mLayersSpinnerAdapter = new IconTextSpinnerAdapter(this, R.layout.post_icon_text_spinner, this);
         for(LayerItemData d : installedLayers)
         {
-            Bitmap bmp = fu.loadBitmapFromStorage(LayerListActivity.CACHE_LIST_DIR + d.name + ".bmp", this);
+            Bitmap bmp = fu.loadBitmapFromStorage("layers/" + d.name + "/bmps/" + d.name + ".bmp", this);
             mLayersSpinnerAdapter.add(d.name, bmp);
         }
         Spinner layersSpin = (Spinner ) findViewById(R.id.toolbar_spinner);
@@ -456,6 +456,8 @@ OnItemSelectedListener /* main spinner */
 	{
 		mCurrentFragmentId = -1;
 		mLastTouchedY = -1;
+
+		mLayerChangedListeners = new ArrayList<LayerChangedListener>();
 
 		/* if it's time to get personal message, wait for network and download it */
 		if(!mSettings.timeToGetPersonalMessage() && !mSettings.getPersonalMessageData().isEmpty())
@@ -986,12 +988,11 @@ OnItemSelectedListener /* main spinner */
 		    String layer = mLayersSpinnerAdapter.getItem(layerSp.getSelectedItemPosition());
 			Intent i = new Intent(this, PostActivity.class);
 			if(loci != null)
-			{
 				i.putExtra("locality", loci.locality);
-				i.putExtra("layer", layer);
-                i.putExtra("latitude", loc.getLatitude());
-                i.putExtra("longitude", loc.getLongitude());
-			}
+			i.putExtra("layer", layer);
+			i.putExtra("latitude", loc.getLatitude());
+			i.putExtra("longitude", loc.getLongitude());
+
 			this.startActivityForResult(i, REPORT_ACTIVITY_FOR_RESULT_ID);
 		}
 	}

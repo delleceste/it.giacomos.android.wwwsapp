@@ -25,6 +25,7 @@ import java.util.zip.ZipInputStream;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,7 +40,10 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
     private String mAppLang;
     private String mErrorMsg;
     private int mDensityDpi;
+    private float mScaledDensity;
     private Context mContext;
+
+    private final int ICON_UNIT_DIM = 48;
 
     public InstallTaskState state;
 
@@ -54,6 +58,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
         WindowManager wMan = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
         wMan.getDefaultDisplay().getMetrics(displayMetrics);
         mDensityDpi = displayMetrics.densityDpi;
+        mScaledDensity = displayMetrics.scaledDensity;
         mContext = ctx;
     }
 
@@ -63,6 +68,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
         final int BUFFER_SIZE = 1024;
         int percentage;
         int displayResolution;
+        int scaledW, scaledH;
         DisplayMetrics displayMetrics = new DisplayMetrics();
         state = InstallTaskState.DOWNLOADING;
         Log.e("InstallTask.doInBackground", "1. starting download of layer " + mLayerName);
@@ -156,7 +162,7 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
             File extractedDir = new File(mInstallDirName);
             if(extractedDir.exists())
             {
-
+                scaledH = scaledW = Math.round(ICON_UNIT_DIM * mScaledDensity);
                 Log.e("InstallTask.doInBg", "dir exists " + mInstallDirName);
                 String filename = "";
                         /* this is where downloaded icons are */
@@ -178,11 +184,20 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
                         {
                             BitmapFactory.Options bo = new BitmapFactory.Options();
                             bo.inDensity = this.mDensityDpi;
+                            bo.inJustDecodeBounds = false;
                             Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath(), bo);
                             Log.e("InstallTask.doInBg", " decoded bitmap " + f.getName() + ": siz " + bmp.getWidth() + " x " + bmp.getHeight() +
-                                    "density: " + bmp.getDensity());
-
+                                    "density: " + bmp.getDensity() + " scaled density " + mScaledDensity + " W/H " + bo.outHeight);
+                            // scaledW = scaledH = Math.round(ICON_UNIT_DIM * mScaledDensity);
                             try {
+                                float ratioH = ((float) scaledW) / bmp.getWidth();
+                                float ratioW = ((float) scaledH) / bmp.getHeight();
+                                Matrix matrix = new Matrix();
+                                // RESIZE THE BIT MAP
+                                matrix.postScale(ratioH, ratioW);
+                                bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
+                                    Log.e("InstallTask.doInBg", " decoded bitmap AND RESIZED " + f.getName() + ": siz " + bmp.getWidth() + " x " + bmp.getHeight() +
+                                        " density: " + bmp.getDensity() + " scaled density " + mScaledDensity + "scaledH, scaledW " + scaledW + ", " + scaledH);
                                 FileOutputStream fos;
                                 iconName = iconName.replace(".png", "");
                                 filename = bmpDirName + "/" + iconName + ".bmp";
@@ -230,6 +245,12 @@ public class InstallTask extends AsyncTask<Void, Integer, String>
         }
 
         return "";
+    }
+
+    private void mRescaleBitmap(int mDensityDpi, Bitmap bmp)
+    {
+        if(mDensityDpi == 0)
+            ;
     }
 
     public boolean unzip(String location, String zipFile) throws IOException
