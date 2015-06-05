@@ -1,6 +1,6 @@
 package it.giacomos.android.wwwsapp.widgets.map;
 
-import it.giacomos.android.wwwsapp.widgets.map.report.network.PostType;
+import it.giacomos.android.wwwsapp.report.network.PostType;
 
 import com.google.android.gms.maps.model.LatLng;
 

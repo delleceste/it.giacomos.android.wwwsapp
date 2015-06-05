@@ -8,13 +8,11 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.Person.Image;
 
-import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.floatingactionbutton.FloatingActionButton;
 import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
 import it.giacomos.android.wwwsapp.interfaceHelpers.MenuActionsManager;
@@ -42,17 +40,15 @@ import it.giacomos.android.wwwsapp.service.sharedData.ReportNotification;
 import it.giacomos.android.wwwsapp.service.sharedData.ReportRequestNotification;
 import it.giacomos.android.wwwsapp.widgets.AnimatedImageView;
 import it.giacomos.android.wwwsapp.widgets.map.MapFragmentListener;
-import it.giacomos.android.wwwsapp.widgets.map.MapMode;
-import it.giacomos.android.wwwsapp.widgets.map.MapViewMode;
 import it.giacomos.android.wwwsapp.widgets.map.OMapFragment;
 import it.giacomos.android.wwwsapp.widgets.map.ReportRequestListener;
-import it.giacomos.android.wwwsapp.widgets.map.report.RemovePostConfirmDialog;
-import it.giacomos.android.wwwsapp.widgets.map.report.PostActivity;
-import it.giacomos.android.wwwsapp.widgets.map.report.ReportRequestDialogFragment;
-import it.giacomos.android.wwwsapp.widgets.map.report.network.PostActionResultListener;
-import it.giacomos.android.wwwsapp.widgets.map.report.network.PostReport;
-import it.giacomos.android.wwwsapp.widgets.map.report.network.PostType;
-import it.giacomos.android.wwwsapp.widgets.map.report.tutorialActivity.TutorialPresentationActivity;
+import it.giacomos.android.wwwsapp.report.RemovePostConfirmDialog;
+import it.giacomos.android.wwwsapp.report.ReportActivity;
+import it.giacomos.android.wwwsapp.report.ReportRequestDialogFragment;
+import it.giacomos.android.wwwsapp.report.network.PostActionResultListener;
+import it.giacomos.android.wwwsapp.report.network.PostReport;
+import it.giacomos.android.wwwsapp.report.network.PostType;
+import it.giacomos.android.wwwsapp.report.tutorialActivity.TutorialPresentationActivity;
 
 import android.graphics.Bitmap;
 import android.support.v4.view.MenuItemCompat;
@@ -986,7 +982,7 @@ OnItemSelectedListener /* main spinner */
 		{
             Spinner layerSp = (Spinner) findViewById(R.id.toolbar_spinner);
 		    String layer = mLayersSpinnerAdapter.getItem(layerSp.getSelectedItemPosition());
-			Intent i = new Intent(this, PostActivity.class);
+			Intent i = new Intent(this, ReportActivity.class);
 			if(loci != null)
 				i.putExtra("locality", loci.locality);
 			i.putExtra("layer", layer);

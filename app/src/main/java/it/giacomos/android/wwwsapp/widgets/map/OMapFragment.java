@@ -1,7 +1,6 @@
 package it.giacomos.android.wwwsapp.widgets.map;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,10 +16,9 @@ import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.locationUtils.GeoCoordinates;
 import it.giacomos.android.wwwsapp.preferences.Settings;
 import it.giacomos.android.wwwsapp.widgets.OAnimatedTextView;
-import it.giacomos.android.wwwsapp.widgets.map.report.OnTiltChangeListener;
-import it.giacomos.android.wwwsapp.widgets.map.report.network.PostReportAsyncTaskPool;
+import it.giacomos.android.wwwsapp.report.OnTiltChangeListener;
+
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

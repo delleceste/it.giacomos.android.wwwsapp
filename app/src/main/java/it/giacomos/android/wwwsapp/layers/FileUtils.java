@@ -46,7 +46,7 @@ public class FileUtils
 		catch (IOException ex) {
 
 		}		
-		Log.e("FileUtils.loadFromStorage", "loading string for " + filename + " took " + (System.currentTimeMillis() - startT));
+//		Log.e("FileUtils.loadFromStorage", "loading string for " + filename + " took " + (System.currentTimeMillis() - startT));
 		return txt;
 	}
 
@@ -60,7 +60,7 @@ public class FileUtils
 		 */
 		filename = getFilePath(filename, ctx);
 		bmp = BitmapFactory.decodeFile(filename);
-		Log.e("FileUtils.loadFromStorage", "loading bitmap for  " + filename + " took " + (System.currentTimeMillis() - startT));
+	//	Log.e("FileUtils.loadFromStorage", "loading bitmap for  " + filename + " took " + (System.currentTimeMillis() - startT));
 		return bmp;
 	}
 
@@ -83,7 +83,7 @@ public class FileUtils
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		Log.e("FileUtils.saveToStorage", "saving bitmap for " + filename + " took " + (System.currentTimeMillis() - startT));
+	//	Log.e("FileUtils.saveToStorage", "saving bitmap for " + filename + " took " + (System.currentTimeMillis() - startT));
 	}
 
 	public void saveToStorage(byte[] bytes, String filename, Context ctx)
@@ -109,7 +109,7 @@ public class FileUtils
 			{
 				Log.e("FileUtils.saveToStorage", e.getLocalizedMessage());
 			}
-			Log.e("FileUtils.saveToStorage", "saving string for " + filename + " took " + (System.currentTimeMillis() - startT));
+	//		Log.e("FileUtils.saveToStorage", "saving string for " + filename + " took " + (System.currentTimeMillis() - startT));
 		}
 	}
 
