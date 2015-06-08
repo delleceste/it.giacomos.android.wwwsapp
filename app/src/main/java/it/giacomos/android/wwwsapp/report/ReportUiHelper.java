@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,13 +51,14 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
     private final int OPTION_CB_ID = 1126332445;
     private HashMap<Integer, Integer> mOptionViewsHash = new HashMap<Integer, Integer>();
     private ArrayList<WidgetData> mData;
-
+    private String mTitle;
 
     public ReportUiHelper(ReportActivity a)
     {
         mActivity = a;
         mOptionCheckBoxCount = 0;
         mData = new ArrayList<WidgetData>();
+        mTitle = "No title";
     }
 
     private boolean inputsValid()
@@ -66,6 +68,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
 
         for (WidgetData d : mData)
         {
+            isValid = true;
             TextValueInterface textValueInterface = null;
             View view = mActivity.findViewById(d.id);
             try
@@ -82,10 +85,15 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
                 }
             } catch (ClassCastException e)
             {
-                Log.e("ReportUIHelper.inputsValid", "No TextValueInterface with id " + d.id + ": " + e.getLocalizedMessage());
+                Log.e("ReportUIHel.inputsValid", "No TextValueInterface with id " + d.id + ": " + e.getLocalizedMessage());
             }
         }
         return isValid;
+    }
+
+    public String getTitle()
+    {
+        return mTitle;
     }
 
     public void build(String layer, String locality)
@@ -118,6 +126,13 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
                     if (layername.compareTo(layer) == 0)
                     {
                         ui.normalize();
+                        NodeList titleElements = ui.getElementsByTagName("title");
+                        if(titleElements.getLength() == 1)
+                        {
+                            Element title = (Element) titleElements.item(0);
+                            if(title.hasAttribute("text"))
+                                mTitle = title.getAttribute("text");
+                        }
                         NodeList elements = ui.getElementsByTagName("property");
                         for (int i = 0; i < elements.getLength(); i++)
                         {
@@ -220,7 +235,6 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         mPlaceholders.put(s, locality);
     }
 
-
     /**
      * Adds an interface widget to the layout according to the widget data specified.
      * If the data is optional, a checkbox will be placed in order to enable the option.
@@ -263,7 +277,8 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
             lo.addView(cb);
             nameView = cb;
             cb.setOnCheckedChangeListener(this);
-        } else
+        }
+        else
         {
             TextView label = new TextView(mActivity);
             label.setText(name);
@@ -286,7 +301,8 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
             editText.setLayoutParams(lp2);
             editText.addTextChangedListener(this);
             lo.addView(editText);
-        } else if (repr.compareTo("Spinner") == 0)
+        }
+        else if (repr.compareTo("Spinner") == 0)
         {
             RSpinner spin = new RSpinner(mActivity);
             spin.setId(id);
@@ -299,7 +315,8 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
             }
             spin.setLayoutParams(lp2);
             lo.addView(spin);
-        } else if (repr.compareTo("Button") == 0 && data.values.size() == 1)
+        }
+        else if (repr.compareTo("Button") == 0 && data.values.size() == 1)
         {
             Button b = new Button(mActivity);
             WidgetValue v = data.values.get(0);
@@ -308,6 +325,21 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
             b.setId(id);
             b.setLayoutParams(lp2);
             lo.addView(b);
+        }
+        else if (repr.compareTo("Checkbox") == 0)
+        {
+            RCheckBox rcb = new RCheckBox(mActivity);
+            if (data.values.size() > 0)
+            {
+                WidgetValue v = data.values.get(0);
+                if (v.text.compareTo("true") == 0)
+                    rcb.setChecked(true);
+            }
+            rcb.setText(""); /* there is the label TextView */
+            rcb.setOnCheckedChangeListener(this);
+            rcb.setId(id);
+            rcb.setLayoutParams(lp2);
+            lo.addView(rcb);
         }
 
         if (cb != null)
@@ -357,9 +389,15 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
-        int viewId = this.mOptionViewsHash.get(buttonView.getId());
-        mActivity.findViewById(viewId).setEnabled(isChecked);
-        mActivity.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+        int optionCheckboxId = buttonView.getId();
+        if(mOptionViewsHash.containsKey(optionCheckboxId))
+        {
+            /* An "option" checkbox has been checked. Enable or disable the corresponding element */
+            int viewId = this.mOptionViewsHash.get(buttonView.getId());
+            mActivity.findViewById(viewId).setEnabled(isChecked);
+            mActivity.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+        }
+        /* else the checkbox is a property element */
     }
 
     @Override

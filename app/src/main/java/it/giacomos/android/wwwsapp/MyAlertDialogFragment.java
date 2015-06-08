@@ -27,6 +27,12 @@ public class MyAlertDialogFragment extends DialogFragment implements DialogInter
 		.show(a.getFragmentManager(), "ErrorDialog");
 	}
 
+	public static void MakeGenericError(int title, int message, Activity a)
+	{
+		MyAlertDialogFragment.newInstance(title, message, R.drawable.ic_dialog_alert)
+		.show(a.getFragmentManager(), "ErrorDialog");
+	}
+
 	public static void MakeGenericError(int message, Activity a)
 	{
 		MyAlertDialogFragment.newInstance(R.string.error_message, message, R.drawable.ic_dialog_alert)
@@ -67,6 +73,16 @@ public class MyAlertDialogFragment extends DialogFragment implements DialogInter
 		Bundle args = new Bundle();
 		args.putInt("name", title);
 		args.putInt("message", message);
+		args.putInt("icon", icon);
+		frag.setArguments(args);
+		return frag;
+	}
+
+	public static MyAlertDialogFragment newInstance(String title, String message, int icon) {
+		MyAlertDialogFragment frag = new MyAlertDialogFragment();
+		Bundle args = new Bundle();
+		args.putString("name", title);
+		args.putString("message_str", message);
 		args.putInt("icon", icon);
 		frag.setArguments(args);
 		return frag;

@@ -20,6 +20,11 @@ public class Urls {
 		return "http://www.giacomos.it/wwwsapp/get_layer_bitmap.php";
 	}
 
+	public String reportServiceUrl()
+	{
+		return  "http://www.giacomos.it/wwwsapp/report.php";
+	}
+
 	public String getAppStoreUrl() {
 		return "";
 	}
@@ -52,6 +57,6 @@ public class Urls {
 	public String layerDownloadUrl() {
 		return "http://www.giacomos.it/wwwsapp/fetch_layer.php";
 	}
-	
-	
+
+
 }

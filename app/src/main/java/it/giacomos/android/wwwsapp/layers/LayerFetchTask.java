@@ -39,7 +39,6 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 		mErrorMsg = "";
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	protected synchronized Boolean doInBackground(Void ...parame) 
 	{
@@ -138,11 +137,11 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 	        		 * to a unauthenticated wireless network... it happened at Elettra...)
 	        		 */
 	        		if(bitmap == null) /* prevent from calling onBitmapBytesUpdate */
-	        			Log.e("LayerFetchTask.doInBackground", "Error decoding bitmap for layer " + layer_name);
+	        			Log.e("LayerFetchTask.doInBg", "Error decoding bitmap for layer " + layer_name);
 	        		else
 	        		{
 	        			cache.saveBitmapToStorage(mBitmapBytes, LayerListActivity.CACHE_LIST_DIR + layer_name + ".bmp", mContext);
-	        			Log.e("LayerFetchTask.doInBackground", " creating bitmap drawable for " + bitmap + 
+	        			Log.e("LayerFetchTask.doInBg", " creating bitmap drawable for " + bitmap +
 	        					": " + bitmap.getWidth() + "x" + bitmap.getHeight());
 	        		}
 	        		progress++;
@@ -151,7 +150,7 @@ public class LayerFetchTask extends AsyncTask<Void, LayerFetchTaskProgressData, 
 	        		byteBuffer.flush();
 	        		inputStream.close();
 	        		percent = (int) Math.round((float) progress / (float) total * 100.0);
-	        		Log.e("LayerFetchTask.doInBackground", " publishing progress " + percent);
+	        		Log.e("LayerFetchTask.doInBg", " publishing progress " + percent);
 	        		this.publishProgress(new LayerFetchTaskProgressData(i.name, i.available_version, percent));
 				}
 				if(!isCancelled())

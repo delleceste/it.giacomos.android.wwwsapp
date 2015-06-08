@@ -176,10 +176,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.ReportDataService" >
-        </service>
-        
-          <service android:name=".service.ReportDataService" >
+         <service android:name=".report.service.ReportDataService" >
         </service>
         
             <service android:name=".layers.installService.LayerInstallService" >
@@ -218,6 +215,15 @@
             android:label="@string/title_activity_settings"
             android:parentActivityName=".HelloWorldActivity"
             android:theme="@android:style/Theme.Holo.Light" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+        </activity>
+
+        <activity
+            android:name=".ErrorActivity"
+            android:parentActivityName=".HelloWorldActivity"
+            android:theme="@android:style/Theme.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />

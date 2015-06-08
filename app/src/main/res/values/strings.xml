@@ -756,5 +756,8 @@ Please note: requests devoid of the full name and date will be ignored.\n\n</str
     <string name="layer_fetch_cancelled">Layer download or installation cancelled</string>
     <string name="Layer">Layer </string>
     <string name="successfully_removed"> successfully removed</string>
-    
+    <string name="report_service_error">Error publishing report</string>
+    <string name="report_lat_lon_unavailable">Latitude and longitude are not available</string>
+    <string name="report_post_successful">Report successfully published</string>
+
 </resources>

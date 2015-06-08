@@ -191,7 +191,8 @@ OnItemSelectedListener /* main spinner */
 			Presage.getInstance().start();
 		}
 
-        if(savedInstanceState != null && !savedInstanceState.getString("layer").isEmpty())
+        if(savedInstanceState != null && savedInstanceState.getString("layer") != null &&
+				!savedInstanceState.getString("layer").isEmpty())
             mCurrentLayerName = savedInstanceState.getString("layer");
         else
             mCurrentLayerName = mSettings.getCurrentLayerName();
@@ -1025,25 +1026,7 @@ OnItemSelectedListener /* main spinner */
 		//		Log.e("onActivityResult", "result " + resultCode);
 		if(requestCode == REPORT_ACTIVITY_FOR_RESULT_ID)
 		{
-			if(resultCode == Activity.RESULT_OK)
-			{
-				Bundle extras = data.getExtras();
-				String locality = extras.getString("locality");
 
-				Location reportLocation = new Location("");
-				reportLocation.setLatitude(data.getDoubleExtra("latitude", 0));
-				reportLocation.setLongitude(data.getDoubleExtra("longitude", 0));
-				GcmRegistrationManager gcmRM = new GcmRegistrationManager();
-
-				/* ok */
-				String deviceId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
-				String registrationId = gcmRM.getRegistrationId(getApplicationContext());
-				Log.e("onActivityResult", " my reg id is " + registrationId);
-				new PostReport(data.getStringExtra("user"), deviceId, registrationId,
-						locality, reportLocation.getLatitude(), reportLocation.getLongitude(), 
-						data.getIntExtra("sky", 0), data.getIntExtra("wind", 0), 
-						data.getStringExtra("temperature"), data.getStringExtra("comment"), this);
-			}
 		}
 		else if(requestCode == TUTORIAL_ACTIVITY_FOR_RESULT_ID)
 		{
