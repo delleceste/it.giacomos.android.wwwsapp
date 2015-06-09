@@ -4,7 +4,7 @@ import it.giacomos.android.wwwsapp.report.network.PostType;
 
 import com.google.android.gms.maps.model.LatLng;
 
-/** HelloWorldActivity implements this interface 
+/** HelloWorldActivity implements this interface
  * 
  * @author giacomo
  *

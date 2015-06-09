@@ -1,6 +1,6 @@
 package it.giacomos.android.wwwsapp.report.network;
 
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 import android.os.AsyncTask;
 
 /** This class manages posting a report on the server.

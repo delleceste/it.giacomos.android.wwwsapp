@@ -1,7 +1,6 @@
 package it.giacomos.android.wwwsapp.layers.installService;
 
-import it.giacomos.android.wwwsapp.layers.LayerItemData;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,8 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -29,7 +26,6 @@ import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.WindowManager;
 
 public class InstallTask extends AsyncTask<Void, Integer, String>

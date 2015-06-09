@@ -1,41 +1,35 @@
-package it.giacomos.android.wwwsapp.report.service;
+package it.giacomos.android.wwwsapp.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
 
-import it.giacomos.android.wwwsapp.ErrorActivity;
-import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
+import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 
 /**
  * Created by giacomo on 8/06/15.
  */
-public class ReportDataService extends IntentService
+public class PostDataService extends IntentService
 {
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
      */
-    public ReportDataService()
+    public PostDataService()
     {
-        super("ReportDataService");
+        super("PostDataService");
     }
 
     @Override
@@ -45,16 +39,17 @@ public class ReportDataService extends IntentService
         String error = "";
         Urls myUrls = new Urls();
         URL url = null;
-        if(intent.hasExtra("params"))
+        String serviceName = "Generic PostDataService";
+        if(intent.hasExtra("params") && intent.hasExtra("url") && intent.hasExtra("serviceName"))
         {
+            serviceName = intent.getStringExtra("serviceName");
             try
             {
-                url = new URL(myUrls.reportServiceUrl());
+                url = new URL(intent.getStringExtra("url"));
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
                 data = intent.getStringExtra("params");
-                Log.e("ReportDataS.onHandleInt", "url: " + url.toString() + " - data " + data);
+                Log.e("PostDataS.onHandleInt", "url: " + url.toString() + " - data " + data);
                 OutputStreamWriter wr;
                 wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(data);
@@ -68,7 +63,7 @@ public class ReportDataService extends IntentService
                 if(response.compareTo("0") != 0)
                     error = response;
                 in.close();
-                Log.e("ReportDataSrv.onHandleInt", " response " + response);
+                Log.e("PostDataS.onHandleI", " response " + response);
 
             } catch (MalformedURLException e)
             {
@@ -83,17 +78,19 @@ public class ReportDataService extends IntentService
         }
         else
             error = getString(R.string.report_lat_lon_unavailable);
+
+        Intent reportIntent = new Intent(HelloWorldActivity.REPORT_DATA_SERVICE_INTENT);
+        reportIntent.putExtra("serviceName", serviceName);
         if(error.length() > 0)
         {
-            Log.e("ReportDataService.onHandleInt", " Error " + error);
-            Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-//            Intent i = new Intent(this, ErrorActivity.class);
-//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            i.putExtra("title", getString(R.string.report_service_error));
-//            i.putExtra("text", error);
-//            startActivity(i);
+            Log.e("PostDataS.onHandleI", " Error " + error);
+            reportIntent.putExtra("type", "error");
+            reportIntent.putExtra("text", error);
         }
         else
-            Toast.makeText(this, R.string.report_post_successful, Toast.LENGTH_SHORT).show();
+        {
+            reportIntent.putExtra("type", "success");
+        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(reportIntent);
     }
 }

@@ -3,7 +3,7 @@ package it.giacomos.android.wwwsapp.report;
 import com.google.android.gms.maps.model.LatLng;
 
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.report.network.PostActionResultListener;
 import it.giacomos.android.wwwsapp.report.network.PostType;
 import it.giacomos.android.wwwsapp.report.network.RemovePostTask;

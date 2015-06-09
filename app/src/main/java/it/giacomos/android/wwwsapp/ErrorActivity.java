@@ -19,6 +19,7 @@ public class ErrorActivity  extends Activity
             int title = i.getIntExtra("title", R.string.error_message);
             int text = i.getIntExtra("text", R.string.download_error);
             MyAlertDialogFragment.MakeGenericError(title, text, this);
+            this.finish();
         }
 
     }

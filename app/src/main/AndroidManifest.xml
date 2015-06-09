@@ -109,7 +109,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value=".HelloWorldActivity" />
         </activity>
 
 
@@ -166,6 +166,7 @@
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_broadcast_receiver" >
 
+
             <!--
               android:permission="string"
               android:process="string" >
@@ -176,7 +177,7 @@
             </intent-filter>
         </receiver>
 
-         <service android:name=".report.service.ReportDataService" >
+         <service android:name=".service.PostDataService" >
         </service>
         
             <service android:name=".layers.installService.LayerInstallService" >
@@ -194,10 +195,10 @@
         activity
             android:name="it.giacomos.android.wwwsapp.trial.BuyProActivity"
             android:label="@string/title_activity_buy_pro"
-            android:parentActivityName="it.giacomos.android.wwwsapp.HelloWorldActivity" >
+            android:parentActivityName="it.giacomos.android.wwwsapp.PostDataServiceWorldActivityldActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value="it.giacomos.android.wwwsapp.PostDataServiceWorldActivityldActivity" />
         </activity
         -->
 
@@ -208,7 +209,7 @@
             android:theme="@style/OtherActivitiesTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value=".HelloWorldActivity" />
         </activity>
         <activity
             android:name=".preferences.SettingsActivity"
@@ -217,7 +218,7 @@
             android:theme="@android:style/Theme.Holo.Light" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value=".HelloWorldActivity" />
         </activity>
 
         <activity
@@ -226,7 +227,7 @@
             android:theme="@android:style/Theme.Dialog" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value=".HelloWorldActivity" />
         </activity>
 
         <receiver
@@ -272,7 +273,7 @@
             android:theme="@android:style/Theme.Holo.Light"  >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.HelloWorldActivity" />
+                android:value=".HelloWorldActivity" />
         </activity>
 
         

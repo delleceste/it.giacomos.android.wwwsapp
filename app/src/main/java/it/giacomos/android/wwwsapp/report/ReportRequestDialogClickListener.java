@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.preferences.Settings;
 import it.giacomos.android.wwwsapp.report.network.PostReportRequestTask;
 import it.giacomos.android.wwwsapp.report.network.PostType;

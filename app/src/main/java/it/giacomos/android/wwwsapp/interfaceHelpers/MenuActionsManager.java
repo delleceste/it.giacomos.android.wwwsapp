@@ -1,7 +1,7 @@
 package it.giacomos.android.wwwsapp.interfaceHelpers;
 
-import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
+import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.locationUtils.GeocodeAddressUpdateListener;
 import it.giacomos.android.wwwsapp.locationUtils.LocationInfo;
@@ -69,14 +69,12 @@ public class MenuActionsManager implements GeocodeAddressUpdateListener
 			break;
 			
 		case R.id.menu_config_info:
-			ConfigInfo configInfo = new ConfigInfo();
-			MyAlertDialogFragment.MakeGenericInfo(Html.fromHtml(configInfo.gatherInfo(mActivity)).toString(), mActivity);
-			configInfo = null;
+
 			break;
 
 		case R.id.menu_settings:
 			Intent prefsActivityIntent = new Intent(mActivity, SettingsActivity.class);
-			mActivity.startActivityForResult(prefsActivityIntent, HelloWorldActivity.SETTINGS_ACTIVITY_FOR_RESULT_ID);	
+			mActivity.startActivityForResult(prefsActivityIntent, HelloWorldActivity.SETTINGS_ACTIVITY_FOR_RESULT_ID);
 			break;
 		}
 		return true;

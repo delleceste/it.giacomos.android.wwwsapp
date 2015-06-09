@@ -63,6 +63,8 @@ public class ReportDataBuilder
             for (String k : mData.keySet())
                 try
                 {
+                    if(!s.isEmpty())
+                        s += "&";
                     s += URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(mData.get(k), "UTF-8");
                 } catch (UnsupportedEncodingException e)
                 {

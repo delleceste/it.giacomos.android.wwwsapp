@@ -1,6 +1,6 @@
 package it.giacomos.android.wwwsapp.layers;
 
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -14,7 +14,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

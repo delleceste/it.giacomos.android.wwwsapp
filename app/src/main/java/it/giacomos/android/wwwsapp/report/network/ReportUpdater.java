@@ -19,7 +19,7 @@ import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.layers.FileUtils;
 import it.giacomos.android.wwwsapp.network.NetworkStatusMonitor;
 import it.giacomos.android.wwwsapp.network.NetworkStatusMonitorListener;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 
 public class ReportUpdater   
 implements NetworkStatusMonitorListener,
@@ -38,7 +38,7 @@ ReportUpdateTaskListener, ConnectionCallbacks, OnConnectionFailedListener
 	{
 		mContext = ctx;
 		mGoogleApiClient = new GoogleApiClient.Builder(ctx).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
-		mNetworkStatusMonitor = new NetworkStatusMonitor(this);
+		mNetworkStatusMonitor = new NetworkStatusMonitor(this, ctx);
 		/* when the map switches mode, a new ReportUpdater is created, and it must be registered.
 		 * onResume is not called when map switches mode. Instead, when the activity is paused, 
 		 * the onPause method of ReportUpdater unregisters from NetworkStatusMonitor.

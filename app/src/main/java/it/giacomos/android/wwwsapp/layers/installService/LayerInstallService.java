@@ -1,15 +1,7 @@
 package it.giacomos.android.wwwsapp.layers.installService;
 
-import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
 import it.giacomos.android.wwwsapp.layers.LayerListActivity;
-import it.giacomos.android.wwwsapp.network.state.Urls;
-import it.giacomos.android.wwwsapp.preferences.Settings;
-import it.giacomos.android.wwwsapp.service.sharedData.NotificationData;
-import it.giacomos.android.wwwsapp.service.sharedData.NotificationDataFactory;
-import it.giacomos.android.wwwsapp.service.sharedData.RainNotification;
-import it.giacomos.android.wwwsapp.service.sharedData.ServiceSharedData;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,40 +9,23 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.concurrent.Executor;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
-import com.google.android.gms.plus.model.people.Person.Image;
-
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
-import android.provider.Settings.Secure;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class LayerInstallService extends Service implements InstallTaskListener
 {

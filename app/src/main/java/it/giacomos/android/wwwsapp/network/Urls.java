@@ -1,4 +1,4 @@
-package it.giacomos.android.wwwsapp.network.state;
+package it.giacomos.android.wwwsapp.network;
 
 import java.lang.String;
 
@@ -59,4 +59,8 @@ public class Urls {
 	}
 
 
+	public String getRegisterUserUrl()
+	{
+		return "http://www.giacomos.it/wwwsapp/register_user.php";
+	}
 }

@@ -4,12 +4,11 @@ import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.service.ServiceManager;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 
 public class PersonalMessageManager 
 {
-	public PersonalMessageManager(HelloWorldActivity helloWorldActivity, PersonalMessageData data) 
+	public PersonalMessageManager(HelloWorldActivity helloWorldActivity, PersonalMessageData data)
 	{
 		/* stop service */
 		ServiceManager serviceManager = new ServiceManager();

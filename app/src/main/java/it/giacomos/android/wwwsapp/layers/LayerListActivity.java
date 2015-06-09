@@ -110,7 +110,7 @@ ServiceStateChangedBroadcastReceiverListener
 	{
 		super.onResume();
 		/* monitor network status change */
-		m_networkStatusMonitor = new NetworkStatusMonitor(this);
+		m_networkStatusMonitor = new NetworkStatusMonitor(this, this);
 		/* register receiver for the install service here, not simply when starting an installation
 		 * because this activity may be resumed while a download is in progress.
 		 */

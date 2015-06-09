@@ -3,7 +3,7 @@ package it.giacomos.android.wwwsapp.service;
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
-import it.giacomos.android.wwwsapp.network.state.Urls;
+import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.preferences.Settings;
 import it.giacomos.android.wwwsapp.service.sharedData.NotificationData;
 import it.giacomos.android.wwwsapp.service.sharedData.NotificationDataFactory;
@@ -28,7 +28,6 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.Person.Image;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -55,7 +54,6 @@ implements  FetchRequestsTaskListener, Runnable, ConnectionCallbacks, OnConnecti
 	private long mSleepInterval;
 	private boolean mIsStarted;
 	private Settings mSettings;
-	private GPlusUserInfo mGPlusUInfo;
 	/* timestamp updated when the AsyncTask completes, successfully or not */
 	private long mLastTaskStartedTimeMillis;
 	private long mCheckIfNeedRunIntervalMillis;
@@ -172,7 +170,6 @@ implements  FetchRequestsTaskListener, Runnable, ConnectionCallbacks, OnConnecti
 		String account = Plus.AccountApi.getAccountName(mGApiClient);
 		if(mLocation != null && account != null)
 		{
-			mGPlusUInfo = new GPlusUserInfo(account, personName, personImage.getUrl());
 			startTask();
 			/* mark the last execution complete timestamp */
 			mLastTaskStartedTimeMillis = System.currentTimeMillis();
@@ -202,7 +199,7 @@ implements  FetchRequestsTaskListener, Runnable, ConnectionCallbacks, OnConnecti
 			/* get the registration id (for new versions, to work with google cloud messaging */
 			GcmRegistrationManager gcmRm = new GcmRegistrationManager();
 			String registrationId = gcmRm.getRegistrationId(this);
-			Log.e("LayerInstallService.startTask", "reg id " + registrationId);
+			Log.e("LayerInstallS.startTask", "reg id " + registrationId);
 
 			if(!registrationId.isEmpty())
 			{
@@ -211,7 +208,6 @@ implements  FetchRequestsTaskListener, Runnable, ConnectionCallbacks, OnConnecti
 				 */
 				mUpdateMyLocationTask = new UpdateMyLocationTask(this, deviceId,
 						registrationId,
-						mGPlusUInfo,
 						mLocation.getLatitude(), 
 						mLocation.getLongitude());
 				/* 

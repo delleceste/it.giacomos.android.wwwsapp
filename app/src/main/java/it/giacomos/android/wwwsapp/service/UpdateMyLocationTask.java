@@ -26,14 +26,12 @@ public class UpdateMyLocationTask extends AsyncTask<String, Integer, String> {
 	String mDeviceId, mRegistrationId;
 	private FetchRequestsTaskListener mServiceDataTaskListener;
 	double mLatitude, mLongitude;
-	GPlusUserInfo mGPlusUInfo;
 
 	private static String CLI = "afe0983der38819073rxc1900lksjd";
 
 	public UpdateMyLocationTask(FetchRequestsTaskListener sdtl, 
 			String deviceId, 
-			String registrationId, 
-			GPlusUserInfo gpui,
+			String registrationId,
 			double lat, 
 			double longit)
 	{
@@ -43,7 +41,6 @@ public class UpdateMyLocationTask extends AsyncTask<String, Integer, String> {
 		mRegistrationId = registrationId;
 		mLatitude = lat;
 		mLongitude = longit;
-		mGPlusUInfo = gpui;
 	}
 
 	public void removeFetchRequestTaskListener()
@@ -64,9 +61,9 @@ public class UpdateMyLocationTask extends AsyncTask<String, Integer, String> {
 		postParameters.add(new BasicNameValuePair("rid", mRegistrationId));
 		postParameters.add(new BasicNameValuePair("la", String.valueOf(mLatitude)));
 		postParameters.add(new BasicNameValuePair("lo", String.valueOf(mLongitude)));
-		postParameters.add(new BasicNameValuePair("account", mGPlusUInfo.account));
-		postParameters.add(new BasicNameValuePair("display_name", mGPlusUInfo.displayName));
-		postParameters.add(new BasicNameValuePair("gplus_url", mGPlusUInfo.url));
+//	postParameters.add(new BasicNameValuePair("account", mGPlusUInfo.account));
+//		postParameters.add(new BasicNameValuePair("display_name", mGPlusUInfo.displayName));
+//		postParameters.add(new BasicNameValuePair("gplus_url", mGPlusUInfo.url));
 		
 	//	Log.e("UpdateMyLocationTask", "rid " + mRegistrationId + ", d " + mDeviceId);
 		UrlEncodedFormEntity form;
