@@ -60,10 +60,10 @@ public class PostDataService extends IntentService
                 String currentLine;
                 while((currentLine = in.readLine()) != null)
                     response += currentLine + "\n";
-                if(response.compareTo("0") != 0)
+                if(response.trim().compareTo("0") != 0) /* trim trailing \n */
                     error = response;
                 in.close();
-                Log.e("PostDataS.onHandleI", " response " + response);
+                Log.e("PostDataS.onHandleI", " response \"" + response + "\"");
 
             } catch (MalformedURLException e)
             {
@@ -77,7 +77,7 @@ public class PostDataService extends IntentService
             }
         }
         else
-            error = getString(R.string.report_lat_lon_unavailable);
+            error = getString(R.string.post_data_service_missing_params);
 
         Intent reportIntent = new Intent(HelloWorldActivity.REPORT_DATA_SERVICE_INTENT);
         reportIntent.putExtra("serviceName", serviceName);

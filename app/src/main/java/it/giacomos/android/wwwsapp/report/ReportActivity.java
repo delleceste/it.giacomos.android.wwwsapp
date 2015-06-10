@@ -92,6 +92,7 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
             reportDataBuilder.add("registration_id", registrationId);
 
             Intent service_intent = new Intent(this, PostDataService.class);
+            service_intent.putExtra("serviceName", "PublishPostService");
             service_intent.putExtra("params", reportDataBuilder.toString());
             service_intent.putExtra("url", new Urls().reportServiceUrl());
 

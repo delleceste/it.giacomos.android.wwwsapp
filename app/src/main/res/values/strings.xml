@@ -759,5 +759,6 @@ Please note: requests devoid of the full name and date will be ignored.\n\n</str
     <string name="report_service_error">Error publishing report</string>
     <string name="report_lat_lon_unavailable">Latitude and longitude are not available</string>
     <string name="report_post_successful">Report successfully published</string>
+    <string name="post_data_service_missing_params">PostDataService: missing parameters (needs params, url, serviceName)</string>
 
 </resources>

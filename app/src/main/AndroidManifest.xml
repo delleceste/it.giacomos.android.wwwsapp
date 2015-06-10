@@ -116,11 +116,11 @@
         <activity
             android:name="it.giacomos.android.wwwsapp.layers.LayerDetailActivity"
             android:label="@string/title_layer_list"
-            android:parentActivityName=".LayerListActivity"
+            android:parentActivityName=".layers.LayerListActivity"
             android:theme="@android:style/Theme.Holo.Light"  >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.LayerListActivity" />
+                android:value="it.giacomos.android.wwwsapp.layers.LayerListActivity" />
         </activity>
 
 
@@ -162,16 +162,7 @@
         <receiver
             android:name=".service.ConnectivityChangedReceiver"
             android:enabled="true"
-            android:exported="true"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/app_broadcast_receiver" >
-
-
-            <!--
-              android:permission="string"
-              android:process="string" >
-            -->
-
+            android:exported="false">
             <intent-filter android:priority="500" >
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

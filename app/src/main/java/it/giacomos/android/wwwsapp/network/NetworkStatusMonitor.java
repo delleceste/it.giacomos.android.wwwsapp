@@ -12,11 +12,12 @@ public class NetworkStatusMonitor extends BroadcastReceiver
 {
 	public NetworkStatusMonitor(NetworkStatusMonitorListener networkStatusMonitorListener, Context ctx)
 	{
+		super();
 		m_networkStatusMonitorListener = networkStatusMonitorListener;
-		mUpdate(ctx);
+		update(ctx);
 	}
 
-	private void mUpdate(Context context)
+	public void update(Context context)
 	{
 		ConnectivityManager cm =
 				(ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -26,8 +27,8 @@ public class NetworkStatusMonitor extends BroadcastReceiver
 
 	public  void onReceive(Context context, Intent intent)
 	{
-		mUpdate(context);
-		Log.e("NetworkStatusMon.onReceive", "is connected " + m_isConnected);
+		update(context);
+		Log.e("NetStatusMon.onReceive", "is connected " + m_isConnected + " listener " + m_networkStatusMonitorListener);
 		if(m_isConnected)
 			m_networkStatusMonitorListener.onNetworkBecomesAvailable();
 		else

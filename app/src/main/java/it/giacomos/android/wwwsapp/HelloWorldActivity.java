@@ -15,7 +15,6 @@ import com.google.android.gms.plus.model.people.Person.Image;
 
 import it.giacomos.android.wwwsapp.floatingactionbutton.FloatingActionButton;
 import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
-import it.giacomos.android.wwwsapp.interfaceHelpers.MenuActionsManager;
 import it.giacomos.android.wwwsapp.layers.FileUtils;
 import it.giacomos.android.wwwsapp.layers.LayerItemData;
 import it.giacomos.android.wwwsapp.layers.LayerListActivity;
@@ -51,6 +50,7 @@ import it.giacomos.android.wwwsapp.report.tutorialActivity.TutorialPresentationA
 
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.app.Activity;
@@ -220,6 +220,9 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         if (this.mCurrentLayerName.isEmpty())
             layersSpin.setSelection(0);
 
+        mNetworkStatusMonitor = new NetworkStatusMonitor(this, this);
+        registerReceiver(mNetworkStatusMonitor, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
 		/* (re)connect the location update client */
         mLocationService.connect();
 
@@ -272,6 +275,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         if (!mGoogleServicesAvailable)
             return;
         mLocationService.disconnect();
+
+        this.unregisterReceiver(mNetworkStatusMonitor);
 
         if (mNewsFetchTask != null && mNewsFetchTask.getStatus() != AsyncTask.Status.FINISHED)
             mNewsFetchTask.cancel(false);
@@ -348,9 +353,13 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
             boolean dataChanged = mPersonData.dataChanged(this);
             if((dataChanged || !mPersonData.userRegistered(this) ) && mNetworkStatusMonitor.isConnected())
             {
-                Log.e("HelloWorldA.onConnected", " starting RegisterUserService if connection is available -> "  + mNetworkStatusMonitor.isConnected());
+                Log.e("HelloWorldA.onConnected", " starting RegisterUserService if connection is available -> "  + mNetworkStatusMonitor.isConnected() +
+                        " dtaChange: " + dataChanged + " user registered " + mPersonData.userRegistered(this));
                 new RegisterUserService(mPersonData, Secure.getString(getContentResolver(), Secure.ANDROID_ID), this);
             }
+            else
+                Log.e("HelloWorldA.onConnected", "not registering user: datachanged " + dataChanged + " user registered " + mPersonData.userRegistered(this));
+
             Log.e("onConnected", "name: " + personName + " img " + personImage + " mail " + account);
         }
     }
@@ -486,8 +495,6 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         mCurrentFragmentId = -1;
         mLastTouchedY = -1;
 
-        mNetworkStatusMonitor = new NetworkStatusMonitor(this, this);
-
         mLayerChangedListeners = new ArrayList<LayerChangedListener>();
 
 		/* if it's time to get personal message, wait for network and download it */
@@ -533,7 +540,6 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mMenuActionsManager = null;
         mCurrentLocation = null;
 
 		/* to show alerts inside onPostResume, after onActivityResult */
@@ -599,11 +605,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
             return true;
         }
         this.closeOptionsMenu();
-        if (mMenuActionsManager == null)
-            mMenuActionsManager = new MenuActionsManager(this);
 
-        boolean ret = mMenuActionsManager.itemSelected(item);
-        return ret;
+        return true;
     }
 
     @Override
@@ -1242,6 +1245,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
     {
         String msgType = data.getString("type");
         String serviceName = data.getString("serviceName");
+        Log.e("onBroadMsgRec", "service " + serviceName + " type " + msgType + " text " + data.getString("text"));
         if (msgType.compareTo("error") == 0)
         {
             String text = data.getString("text");
@@ -1262,11 +1266,17 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
     @Override
     public void onNetworkBecomesAvailable()
     {
-        boolean dataChanged = mPersonData.dataChanged(this);
-    //    if(dataChanged || !mPersonData.userRegistered(this) )
+        if(mPersonData != null)
         {
-            Log.e("HelloWorldA.onNetBecoAv", " starting RegisterUserService" );
-            new RegisterUserService(mPersonData, Secure.getString(getContentResolver(), Secure.ANDROID_ID), this);
+            boolean dataChanged = mPersonData.dataChanged(this);
+            if( dataChanged || !mPersonData.userRegistered(this) )
+            {
+                Log.e("HelloWorldA.onNetBecoAv", " starting RegisterUserService");
+                new RegisterUserService(mPersonData, Secure.getString(getContentResolver(), Secure.ANDROID_ID), this);
+            }
+            else
+                Log.e("HelloWorldA.onNetBecoAv", "not starting RegisterUserService dataCHanged " +
+                        dataChanged + " user registered " + mPersonData.userRegistered(this));
         }
     }
 
@@ -1279,7 +1289,6 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
 
     /* private members */
     private Location mCurrentLocation;
-    private MenuActionsManager mMenuActionsManager;
     private Settings mSettings;
 
     private ListView mDrawerList;

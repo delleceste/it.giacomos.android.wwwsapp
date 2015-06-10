@@ -34,6 +34,4 @@ public class RegisterUserService
         Log.e("RegisterUserService", "starting service PostDataService for " + serviceName);
         ctx.startService(service_intent);
     }
-
-
 }
