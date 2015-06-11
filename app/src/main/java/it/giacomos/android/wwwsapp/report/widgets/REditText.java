@@ -13,7 +13,13 @@ public class REditText extends EditText implements TextValueInterface
     }
 
     @Override
-    public String getValueAsText()
+    public String getDisplayedText()
+    {
+        return super.getText().toString();
+    }
+
+     @Override
+    public String getValue()
     {
         return getText().toString();
     }

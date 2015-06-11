@@ -3,8 +3,6 @@ package it.giacomos.android.wwwsapp.report;
 import android.util.Log;
 import android.view.View;
 
-import org.w3c.dom.Text;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ public class ReportDataBuilder
                 try
                 {
                     TextValueInterface tvi = (TextValueInterface) v;
-                    value = tvi.getValueAsText();
+                    value = tvi.getValue();
                     param = d.name;
                     mData.put(param, value);
                 }

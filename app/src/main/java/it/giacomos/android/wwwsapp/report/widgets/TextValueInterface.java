@@ -5,7 +5,9 @@ package it.giacomos.android.wwwsapp.report.widgets;
  */
 public interface TextValueInterface
 {
-    public String getValueAsText();
+    String getValue();
 
-    public void setValidData(boolean valid);
+    String getDisplayedText();
+
+    void setValidData(boolean valid);
 }

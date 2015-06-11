@@ -3,9 +3,6 @@ package it.giacomos.android.wwwsapp.report.widgets;
 import android.content.Context;
 import android.graphics.Color;
 import android.widget.CheckBox;
-import android.widget.TextView;
-
-import it.giacomos.android.wwwsapp.R;
 
 /**
  * Created by giacomo on 5/06/15.
@@ -19,12 +16,17 @@ public class RCheckBox extends CheckBox implements TextValueInterface
     }
 
     @Override
-    public String getValueAsText()
+    public String getValue()
     {
         if(isChecked())
             return  "true";
         else
             return "false";
+    }
+
+    public String getDisplayedText()
+    {
+        return super.getText().toString();
     }
 
     @Override

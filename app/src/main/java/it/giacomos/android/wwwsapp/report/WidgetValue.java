@@ -8,13 +8,15 @@ import android.graphics.Bitmap;
 public class WidgetValue
 {
     public String text;
+    public String value;
     public Bitmap icon;
     public boolean isValid;
 
-    public WidgetValue(String txt)
+    public WidgetValue(String txt, String val)
     {
         text = txt;
         isValid = true;
         icon = null;
+        value = val;
     }
 }

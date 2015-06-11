@@ -20,7 +20,20 @@ public class RSpinner extends Spinner implements TextValueInterface
     }
 
     @Override
-    public String getValueAsText()
+    public String getValue()
+    {
+        String s = "";
+        DataValuesSpinnerAdapter spinnerAdapter = (DataValuesSpinnerAdapter) getAdapter();
+        if(spinnerAdapter != null)
+        {
+            WidgetValue v = spinnerAdapter.getItem(getSelectedItemPosition());
+            s = v.value;
+        }
+        return  s;
+    }
+
+    @Override
+    public String getDisplayedText()
     {
         String s = "";
         DataValuesSpinnerAdapter spinnerAdapter = (DataValuesSpinnerAdapter) getAdapter();

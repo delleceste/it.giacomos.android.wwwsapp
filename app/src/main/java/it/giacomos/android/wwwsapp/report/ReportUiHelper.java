@@ -75,7 +75,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
             {
                 textValueInterface = (TextValueInterface) view;
                 if (textValueInterface != null)
-                    text = textValueInterface.getValueAsText();
+                    text = textValueInterface.getValue();
                 for (WidgetValue wv : d.values)
                 {
                     if (!wv.isValid && wv.text.compareTo(text) == 0 && view != null && view.isEnabled())
@@ -221,18 +221,22 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
     private WidgetValue getWidgetValueFromElement(Element val, String layerName)
     {
         FileUtils fu = new FileUtils();
-        WidgetValue wval = new WidgetValue(val.getAttribute("text"));
+        String text = val.getAttribute("text");
+        String value = val.getTextContent();
+        if(value == null || value.isEmpty()) /* initialize value from the text */
+            value = text;
+        WidgetValue wval = new WidgetValue(text, value);
         wval.isValid = !val.hasAttribute("valid") || (val.hasAttribute("valid") && val.getAttribute("valid").compareTo("true") == 0);
         if (val.hasAttribute("icon") && val.getAttribute("icon").length() > 0)
             wval.icon = fu.loadBitmapFromStorage("layers/" + layerName + "/bmps/" + val.getAttribute("icon") + ".bmp", mActivity);
         return wval;
     }
 
-    public void addTextPlaceHolder(String s, String locality)
+    public void addTextPlaceHolder(String s, String placeH)
     {
         if (mPlaceholders == null)
             mPlaceholders = new HashMap<String, String>();
-        mPlaceholders.put(s, locality);
+        mPlaceholders.put(s, placeH);
     }
 
     /**
