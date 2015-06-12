@@ -35,8 +35,7 @@ public class Urls {
 	}
 
 	public String getReportUrl() {
-		// TODO Auto-generated method stub
-		return null;
+		return  "http://www.giacomos.it/wwwsapp/get_report.php";
 	}
 
 	public String getRemovePostUrl() {

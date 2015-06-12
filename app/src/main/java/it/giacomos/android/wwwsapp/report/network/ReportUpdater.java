@@ -103,6 +103,8 @@ ReportUpdateTaskListener, ConnectionCallbacks, OnConnectionFailedListener
 				Log.e("update", "reportUpdateTask is running or pending");
 				return;
 			}
+			else
+				Log.e("ReportUpdater.update", " connecting google services for location");
 
 			if(mNetworkStatusMonitor.isConnected())
 			{

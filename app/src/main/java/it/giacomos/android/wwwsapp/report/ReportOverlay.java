@@ -101,7 +101,7 @@ OnClickListener
 	public void clear() 
 	{
 		mReportUpdater.clear();
-		mCancelTasks();
+		cancelTasks();
 		mRemoveMarkers();
 	}
 
@@ -117,7 +117,7 @@ OnClickListener
 		/* we can cancel report overlay tasks and geocode address tasks if paused, because
 		 * the activity, when resumed, updates data.
 		 */
-		mCancelTasks();
+		cancelTasks();
 	}
 
 	public void onResume()
@@ -132,7 +132,7 @@ OnClickListener
 		mDataInterfaceMarkerIdHash.clear();
 	}
 
-	private void mCancelTasks()
+	public void cancelTasks()
 	{
 		mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
 		if(mReportOverlayTask != null)

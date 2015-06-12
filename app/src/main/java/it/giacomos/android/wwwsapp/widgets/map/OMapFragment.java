@@ -10,15 +10,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.locationUtils.GeoCoordinates;
 import it.giacomos.android.wwwsapp.preferences.Settings;
+import it.giacomos.android.wwwsapp.report.ReportOverlay;
 import it.giacomos.android.wwwsapp.widgets.OAnimatedTextView;
 import it.giacomos.android.wwwsapp.report.OnTiltChangeListener;
 
+import android.app.Activity;
+import android.os.Handler;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,8 +33,13 @@ import android.os.Bundle;
 
 public class OMapFragment extends SupportMapFragment implements
 GoogleMap.OnCameraChangeListener,
-OnMapReadyCallback
+OnMapReadyCallback, Runnable
 {
+    private final int UPDATE_DELAY = 1500;
+
+	private LatLngBounds mCurrentMapBounds;
+    private Handler mUpdateHandler;
+    private long mLastCameraChangedTimeMs;
 	private float mOldZoomLevel;
 	private boolean mCenterOnUpdate;
 	private boolean mMapReady; /* a map is considered ready after first camera update */
@@ -40,6 +50,7 @@ OnMapReadyCallback
 	private OnTiltChangeListener mOnTiltChangeListener;
 	private ArrayList <OOverlayInterface> mOverlays;
 	private Settings mSettings;
+    private ReportOverlay mReportOverlay;
 
 	/* MapFragmentListener: the activity must implement this in order to be notified when 
 	 * the GoogleMap is ready.
@@ -58,12 +69,18 @@ OnMapReadyCallback
 		mOverlays = new ArrayList<OOverlayInterface>();
 		mMode = new MapViewMode();
 		mMode.isInit = true;
+        mLastCameraChangedTimeMs = 0;
 	}
 
 	@Override
 	public void onMapReady(GoogleMap googleMap) 
 	{
-		
+        mReportOverlay.setMapTilt(googleMap.getCameraPosition().tilt);
+        googleMap.setOnMapLongClickListener(mReportOverlay);
+        googleMap.setOnInfoWindowClickListener(mReportOverlay);
+        googleMap.setOnMarkerDragListener(mReportOverlay);
+        googleMap.setOnMapClickListener(mReportOverlay);
+        googleMap.setOnMarkerClickListener(mReportOverlay);
 	}
 	
 	@Override
@@ -99,7 +116,21 @@ OnMapReadyCallback
 			mOldZoomLevel = cameraPosition.zoom;
 		}
 
-		if(!mMapReady)
+        if(mMapReady)
+        {
+            mCurrentMapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+		    Log.e("OMapFrag.OnCameraUpdate", "Camera changed: TILT " + cameraPosition.tilt + " boundaries " + mCurrentMapBounds.northeast + " SW " + mCurrentMapBounds.southwest);
+            if(mUpdateHandler == null)
+                mUpdateHandler = new Handler();
+            if(System.currentTimeMillis() - mLastCameraChangedTimeMs < UPDATE_DELAY)
+            {
+                mUpdateHandler.removeCallbacks(this);
+                mReportOverlay.cancelTasks();
+            }
+            mUpdateHandler.postDelayed(this, UPDATE_DELAY);
+            mLastCameraChangedTimeMs = System.currentTimeMillis();
+        }
+		else /* at the beginning */
 		{
 			mMapReady = true;
 			mMapFragmentListener.onCameraReady();
@@ -107,6 +138,8 @@ OnMapReadyCallback
 		
 		if(mOnTiltChangeListener != null)
 			mOnTiltChangeListener.onTiltChanged(cameraPosition.tilt);
+
+
 	} 
 
 	public void onStart()
@@ -134,6 +167,8 @@ OnMapReadyCallback
 	{
 		super.onResume();
 		mMap.setMyLocationEnabled(true);
+        mReportOverlay.onResume();
+        mReportOverlay.update(getActivity().getApplicationContext(), false);
 	}
 	
 	public void onPause()
@@ -189,6 +224,11 @@ OnMapReadyCallback
 		/* when the activity creates us, it passes the initialization stuff through arguments */
 		mSetMode(mMode);
 		oActivity.findViewById(R.id.mapMessageTextView).setVisibility(View.GONE);
+
+        mReportOverlay = new ReportOverlay(this);
+        mOnTiltChangeListener = mReportOverlay;
+        mReportOverlay.setOnReportRequestListener((HelloWorldActivity) getActivity());
+        mOverlays.add(mReportOverlay);
 
 	}
 
@@ -321,4 +361,13 @@ OnMapReadyCallback
 		return myLocation.distanceTo(pt) < 500;
 	}
 
+	@Override
+	public void run()
+	{
+		Log.e("OMapFrag.run", " would update layer ");
+        Activity a = getActivity();
+        if(a != null)
+            a.findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
+        mReportOverlay.update(getActivity().getApplicationContext(), true);
+	}
 }

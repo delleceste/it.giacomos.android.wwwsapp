@@ -11,7 +11,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
-import it.giacomos.android.wwwsapp.locationUtils.LocationInfo;
 
 public class GeocodeAddressTask extends AsyncTask<Location, Integer, LocationInfo>
 {
