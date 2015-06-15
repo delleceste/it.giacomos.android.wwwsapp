@@ -37,7 +37,6 @@ OnMapReadyCallback, Runnable
 {
     private final int UPDATE_DELAY = 1500;
 
-	private LatLngBounds mCurrentMapBounds;
     private Handler mUpdateHandler;
     private long mLastCameraChangedTimeMs;
 	private float mOldZoomLevel;
@@ -118,8 +117,6 @@ OnMapReadyCallback, Runnable
 
         if(mMapReady)
         {
-            mCurrentMapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-		    Log.e("OMapFrag.OnCameraUpdate", "Camera changed: TILT " + cameraPosition.tilt + " boundaries " + mCurrentMapBounds.northeast + " SW " + mCurrentMapBounds.southwest);
             if(mUpdateHandler == null)
                 mUpdateHandler = new Handler();
             if(System.currentTimeMillis() - mLastCameraChangedTimeMs < UPDATE_DELAY)
@@ -168,7 +165,6 @@ OnMapReadyCallback, Runnable
 		super.onResume();
 		mMap.setMyLocationEnabled(true);
         mReportOverlay.onResume();
-        mReportOverlay.update(getActivity().getApplicationContext(), false);
 	}
 	
 	public void onPause()
@@ -189,6 +185,12 @@ OnMapReadyCallback, Runnable
 		
 		if(mMap != null)
 			mMap.setMyLocationEnabled(false);
+
+        /* unschedule report overlay update */
+        if(mUpdateHandler != null)
+            mUpdateHandler.removeCallbacks(this);
+		/* let ReportUpdater unregister network receiver */
+		mReportOverlay.onPause();
 	}
 
 	@Override
@@ -365,9 +367,6 @@ OnMapReadyCallback, Runnable
 	public void run()
 	{
 		Log.e("OMapFrag.run", " would update layer ");
-        Activity a = getActivity();
-        if(a != null)
-            a.findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
-        mReportOverlay.update(getActivity().getApplicationContext(), true);
+        mReportOverlay.setArea(mMap.getProjection().getVisibleRegion().latLngBounds);
 	}
 }

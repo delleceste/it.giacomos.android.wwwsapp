@@ -15,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -43,12 +44,12 @@ import it.giacomos.android.wwwsapp.widgets.map.OverlayType;
 import it.giacomos.android.wwwsapp.widgets.map.ReportRequestListener;
 import it.giacomos.android.wwwsapp.report.network.PostType;
 import it.giacomos.android.wwwsapp.report.network.ReportUpdater;
-import it.giacomos.android.wwwsapp.report.network.ReportUpdaterListener;
+import it.giacomos.android.wwwsapp.report.network.ReportDownloadListener;
 
-public class ReportOverlay implements OOverlayInterface, 
-ReportOverlayTaskListener, OnMarkerClickListener,
+public class ReportOverlay implements OOverlayInterface,
+        ReportProcessingTaskListener, OnMarkerClickListener,
 OnMapClickListener, OnMapLongClickListener, OnInfoWindowClickListener, 
-OnMarkerDragListener, GeocodeAddressUpdateListener, ReportUpdaterListener,
+OnMarkerDragListener, GeocodeAddressUpdateListener, ReportDownloadListener,
 OnTiltChangeListener,
 OnClickListener
 {
@@ -80,7 +81,7 @@ OnClickListener
 		mReportOverlayTask = null;
 		mMapBaloonInfoWindowAdapter = new MapBaloonInfoWindowAdapter(mMapFrag.getActivity());
 		mGeocodeAddressTask = null;
-		mReportUpdater = new ReportUpdater(oMapFragment.getActivity().getApplicationContext(),  this);
+		mReportUpdater = new ReportUpdater(oMapFragment.getActivity().getApplicationContext());
 		mMapFrag.getMap().setInfoWindowAdapter(mMapBaloonInfoWindowAdapter);
 		mDataInterfaceMarkerIdHash = new HashMap<String, DataInterface>();
 		mDataInterfaceList = new ArrayList<DataInterface>();
@@ -105,6 +106,11 @@ OnClickListener
 		mRemoveMarkers();
 	}
 
+	public void setArea(LatLngBounds bounds)
+	{
+		mReportUpdater.areaChanged(bounds);
+	}
+
 	/** ReportOverlay has a ReportUpdater which registers with the LocationClient and 
 	 *  with the  NetworkStatusMonitor to obtain location updates and to be notified 
 	 *  when the network goes up/down. When the activity is paused, it is necessary to
@@ -112,8 +118,8 @@ OnClickListener
 	 * 
 	 */
 	public void onPause()
-	{
-		mReportUpdater.onPause();
+    {
+		mReportUpdater.unregister();
 		/* we can cancel report overlay tasks and geocode address tasks if paused, because
 		 * the activity, when resumed, updates data.
 		 */
@@ -122,7 +128,7 @@ OnClickListener
 
 	public void onResume()
 	{
-		mReportUpdater.onResume();
+		mReportUpdater.register(this);
 	}
 
 	private void mRemoveMarkers()
@@ -175,8 +181,9 @@ OnClickListener
 	/** redraws all markers, the user report markers, my request marker and buddy request notification
 	 *  marker, if present.
 	 */
-	public void onReportOverlayTaskFinished(DataInterface [] dataInterfaceList) 
+	public void onReportProcessingTaskFinished(DataInterface[] dataInterfaceList)
 	{
+        mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
 		if(dataInterfaceList != null) /* the task may return null */
 		{
 			/* store new data into mDataInterfaceList field */
@@ -337,11 +344,18 @@ OnClickListener
 	{
 		Toast.makeText(mMapFrag.getActivity().getApplicationContext(), message, Toast.LENGTH_LONG).show();
 	}
-	
-	@Override
-	public void onReportUpdateError(String error)
+
+    @Override
+    public void onReportDownloadStarted()
+    {
+        mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+	public void onReportDownloadError(String error)
 	{
 		MyAlertDialogFragment.MakeGenericError(error, mMapFrag.getActivity());
+        mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
 		mRemoveMarkers();
 	}
 
@@ -353,14 +367,14 @@ OnClickListener
 	 * 2) the pending request list (of type RequestData).
 	 * The two lists are merged together and sent to an async task that creates the data
 	 * structures used to afterwards build markers and place them on the map.
-	 * When the async task finishes, onReportOverlayTaskFinished() method is invoked.
+	 * When the async task finishes, onReportProcessingTaskFinished() method is invoked.
 	 */
 	@Override
-	public void onReportUpdateDone(String txt) 
+	public void onReportDownloaded(String txt)
 	{		
 		/* In this first implementation, let the markers be updated even if the text has not changed.
 		 * When the task has been completed, the buddy request notification marker is drawn if pertinent,
-		 * inside onReportOverlayTaskFinished().
+		 * inside onReportProcessingTaskFinished().
 		 */
 
 		/* ok start processing data */

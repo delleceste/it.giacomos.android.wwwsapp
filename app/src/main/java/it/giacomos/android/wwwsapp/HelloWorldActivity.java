@@ -209,7 +209,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
     public void onResume()
     {
         super.onResume();
-        //		Log.e("HelloWorldActivity.onResume", "onResume called");
+        //		Log.e("HelloWorldActivity.register", "register called");
         if (!mGoogleServicesAvailable)
             return;
 
@@ -238,7 +238,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
 		/*
 		 * mAdsEnabled is true if
 		 * - not purchased, not first execution of the app
-		 * - not resuming after onPause
+		 * - not resuming after unregister
 		 * - resuming when savedInstanceState is null (i.e. don't show ads after screen rotation) 
 		 * - not resuming after onNewIntent
 		 */
@@ -289,7 +289,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mPostDataServiceBroadcastReceiver);
             mPostDataServiceBroadcastReceiver.unregisterListener();
         }
-		/* no ads when resuming after onPause */
+		/* no ads when resuming after unregister */
         mAdsEnabled = false;
     }
 
@@ -436,7 +436,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
 		/* From Android documentation:
 		 * Note that this method may never be called, in low memory situations where 
 		 * the system does not have enough memory to keep your activity's process running 
-		 * after its onPause() method is called. 
+		 * after its unregister() method is called.
 		 */
         super.onStop();
         if (!mGoogleServicesAvailable)

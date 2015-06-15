@@ -6,9 +6,9 @@ import android.os.AsyncTask;
 public class ReportOverlayTask extends AsyncTask<DataInterface, Integer, DataInterface[] > 
 {
 	private Context mContext;
-	private ReportOverlayTaskListener mReportOverlayTaskListener;
+	private ReportProcessingTaskListener mReportOverlayTaskListener;
 	
-	public ReportOverlayTask(Context ctx, ReportOverlayTaskListener rotl)
+	public ReportOverlayTask(Context ctx, ReportProcessingTaskListener rotl)
 	{
 		super();
 		mContext = ctx;
@@ -42,6 +42,6 @@ public class ReportOverlayTask extends AsyncTask<DataInterface, Integer, DataInt
 	@Override
 	public void onPostExecute(DataInterface [] dataI)
 	{
-		mReportOverlayTaskListener.onReportOverlayTaskFinished(dataI);
+		mReportOverlayTaskListener.onReportProcessingTaskFinished(dataI);
 	}
 }
