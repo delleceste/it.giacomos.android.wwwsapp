@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -383,6 +384,7 @@ OnClickListener
         String layerName = data[0];
          /* save data into cache */
         FileUtils fu = new FileUtils();
+		Log.e("RepOv.onRepDownloaded", "layer " + layerName + " data " + data[1]);
         fu.saveToStorage(data[1].getBytes(), layerName + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext());
 		mReportOverlayTask = new ReportOverlayTask(mMapFrag.getActivity().getApplicationContext(), this);
 		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, data);

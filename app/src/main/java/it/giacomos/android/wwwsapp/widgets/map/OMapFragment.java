@@ -232,7 +232,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener
         mOnTiltChangeListener = mReportOverlay;
         mReportOverlay.setOnReportRequestListener((HelloWorldActivity) getActivity());
         mOverlays.add(mReportOverlay);
-
+		oActivity.addLayerChangedListener(this);
 	}
 
 	@Override

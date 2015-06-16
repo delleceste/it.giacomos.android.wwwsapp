@@ -78,7 +78,7 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 
 	public void setLayer(String layer)
 	{
-		if(mLayerName.compareTo(layer) != 0)
+		if(mLayerName == null || mLayerName.compareTo(layer) != 0)
 		{
 			mLayerName = layer;
 			update(true);
