@@ -1,7 +1,13 @@
 package it.giacomos.android.wwwsapp.report.network;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,97 +22,115 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLngBounds;
 
-public class ReportUpdateTask extends AsyncTask<String, Integer, String> 
+import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.network.HttpPostParametrizer;
+
+public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
 {
-	private static final String CLI = "afe0983der38819073rxc1900lksjd";
-	private String mErrorMsg;
-	private ReportUpdateTaskListener mReportUpdateTaskListener;
-	LatLngBounds mArea;
+    private static final String CLI = "afe0983der38819073rxc1900lksjd";
+    private String mErrorMsg;
+    private ReportUpdateTaskListener mReportUpdateTaskListener;
+    LatLngBounds mArea;
 
-	public ReportUpdateTask(ReportUpdateTaskListener reportUpdateTaskListener, LatLngBounds area)
-	{
-		mReportUpdateTaskListener = reportUpdateTaskListener;
-		mArea = area;
-	}
+    public ReportUpdateTask(ReportUpdateTaskListener reportUpdateTaskListener, LatLngBounds area)
+    {
+        mReportUpdateTaskListener = reportUpdateTaskListener;
+        mArea = area;
+    }
 
-	@Override
-	public void onPostExecute(String doc)
-	{
-        Log.e("RepUpdTask.onPostExec", " got " + doc);
-		mReportUpdateTaskListener.onReportUpdateTaskComplete(!mErrorMsg.isEmpty(), doc);
-		mArea  = null;
-	}
-	
-	@Override
-	public void onCancelled(String doc)
-	{
+    @Override
+    public void onPostExecute(String[] data)
+    {
+        Log.e("RepUpdTask.onPostExec", " got " + data[1] + " for " + data[0]);
+        mReportUpdateTaskListener.onReportUpdateTaskComplete(!mErrorMsg.isEmpty(), data);
+        mArea = null;
+    }
+
+    @Override
+    public void onCancelled(String[] doc)
+    {
         Log.e("ReportUpdateTask.onCanc", "cancelled task");
-		mArea  = null;
-	}
-	
-	public String getError()
-	{
-		return mErrorMsg;
-	}
+        mArea = null;
+    }
 
-	public LatLngBounds getArea()
-	{
-		return mArea;
-	}
+    public String getError()
+    {
+        return mErrorMsg;
+    }
 
-	public boolean isProcessingArea(LatLngBounds area)
-	{
-		return mArea != null && mArea == area;
-	}
+    public LatLngBounds getArea()
+    {
+        return mArea;
+    }
 
-	@Override
-	protected String doInBackground(String... urls) 
-	{
-		String document = "";
-		synchronized (mArea)
-		{
-			mErrorMsg = "";
-			HttpClient httpClient = new DefaultHttpClient();
-			HttpPost request = new HttpPost(urls[0]);
-			List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-			postParameters.add(new BasicNameValuePair("cli", CLI));
-			UrlEncodedFormEntity form;
-			try
-			{
-				form = new UrlEncodedFormEntity(postParameters);
-				request.setEntity(form);
-				HttpResponse response = httpClient.execute(request);
-				StatusLine statusLine = response.getStatusLine();
-				if (statusLine.getStatusCode() < 200 || statusLine.getStatusCode() >= 300)
-					mErrorMsg = statusLine.getReasonPhrase();
-				else if (statusLine.getStatusCode() < 0)
-					mErrorMsg = "Server error";
-	        /* check the echo result */
-				HttpEntity entity = response.getEntity();
-				document = EntityUtils.toString(entity);
-			} catch (UnsupportedEncodingException e)
-			{
-				mErrorMsg = e.getLocalizedMessage();
-				e.printStackTrace();
-			} catch (ClientProtocolException e)
-			{
-				mErrorMsg = e.getLocalizedMessage();
-				e.printStackTrace();
-			} catch (IOException e)
-			{
-				mErrorMsg = e.getLocalizedMessage();
-				e.printStackTrace();
-			}
-		    mArea  = null;
-		}
-		return document;
-	}
+    public boolean isProcessingArea(LatLngBounds area)
+    {
+        return mArea != null && mArea == area;
+    }
 
-	
+    @Override
+    /**
+     * @param  task_data: task_data[0] = REPORT_URL;
+     * task_data[1] = mLayerName;
+     */
+    protected String[] doInBackground(String... task_data)
+    {
+        String[] document = new String[2];
+        synchronized (mArea)
+        {
+            URL url = null;
+            String layerName = task_data[1];
+            document[0] = task_data[1]; /* this will be returned */
+            try
+            {
+                document[1] = "";
+                url = new URL(task_data[0]);
+                HttpPostParametrizer httpPostParametrizer = new HttpPostParametrizer();
+                httpPostParametrizer.add("layer", layerName);
+                httpPostParametrizer.add("sw_lat", mArea.southwest.latitude);
+                httpPostParametrizer.add("sw_lon", mArea.southwest.longitude);
+                httpPostParametrizer.add("ne_lat", mArea.northeast.latitude);
+                httpPostParametrizer.add("ne_lon", mArea.northeast.longitude);
+                String data = httpPostParametrizer.toString();
+
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                Log.e("PostDataS.onHandleInt", "url: " + url.toString() + " - data " + data);
+                OutputStreamWriter wr;
+                wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(data);
+                wr.flush();
+                wr.close();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String currentLine;
+                while ((currentLine = in.readLine()) != null)
+                    document[1] += currentLine + "\n";
+
+                in.close();
+                Log.e("RepUpdateTask.onHandleI", " response \"" + document[1] + "\"");
+
+            } catch (MalformedURLException e)
+            {
+                mErrorMsg = e.getLocalizedMessage();
+            } catch (UnsupportedEncodingException e)
+            {
+                mErrorMsg = e.getLocalizedMessage();
+            } catch (IOException e)
+            {
+                mErrorMsg = e.getLocalizedMessage();
+            }
+        }
+        mArea = null;
+    return document;
+}
+
+
 }

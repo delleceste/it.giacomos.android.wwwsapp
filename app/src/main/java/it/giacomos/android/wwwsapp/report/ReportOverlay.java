@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.Toast;
 import it.giacomos.android.wwwsapp.MyAlertDialogFragment;
 import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.layers.FileUtils;
 import it.giacomos.android.wwwsapp.locationUtils.GeocodeAddressTask;
 import it.giacomos.android.wwwsapp.locationUtils.GeocodeAddressUpdateListener;
 import it.giacomos.android.wwwsapp.locationUtils.LocationInfo;
@@ -62,6 +63,8 @@ OnClickListener
 	private final int TILT_MARKERS_SHOW_ALL_THRESH = 10;
 	private final int TILT_MARKERS_SHOW_ONLY_USERS_THRESH = 15;
 
+	private final String CACHE_FILE_SUFFIX = "_report.cache";
+
 	private OMapFragment mMapFrag;
 	private ReportOverlayTask mReportOverlayTask;
 	private MapBaloonInfoWindowAdapter mMapBaloonInfoWindowAdapter;
@@ -73,6 +76,7 @@ OnClickListener
 	/* maps the marker id (obtained with marker.getId()) with the associated marker data */
 	private HashMap<String , DataInterface> mDataInterfaceMarkerIdHash;
 	private ArrayList<DataInterface> mDataInterfaceList;
+	private String mLayer;
 
 	public ReportOverlay(OMapFragment oMapFragment) 
 	{
@@ -131,6 +135,14 @@ OnClickListener
 		mReportUpdater.register(this);
 	}
 
+	public void setLayer(String layer)
+	{
+		FileUtils dpcu = new FileUtils();
+        String[] data =  {mLayer,  dpcu.loadFromStorage(mLayer + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext() ) };
+        onReportDownloaded(data);
+		mReportUpdater.setLayer(layer);
+	}
+
 	private void mRemoveMarkers()
 	{
 		for(String markerId : mDataInterfaceMarkerIdHash.keySet())
@@ -184,6 +196,9 @@ OnClickListener
 	public void onReportProcessingTaskFinished(DataInterface[] dataInterfaceList)
 	{
         mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
+
+        if(dataInterfaceList == null || dataInterfaceList.length == 0)
+            Toast.makeText(mMapFrag.getActivity().getApplicationContext(), R.string.reportNoneAvailable, Toast.LENGTH_LONG).show();
 		if(dataInterfaceList != null) /* the task may return null */
 		{
 			/* store new data into mDataInterfaceList field */
@@ -360,32 +375,17 @@ OnClickListener
 	}
 
 	/** This is invoked when the report data in textual form has completed downloading.
-	 * @param txt the downloaded data in simple text format.
-	 * 
-	 * This method parses the textual data and creates two lists, using DataParser class:
-	 * 1) the published reports (of type ReportData)
-	 * 2) the pending request list (of type RequestData).
-	 * The two lists are merged together and sent to an async task that creates the data
-	 * structures used to afterwards build markers and place them on the map.
-	 * When the async task finishes, onReportProcessingTaskFinished() method is invoked.
+	 * @param data: data[0] the layer name data[1] the downloaded data in simple text format.
 	 */
 	@Override
-	public void onReportDownloaded(String txt)
-	{		
-		/* In this first implementation, let the markers be updated even if the text has not changed.
-		 * When the task has been completed, the buddy request notification marker is drawn if pertinent,
-		 * inside onReportProcessingTaskFinished().
-		 */
-
-		/* ok start processing data */
-		DataParser reportDataFactory = new DataParser();
-		DataInterface dataList[] = reportDataFactory.parse(txt);
-
+	public void onReportDownloaded(String[] data)
+    {
+        String layerName = data[0];
+         /* save data into cache */
+        FileUtils fu = new FileUtils();
+        fu.saveToStorage(data[1].getBytes(), layerName + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext());
 		mReportOverlayTask = new ReportOverlayTask(mMapFrag.getActivity().getApplicationContext(), this);
-		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, dataList);
-
-		if(dataList == null || dataList.length == 0)
-			Toast.makeText(mMapFrag.getActivity().getApplicationContext(), R.string.reportNoneAvailable, Toast.LENGTH_LONG).show();
+		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, data);
 	}
 
 	@Override
@@ -703,5 +703,4 @@ OnClickListener
 		}
 		
 	}
-
 }

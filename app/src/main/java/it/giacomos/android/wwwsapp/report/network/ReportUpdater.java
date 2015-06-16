@@ -18,7 +18,6 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 {
 	private final String REPORT_URL = "http://www.giacomos.it/wwwsapp/get_report.php";
 	private static final long DOWNLOAD_REPORT_OLD_TIMEOUT = 10000;
-	private final String CACHE_FILE = "report.cache";
 
 	private Context mContext;
 	private ReportDownloadListener mReportDownloadListener;
@@ -26,6 +25,7 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 	private long mLastReportUpdatedAt;
 	private ReportUpdateTask mReportUpdateTask;
 	private LatLngBounds mNewArea, mCurrentArea;
+	private String mLayerName;
 
 	public ReportUpdater(Context ctx)
 	{
@@ -35,7 +35,6 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 		mLastReportUpdatedAt = 0;
 		mReportUpdateTask = null;
 	}
-
 
 	public void unregister()
 	{
@@ -56,8 +55,6 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 		 */
 		mContext.registerReceiver(mNetworkStatusMonitor, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		mReportDownloadListener = rul;
-		FileUtils dpcu = new FileUtils();
-		rul.onReportDownloaded(dpcu.loadFromStorage(CACHE_FILE, mContext));
 	}
 
 	public void clear()
@@ -79,6 +76,15 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 			mReportUpdateTask.cancel(false);
 	}
 
+	public void setLayer(String layer)
+	{
+		if(mLayerName.compareTo(layer) != 0)
+		{
+			mLayerName = layer;
+			update(true);
+		}
+	}
+
 	public void update(boolean force)
 	{
 		if((!reportUpToDate() || force) && mNewArea != null)
@@ -92,8 +98,11 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 			{
 				/* create and start a new task only if the interesting area is not currently being processed by a running task */
 				Log.e("ReportUpd.update", "creating new task for area " + mNewArea);
+				String [] task_data = new String[2];
+				task_data[0] = REPORT_URL;
+				task_data[1] = mLayerName;
 				mReportUpdateTask = new ReportUpdateTask(this, mNewArea);
-				mReportUpdateTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, REPORT_URL);
+				mReportUpdateTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, task_data);
 			}
 			else if(mReportUpdateTask != null)
 				Log.e("ReportUpd.update", "update: is processing area: " + mReportUpdateTask.isProcessingArea(mNewArea) );
@@ -125,17 +134,13 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 	}
 
 	@Override
-	public void onReportUpdateTaskComplete(boolean error, String data) 
+	public void onReportUpdateTaskComplete(boolean error, String[] data)
 	{
 		if(!error)
 		{
 			/* call onReportDownloaded on ReportOverlay */
 			if(mReportDownloadListener != null)
 				mReportDownloadListener.onReportDownloaded(data);
-			Log.e("ReportUpdater.onReportUpdateTaskComplete", "saving to cache: " + data);
-			/* save data into cache */
-			FileUtils fu = new FileUtils();
-			fu.saveToStorage(data.getBytes(),CACHE_FILE, mContext);
 			mCurrentArea = mNewArea;
 			mLastReportUpdatedAt = System.currentTimeMillis();
 		}
@@ -149,4 +154,5 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 		if(mNetworkStatusMonitor.isConnected())
 			update(true); /* true: on area change, force update */
 	}
+
 }

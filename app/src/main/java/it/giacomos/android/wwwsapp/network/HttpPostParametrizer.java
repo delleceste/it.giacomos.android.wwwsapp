@@ -18,6 +18,13 @@ public class HttpPostParametrizer
         mData.put(name, value);
     }
 
+     public void add(String name, double value)
+    {
+        if(mData == null)
+            mData = new HashMap<String, String> ();
+        mData.put(name, String.valueOf(value));
+    }
+
     public String toString()
     {
         String s = "";

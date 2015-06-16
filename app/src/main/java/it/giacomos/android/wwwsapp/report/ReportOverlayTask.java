@@ -3,7 +3,7 @@ package it.giacomos.android.wwwsapp.report;
 import android.content.Context;
 import android.os.AsyncTask;
 
-public class ReportOverlayTask extends AsyncTask<DataInterface, Integer, DataInterface[] > 
+public class ReportOverlayTask extends AsyncTask<String, Integer, DataInterface[] >
 {
 	private Context mContext;
 	private ReportProcessingTaskListener mReportOverlayTaskListener;
@@ -16,21 +16,28 @@ public class ReportOverlayTask extends AsyncTask<DataInterface, Integer, DataInt
 	}
 	
 	@Override
-	protected DataInterface[] doInBackground(DataInterface... params) 
+	/**
+	 * @param data data[0] layer name data[1] downloaded document (JSON)
+	 */
+	protected DataInterface[] doInBackground(String... data)
 	{
-		if(params == null)
+		if(data == null)
 			return null;
-		
-		int dataSiz = params.length;
+
+		/* ok start processing data */
+		DataParser reportDataFactory = new DataParser();
+		DataInterface dataList[] = reportDataFactory.parse(data[1]);
+
+		int dataSiz = dataList.length;
 		for(int i = 0; i < dataSiz; i++)
 		{
 			if(this.isCancelled())
 				break;
 			
-			DataInterface dataInterface = params[i];
+			DataInterface dataInterface = dataList[i];
 			dataInterface.buildMarkerOptions(mContext);
 		}
-		return params;
+		return dataList;
 	}
 	
 	@Override

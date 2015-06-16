@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
+import it.giacomos.android.wwwsapp.LayerChangedListener;
 import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.locationUtils.GeoCoordinates;
 import it.giacomos.android.wwwsapp.preferences.Settings;
@@ -33,7 +34,7 @@ import android.os.Bundle;
 
 public class OMapFragment extends SupportMapFragment implements
 GoogleMap.OnCameraChangeListener,
-OnMapReadyCallback, Runnable
+OnMapReadyCallback, Runnable, LayerChangedListener
 {
     private final int UPDATE_DELAY = 1500;
 
@@ -234,6 +235,12 @@ OnMapReadyCallback, Runnable
 
 	}
 
+	@Override
+	public void onLayerChanged(String layerName)
+	{
+		mReportOverlay.setLayer(layerName);
+	}
+
 	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		return super.onCreateView(inflater, container, savedInstanceState);
@@ -369,4 +376,5 @@ OnMapReadyCallback, Runnable
 		Log.e("OMapFrag.run", " would update layer ");
         mReportOverlay.setArea(mMap.getProjection().getVisibleRegion().latLngBounds);
 	}
+
 }
