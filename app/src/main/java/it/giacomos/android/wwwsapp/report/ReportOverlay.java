@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -78,7 +79,6 @@ OnClickListener
 
 	/* maps the marker id (obtained with marker.getId()) with the associated marker data */
 	private HashMap<String , DataInterface> mDataInterfaceMarkerIdHash;
-	private ArrayList<DataInterface> mDataInterfaceList;
 
 	public ReportOverlay(OMapFragment oMapFragment, String accountName)
 	{
@@ -90,7 +90,6 @@ OnClickListener
 		mReportUpdater = new ReportUpdater(oMapFragment.getActivity().getApplicationContext(), accountName);
 		mMapFrag.getMap().setInfoWindowAdapter(mMapBaloonInfoWindowAdapter);
 		mDataInterfaceMarkerIdHash = new HashMap<String, DataInterface>();
-		mDataInterfaceList = new ArrayList<DataInterface>();
 		mMapTilt = 0;
 
 		Context ctx = mMapFrag.getActivity();
@@ -147,7 +146,7 @@ OnClickListener
 
 	private boolean mMarkerPresent(DataInterface di)
 	{
-		Iterator<DataInterface> it = mDataInterfaceList.iterator();
+		Iterator<DataInterface> it = mDataInterfaceMarkerIdHash.values().iterator();
 		while (it.hasNext())
 		{
 			DataInterface dataInterface = it.next();
@@ -238,7 +237,7 @@ OnClickListener
 
 	private void mUpdateMarkers(DataInterface[] newDataIfArray)
 	{
-		ArrayList<DataInterface> newDataList = new ArrayList<DataInterface>();
+		HashSet<DataInterface> newDataSet = new HashSet<DataInterface>();
 
 		boolean showAll = (mMapTilt >= TILT_MARKERS_SHOW_ALL_THRESH &&
 				mMapTilt < TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
@@ -248,36 +247,48 @@ OnClickListener
 		
 	//	mDataInterfaceMarkerIdHash.clear();
 
+		Log.e("ReportOvarlay.updateMarkers", " data interface list size " + mDataInterfaceMarkerIdHash.size());
 		/* remove markers that are no more in view */
-		if(!mDataInterfaceList.isEmpty())
-		{
-			Iterator<DataInterface> existingDIIter = mDataInterfaceList.iterator();
+		Iterator<Map.Entry<String, DataInterface> > existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
 			while (existingDIIter.hasNext())
-			{
-				boolean contains = false;
-				DataInterface existingDI = existingDIIter.next();
-				for (DataInterface dataI : newDataIfArray)
-				{
-					contains = dataI.sameAs(existingDI);
-					if (contains)
-					{
-						Log.e("ReportOverlay.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getMarker().getTitle());
-						break;
-					}
-					else /* must be added a new marker */
-						newDataList.add(dataI);
-				}
-				if (!contains)
-				{
-					existingDI.getMarker().remove();
-					existingDIIter.remove();
-				}
-			}
-		}
-		else
-			newDataList = new ArrayList<DataInterface>(Arrays.asList(newDataIfArray));
+            {
+                boolean contains = false;
+                Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
+                DataInterface existingDI = existingDIMap.getValue();
+                for (DataInterface dataI : newDataIfArray)
+                {
+                    contains = dataI.sameAs(existingDI);
+                    if (contains)
+                    {
+                        Log.e("ReportOverlay.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getLayerName());
+                        break;
+                    }
+                }
+                if (!contains)
+                {
+                    existingDI.getMarker().remove();
+                    existingDIIter.remove();
+                }
+            }
 
-		for(DataInterface dataI : newDataList)
+        for (DataInterface dataI : newDataIfArray)
+        {
+            boolean contains = false;
+            existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
+            while (existingDIIter.hasNext())
+            {
+                Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
+                DataInterface existingDI = existingDIMap.getValue();
+                if(existingDI.sameAs(dataI))
+                    contains = true;
+            }
+            if(!contains)
+                newDataSet.add(dataI);
+
+        }
+
+
+		for(DataInterface dataI : newDataSet)
 		{
 //			Log.e("reportOvarlay.mUpdateMarkers", " ty " + dataI.getType() + "showAll " + showAll
 //					+ " showUser " + showUsers + " tilt " + mMapTilt);
@@ -703,8 +714,8 @@ OnClickListener
 			 * touched but the active user/report/request markers are hidden or
 			 * shown according to the tilt value.
 			 */
-			mUpdateMarkers((DataInterface[]) mDataInterfaceList.toArray());
-		}
+			mUpdateMarkers((DataInterface[]) mDataInterfaceMarkerIdHash.values().toArray());
+        }
 	}
 
 	private boolean mMarkersNeedUpdate(float oldTilt, float newTilt)

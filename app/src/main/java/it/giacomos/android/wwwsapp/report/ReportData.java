@@ -19,10 +19,11 @@ public class ReportData extends DataInterface
 	private Marker mMarker;
 	private MarkerOptions mMarkerOptions;
 	
-	public ReportData(String layNam, double lat, double lon, String datet, String userDisplayNam)
+	public ReportData(int userId, String layNam, double lat, double lon, String datet, String userDisplayNam)
 	{
-		super(layNam, lat, lon, datet, userDisplayNam);
+		super(userId, layNam, lat, lon, datet, userDisplayNam);
 		mMarker = null;
+		writable = "r";
 	}
 
     public boolean sameAs(DataInterface other)
