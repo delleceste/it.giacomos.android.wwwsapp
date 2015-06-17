@@ -20,7 +20,7 @@ public class ActiveUser extends DataInterface {
 	public ActiveUser(String datet, double lat, double lon, 
 			boolean recent, boolean quite_recent)
 	{
-		super(lat, lon, datet);
+		super("ActiveUser", lat, lon, datet, "ActiveUser");
 		datetime = datet;
 		isRecent = recent;
 		isQuiteRecent = quite_recent;
@@ -31,7 +31,7 @@ public class ActiveUser extends DataInterface {
 			boolean recent, boolean quite_recent, 
 			int otherUsersNearbyCnt)
 	{
-		super(lat, lon, datet);
+		super("ActiveUser", lat, lon, datet, "ActiveUser");
 		datetime = datet;
 		isRecent = recent;
 		isQuiteRecent = quite_recent;
@@ -55,7 +55,7 @@ public class ActiveUser extends DataInterface {
 	}
 
 	@Override
-	public MarkerOptions buildMarkerOptions(Context ctx)
+	public MarkerOptions buildMarkerOptions(Context ctx, XmlUIDocumentRepr  repr)
 	{
 		String  title, snippet;
 		Resources res = ctx.getResources();
@@ -125,6 +125,12 @@ public class ActiveUser extends DataInterface {
 	public Marker getMarker() 
 	{
 		return mMarker;
+	}
+
+	@Override
+	public boolean sameAs(DataInterface di)
+	{
+		return false;
 	}
 
 	@Override

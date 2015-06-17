@@ -24,18 +24,23 @@ public class ReportOverlayTask extends AsyncTask<String, Integer, DataInterface[
 		if(data == null)
 			return null;
 
+		XmlUiParser xmlUiParser = new XmlUiParser();
+		XmlUIDocumentRepr xmlUIDocumentRepr = xmlUiParser.parse(data[0], mContext);
 		/* ok start processing data */
 		DataParser reportDataFactory = new DataParser();
 		DataInterface dataList[] = reportDataFactory.parse(data[1]);
 
-		int dataSiz = dataList.length;
-		for(int i = 0; i < dataSiz; i++)
+		if(dataList != null)
 		{
-			if(this.isCancelled())
-				break;
-			
-			DataInterface dataInterface = dataList[i];
-			dataInterface.buildMarkerOptions(mContext);
+			int dataSiz = dataList.length;
+			for (int i = 0; i < dataSiz; i++)
+			{
+				if (this.isCancelled())
+					break;
+
+				DataInterface dataInterface = dataList[i];
+				dataInterface.buildMarkerOptions(mContext, xmlUIDocumentRepr);
+			}
 		}
 		return dataList;
 	}

@@ -6,6 +6,8 @@ import android.location.Location;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.HashMap;
+
 public abstract class DataInterface 
 {
 	public static int TYPE_REPORT = 0;
@@ -14,7 +16,8 @@ public abstract class DataInterface
 	
 	private final int closeDistance = 500;
 	private double latitude, longitude;
-	private String datetime;
+	private String datetime, userDisplayName, layerName;
+	private HashMap<String, String> data;
 	
 	
 	public String getDateTime()
@@ -39,25 +42,44 @@ public abstract class DataInterface
 	public double getLongitude() {
 		return longitude;
 	}
+
+	public String getUserDisplayName()
+	{
+		return userDisplayName;
+	}
+
+	public String getLayerName()
+	{
+		return layerName;
+	}
 	
 	public abstract int getType();
-	public abstract String getLocality();
-	
+
 	public abstract boolean isWritable();
 	
-	public abstract MarkerOptions buildMarkerOptions(Context ctx);
+	public abstract MarkerOptions buildMarkerOptions(Context ctx, XmlUIDocumentRepr dataRepr);
 	
 	public abstract MarkerOptions getMarkerOptions();
 	
 	public abstract void  setMarker(Marker m);
 	
-	public abstract Marker getMarker();	
+	public abstract Marker getMarker();
+
+	public abstract boolean sameAs(DataInterface di);
+
+	public void add(String key, String value)
+	{
+		data.put(key, value);
+	}
 	
-	public DataInterface(double lat, double lon, String datet)
+	public DataInterface(String layNam, double lat, double lon, String datet, String userDisplayNam)
 	{
 		latitude = lat;
 		longitude = lon;
 		datetime = datet;
+		userDisplayName = userDisplayNam;
+		layerName = layNam;
+		data = new HashMap<String, String>();
 	}
 	
 	public abstract boolean isPublished();
@@ -91,6 +113,26 @@ public abstract class DataInterface
 		
 		return l1.distanceTo(l2) < closeDistance;
 	}
-	
-	
+
+	public String getLocality()
+	{
+		if(data.containsKey("locality"))
+			return data.get("locality");
+		return "";
+	}
+
+	public String getDataRepr()
+	{
+		String s = "";
+		String value = "";
+		for(String k : data.keySet())
+		{
+			value = data.get(k);
+			if(!value.isEmpty())
+				s += k + ": " + data.get(k) + "\n";
+		}
+		return s;
+	}
+
+
 }

@@ -118,6 +118,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 
         if(mMapReady)
         {
+			Log.e("OMapFrag.onCameraCh", "camera changed ");
             if(mUpdateHandler == null)
                 mUpdateHandler = new Handler();
             if(System.currentTimeMillis() - mLastCameraChangedTimeMs < UPDATE_DELAY)
@@ -228,7 +229,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 		mSetMode(mMode);
 		oActivity.findViewById(R.id.mapMessageTextView).setVisibility(View.GONE);
 
-        mReportOverlay = new ReportOverlay(this);
+        mReportOverlay = new ReportOverlay(this, oActivity.getAccount());
         mOnTiltChangeListener = mReportOverlay;
         mReportOverlay.setOnReportRequestListener((HelloWorldActivity) getActivity());
         mOverlays.add(mReportOverlay);

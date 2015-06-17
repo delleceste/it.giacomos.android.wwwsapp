@@ -666,9 +666,11 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         super.onRestoreInstanceState(inState);
     }
 
-    void radar()
+    public String getAccount()
     {
-        findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
+        if (mGoogleApiClient.isConnected() && Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null)
+            return Plus.AccountApi.getAccountName(mGoogleApiClient);
+        return "";
     }
 
     /**

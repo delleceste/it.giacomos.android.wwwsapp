@@ -43,6 +43,7 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
     {
         mReportUpdateTaskListener = reportUpdateTaskListener;
         mArea = area;
+        mErrorMsg = "";
     }
 
     @Override
@@ -82,11 +83,13 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
      */
     protected String[] doInBackground(String... task_data)
     {
+        Log.e("RepUpdTask.doInBg", " layer " + task_data[1] + " URL  " + task_data[0]);
         String[] document = new String[2];
         synchronized (mArea)
         {
             URL url = null;
             String layerName = task_data[1];
+            String accountName = task_data[2];
             document[0] = task_data[1]; /* this will be returned */
             try
             {
@@ -94,6 +97,7 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
                 url = new URL(task_data[0]);
                 HttpPostParametrizer httpPostParametrizer = new HttpPostParametrizer();
                 httpPostParametrizer.add("layer", layerName);
+                httpPostParametrizer.add("account", accountName);
                 httpPostParametrizer.add("sw_lat", mArea.southwest.latitude);
                 httpPostParametrizer.add("sw_lon", mArea.southwest.longitude);
                 httpPostParametrizer.add("ne_lat", mArea.northeast.latitude);
@@ -115,7 +119,7 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
                     document[1] += currentLine + "\n";
 
                 in.close();
-                Log.e("RepUpdateTask.onHandleI", " response \"" + document[1] + "\"");
+                Log.e("RepUpdateTask.doInBg", " response \"" + document[1] + "\"");
 
             } catch (MalformedURLException e)
             {
@@ -129,6 +133,7 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
             }
         }
         mArea = null;
+
     return document;
 }
 

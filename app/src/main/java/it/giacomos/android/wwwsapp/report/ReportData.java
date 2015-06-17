@@ -1,8 +1,11 @@
 package it.giacomos.android.wwwsapp.report;
 
 import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.layers.FileUtils;
+
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -12,25 +15,28 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class ReportData extends DataInterface
 {
-	public String username, locality, comment, temperature, writable;
-	public int sky, wind;
-	
+	public String  writable;
 	private Marker mMarker;
 	private MarkerOptions mMarkerOptions;
 	
-	public ReportData(String u, String d, String l, String c, 
-			String t, int s, int w, double lat, double longi, String writa)
+	public ReportData(String layNam, double lat, double lon, String datet, String userDisplayNam)
 	{
-		super(lat, longi, d);
-		username = u;
-		locality = l;
-		comment = c;
-		temperature = t;
-		sky = s;
-		wind = w;
-		writable = writa;
+		super(layNam, lat, lon, datet, userDisplayNam);
 		mMarker = null;
 	}
+
+    public boolean sameAs(DataInterface other)
+    {
+        if(this.getType() != other.getType())
+            return false;
+        ReportData o = (ReportData) other;
+        return writable.compareTo(o.writable) == 0 && getLatitude() == o.getLatitude() &&
+                getLongitude() == o.getLongitude() &&
+                getDataRepr().compareTo(o.getDataRepr()) == 0 &&
+                getUserDisplayName().compareTo(o.getUserDisplayName()) == 0 &&
+                getLayerName().compareTo(o.getLayerName()) == 0 &&
+                getLocality().compareTo(o.getLocality() ) == 0;
+    }
 
 	public boolean isWritable()
 	{
@@ -44,92 +50,41 @@ public class ReportData extends DataInterface
 	}
 
 	@Override
-	public String getLocality() {
-		return locality;
-	}
-
-	@Override
-	public MarkerOptions buildMarkerOptions(Context ctx) 
+	public MarkerOptions buildMarkerOptions(Context ctx, XmlUIDocumentRepr dataRepr)
 	{
-		String text = "";
 		String title = "";
-		String skystr = "";
-		int windIdx, iconId  = -1;
-		boolean night = false;
-		
-		String windtxtItems[] = ctx.getResources().getStringArray(R.array.report_wind_textitems);
+		String snippet = "";
+        String locality;
 		mMarkerOptions = null;
-		Resources res = ctx.getResources();
 
-		if(sky == 1)
-		{
-//			if(night)
-//				iconId = R.drawable.weather_sky_0_nite;
-//			else
-//				iconId = R.drawable.weather_sky_0;
-//			
-//			skystr += res.getString(R.string.sky0);
-		}
-		title = username;
+		title = getUserDisplayName();
+		snippet = getLayerName() + ", " + getDateTime() + "\n";
+
+		locality = getLocality();
 		if(locality.length() > 1) /* different from "-" */
 			title += " - " + locality;
 		
-		text = getDateTime() + "\n";
-		
-		if(skystr.length() > 0)
-			text += skystr + "\n";
-		
-		if(wind > 0)
-			text += res.getString(R.string.wind) + ": " + windtxtItems[wind] + "\n";
-		
-		try{
-			Float.parseFloat(temperature);
-			text += res.getString(R.string.temp)  + ": " + temperature + "C\n";
-			
-		}
-		catch(NumberFormatException e)
-		{
-			
-		}
-		if(comment.length() > 0)
-			text += res.getString(R.string.reportComment) + ":\n" + comment;
-		
-		if(isWritable())
-			text += "\n*" + res.getString(R.string.reportTouchBaloonToRemove);
+		snippet += "\n" + getDataRepr();
 		
 		mMarkerOptions = new MarkerOptions();
 		mMarkerOptions.position(new LatLng(getLatitude(), getLongitude()));
 		mMarkerOptions.title(title);
-		mMarkerOptions.snippet(text);
+		mMarkerOptions.snippet(snippet);
 
-		if(iconId > -1)
+        BitmapDescriptor bitmapDescriptor = null;
+		if(dataRepr.hasMarkerIcon())
 		{
+			FileUtils fu = new FileUtils();
+			Bitmap markerIcon = fu.loadBitmapFromStorage("layers/" + getLayerName() + "/bmps/" + dataRepr.getMarkerIcon() + ".bmp", ctx);
 			/* for sky no label, so do not use obsBmpFactory */
-			BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(iconId);
-			if(bitmapDescriptor != null)
-			{
-				mMarkerOptions.icon(bitmapDescriptor);
-				mMarkerOptions.anchor(0.5f, 0.5f);
-			}
+			bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(markerIcon);
+			mMarkerOptions.icon(bitmapDescriptor);
+			mMarkerOptions.anchor(0.5f, 0.5f);
 		}
 		else
-		{
-			windIdx = wind;
-			if(windIdx == 1)
-//				iconId = R.drawable.weather_wind_calm;
-			
-			if(iconId > -1)
-			{
-				BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(iconId);
-				if(bitmapDescriptor != null)
-					mMarkerOptions.icon(bitmapDescriptor);
-			}
-			else
-				mMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-		}
-		
-		return mMarkerOptions;
+			mMarkerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
 
+		return mMarkerOptions;
 	}
 
 	public void setMarker(Marker m)

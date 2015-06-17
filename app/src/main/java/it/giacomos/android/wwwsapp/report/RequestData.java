@@ -20,7 +20,7 @@ public class RequestData extends DataInterface
 
 	/** Builds a RequestData object
 	 * 
-	 * @param d the date time in string format
+	 * @param datetime the date time in string format
 	 * @param user the user name
 	 * @param local the locality associated to the request
 	 * @param la the latitude
@@ -28,10 +28,10 @@ public class RequestData extends DataInterface
 	 * @param wri writable attribute: if true: the user owns the request.
 	 * @param isSatisfied if true: the request has been published on the database
 	 */
-	public RequestData(String d, String user, String local, 
+	public RequestData(String datetime, String user, String local,
 			double la, double lo, String wri, boolean isPublished)
 	{
-		super(la, lo, d);
+		super("RequestData", la, lo, datetime, user);
 		writable = wri;
 		username = user;
 		locality = local;
@@ -59,7 +59,7 @@ public class RequestData extends DataInterface
 	}
 
 	@Override
-	public MarkerOptions buildMarkerOptions(Context ctx) 
+	public MarkerOptions buildMarkerOptions(Context ctx, XmlUIDocumentRepr repr)
 	{
 		Resources res = ctx.getResources();
 		String  title;
@@ -100,6 +100,12 @@ public class RequestData extends DataInterface
 	@Override
 	public Marker getMarker() {
 		return mMarker;
+	}
+
+	@Override
+	public boolean sameAs(DataInterface di)
+	{
+		return false;
 	}
 
 	@Override

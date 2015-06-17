@@ -1,5 +1,6 @@
 package it.giacomos.android.wwwsapp.report;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,16 +79,15 @@ OnClickListener
 	/* maps the marker id (obtained with marker.getId()) with the associated marker data */
 	private HashMap<String , DataInterface> mDataInterfaceMarkerIdHash;
 	private ArrayList<DataInterface> mDataInterfaceList;
-	private String mLayer;
 
-	public ReportOverlay(OMapFragment oMapFragment) 
+	public ReportOverlay(OMapFragment oMapFragment, String accountName)
 	{
 		mMapFrag = oMapFragment;
 		mMyReportRequestListener = null; /* HelloWorldActivity */
 		mReportOverlayTask = null;
 		mMapBaloonInfoWindowAdapter = new MapBaloonInfoWindowAdapter(mMapFrag.getActivity());
 		mGeocodeAddressTask = null;
-		mReportUpdater = new ReportUpdater(oMapFragment.getActivity().getApplicationContext());
+		mReportUpdater = new ReportUpdater(oMapFragment.getActivity().getApplicationContext(), accountName);
 		mMapFrag.getMap().setInfoWindowAdapter(mMapBaloonInfoWindowAdapter);
 		mDataInterfaceMarkerIdHash = new HashMap<String, DataInterface>();
 		mDataInterfaceList = new ArrayList<DataInterface>();
@@ -117,7 +118,7 @@ OnClickListener
 	}
 
 	/** ReportOverlay has a ReportUpdater which registers with the LocationClient and 
-	 *  with the  NetworkStatusMonitor to obtain location updates and to be notified 
+	 *  with the  NetworkStatusMonitor to obtain location updates and to be notified
 	 *  when the network goes up/down. When the activity is paused, it is necessary to
 	 *  release such resources.
 	 * 
@@ -139,9 +140,21 @@ OnClickListener
 	public void setLayer(String layer)
 	{
 		FileUtils dpcu = new FileUtils();
-        String[] data =  {mLayer,  dpcu.loadFromStorage(mLayer + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext() ) };
+        String[] data =  { layer,  dpcu.loadFromStorage(layer + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext() ) };
         onReportDownloaded(data);
 		mReportUpdater.setLayer(layer);
+	}
+
+	private boolean mMarkerPresent(DataInterface di)
+	{
+		Iterator<DataInterface> it = mDataInterfaceList.iterator();
+		while (it.hasNext())
+		{
+			DataInterface dataInterface = it.next();
+			if(dataInterface.sameAs(di))
+				return true;
+		}
+		return false;
 	}
 
 	private void mRemoveMarkers()
@@ -203,14 +216,13 @@ OnClickListener
 		if(dataInterfaceList != null) /* the task may return null */
 		{
 			/* store new data into mDataInterfaceList field */
-			mDataInterfaceList = new ArrayList<DataInterface>(Arrays.asList(dataInterfaceList));
 			/* save my request markers that haven't been published yet in order not to lose them
 			 * when the update takes place. Actually, mRemoveMarkers below clears all markers.
 			 */
 			ArrayList<DataInterface> myRequestsYetUnpublishedBackup = mSaveYetUnpublishedMyRequestData();
-			mRemoveMarkers();
+	//		mRemoveMarkers();
 			/* creates markers on the map according to the tilt value. Populates mDataInterfaceMarkerIdHash */
-			mUpdateMarkers();
+			mUpdateMarkers(dataInterfaceList);
 
 			/* do not need data interface list anymore, since it's been saved into hash */
 			dataInterfaceList = new DataInterface[0];
@@ -224,8 +236,10 @@ OnClickListener
 		
 	}
 
-	private void mUpdateMarkers() 
+	private void mUpdateMarkers(DataInterface[] newDataIfArray)
 	{
+		ArrayList<DataInterface> newDataList = new ArrayList<DataInterface>();
+
 		boolean showAll = (mMapTilt >= TILT_MARKERS_SHOW_ALL_THRESH &&
 				mMapTilt < TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
 		boolean showUsers = (mMapTilt >= TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
@@ -234,19 +248,40 @@ OnClickListener
 		
 	//	mDataInterfaceMarkerIdHash.clear();
 
-		/* invoked when map tilt changes. We need to remove or add markers
-		 * appropriately. mDataInterfaceMarkerIdHash is updated with the new id
-		 * of the marker, if added. Each 
-		 * DataInterface stored in its values will have its marker set
-		 * or unset (i.e. set to null) accordingly to the shown/hidden status 
-		 * of the marker.
-		 * 
-		 */
-		for(DataInterface dataI : mDataInterfaceList)
+		/* remove markers that are no more in view */
+		if(!mDataInterfaceList.isEmpty())
+		{
+			Iterator<DataInterface> existingDIIter = mDataInterfaceList.iterator();
+			while (existingDIIter.hasNext())
+			{
+				boolean contains = false;
+				DataInterface existingDI = existingDIIter.next();
+				for (DataInterface dataI : newDataIfArray)
+				{
+					contains = dataI.sameAs(existingDI);
+					if (contains)
+					{
+						Log.e("ReportOverlay.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getMarker().getTitle());
+						break;
+					}
+					else /* must be added a new marker */
+						newDataList.add(dataI);
+				}
+				if (!contains)
+				{
+					existingDI.getMarker().remove();
+					existingDIIter.remove();
+				}
+			}
+		}
+		else
+			newDataList = new ArrayList<DataInterface>(Arrays.asList(newDataIfArray));
+
+		for(DataInterface dataI : newDataList)
 		{
 //			Log.e("reportOvarlay.mUpdateMarkers", " ty " + dataI.getType() + "showAll " + showAll
 //					+ " showUser " + showUsers + " tilt " + mMapTilt);
-			
+
 			int typ = dataI.getType();
 			Marker marker = dataI.getMarker();
 			
@@ -268,13 +303,13 @@ OnClickListener
 					marker = mMapFrag.getMap().addMarker(dataI.getMarkerOptions());
 					/* store it into our data reference */
 					dataI.setMarker(marker);
-//					Log.e("reportOvarlay.mUpdateMarkers", "setting marker " + marker.getTitle() + 
-//							" id " + marker.getId());
+			Log.e("reportOvarlay.mUpdateMarkers", "setting marker " + marker.getTitle() +
+							" id " + marker.getId() + " hash " + marker.hashCode());
 					mDataInterfaceMarkerIdHash.put(marker.getId(), dataI);
 				}
 				else
 				{
-//					Log.e("reportOvarlay.mUpdateMarkers", "marker " + marker.getTitle() + 
+//					Log.e("reportOvarlay.mUpdateMarkers", "marker " + marker.getTitle() +
 //							" should be visible already");
 
 					/* if there was a not null marker in the data interface, then it
@@ -416,7 +451,7 @@ OnClickListener
 		DateFormat df = DateFormat.getDateInstance();
 		/* RequestData(String d, String user, String local, double la, double lo, String wri, boolean isPublished) */
 		RequestData myRequestData = new RequestData(df.format(date), userName, "-", point.latitude, point.longitude, "w", false);
-		myRequestData.buildMarkerOptions(ctx);
+		myRequestData.buildMarkerOptions(ctx, null);
 		Marker myRequestMarker = mMapFrag.getMap().addMarker(myRequestData.getMarkerOptions());
 		myRequestData.setMarker(myRequestMarker);
 		/* prepend "MyRequestMarker" to the id of my request marker */
@@ -446,7 +481,7 @@ OnClickListener
 	@Override
 	public void onGeocodeAddressUpdate(LocationInfo locationInfo, String id) 
 	{	
-		//Log.e("ReportOverlay.onGeocodeAddressUpdate", "-> " + locationInfo.locality);
+		Log.e("ReportOverlay.onGeocodeAddressUpdate", "-> " + locationInfo.locality);
 		DataInterface dataI = mDataInterfaceMarkerIdHash.get(id);
 		if(dataI != null) /* may have been removed */
 		{
@@ -569,7 +604,7 @@ OnClickListener
 			 * onGeocodeAddressTask actually updates the locality by changing the snippet on the marker rather 
 			 * than regenerating a MarkerOptions.
 			 */
-			MarkerOptions mo = ((RequestData) di).buildMarkerOptions(mMapFrag.getActivity().getApplicationContext());
+			MarkerOptions mo = ((RequestData) di).buildMarkerOptions(mMapFrag.getActivity().getApplicationContext(), null);
 			Marker myRestoredRequestMarker = mMapFrag.getMap().addMarker(mo);
 			di.setMarker(myRestoredRequestMarker); /* replace old marker with new one */
 			myRestoredRequestMarker.showInfoWindow();
@@ -668,7 +703,7 @@ OnClickListener
 			 * touched but the active user/report/request markers are hidden or
 			 * shown according to the tilt value.
 			 */
-			mUpdateMarkers();
+			mUpdateMarkers((DataInterface[]) mDataInterfaceList.toArray());
 		}
 	}
 

@@ -25,15 +25,17 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 	private long mLastReportUpdatedAt;
 	private ReportUpdateTask mReportUpdateTask;
 	private LatLngBounds mNewArea, mCurrentArea;
-	private String mLayerName;
+	private String mNewLayerName, mCurrentLayerName, mAccount;
 
-	public ReportUpdater(Context ctx)
+	public ReportUpdater(Context ctx, String account)
 	{
 		mContext = ctx;
 		mNetworkStatusMonitor = new NetworkStatusMonitor(this, ctx);
 		mContext.registerReceiver(mNetworkStatusMonitor, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 		mLastReportUpdatedAt = 0;
 		mReportUpdateTask = null;
+		mCurrentLayerName = mNewLayerName = "";
+        mAccount = account;
 	}
 
 	public void unregister()
@@ -78,16 +80,15 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 
 	public void setLayer(String layer)
 	{
-		if(mLayerName == null || mLayerName.compareTo(layer) != 0)
-		{
-			mLayerName = layer;
-			update(true);
-		}
+		mNewLayerName = layer;
+		update(mNewLayerName.compareTo(mCurrentLayerName) != 0);
 	}
 
 	public void update(boolean force)
 	{
-		if((!reportUpToDate() || force) && mNewArea != null)
+        Log.e("RepUpdater.update", "force " + force + " up2 date " + reportUpToDate() + " connected " + mNetworkStatusMonitor.isConnected()
+            + " mNewArea: " + mNewArea);
+		if((!reportUpToDate() || force) && mNewArea != null && mNetworkStatusMonitor.isConnected())
 		{
 			/* cancel previous task if running and if it is not processing the same area as we are going to process */
 			Log.e("ReportUpd.update", " Updating reports: force " + force + " latlng changed " +
@@ -98,9 +99,10 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 			{
 				/* create and start a new task only if the interesting area is not currently being processed by a running task */
 				Log.e("ReportUpd.update", "creating new task for area " + mNewArea);
-				String [] task_data = new String[2];
+				String [] task_data = new String[3];
 				task_data[0] = REPORT_URL;
-				task_data[1] = mLayerName;
+				task_data[1] = mNewLayerName;
+                task_data[2] = mAccount;
 				mReportUpdateTask = new ReportUpdateTask(this, mNewArea);
 				mReportUpdateTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, task_data);
 			}
@@ -115,7 +117,7 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 		/* force an update if map visible area bounds changed
 		 * Otherwise, update only if some time has elapsed after last update.
 		 */
-		update(mNewArea != mCurrentArea);
+		update( (mNewArea != mCurrentArea) || (mCurrentLayerName.compareTo(mNewLayerName) != 0));
 	}
 
 	@Override
@@ -141,7 +143,9 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 			/* call onReportDownloaded on ReportOverlay */
 			if(mReportDownloadListener != null)
 				mReportDownloadListener.onReportDownloaded(data);
+
 			mCurrentArea = mNewArea;
+			mCurrentLayerName = mNewLayerName;
 			mLastReportUpdatedAt = System.currentTimeMillis();
 		}
 		else if(mReportDownloadListener != null)
@@ -150,9 +154,17 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 
 	public void areaChanged(LatLngBounds bounds)
 	{
-		mNewArea = bounds;
-		if(mNetworkStatusMonitor.isConnected())
-			update(true); /* true: on area change, force update */
+        if(mNewArea == null ||
+                bounds.northeast.latitude != mNewArea.northeast.latitude ||
+                bounds.northeast.longitude != mNewArea.northeast.longitude ||
+                bounds.southwest.latitude != mNewArea.southwest.latitude ||
+                bounds.southwest.longitude != mNewArea.southwest.longitude)
+        {
+            Log.e("ReportUpd.areaChanged", "area changed from " + mNewArea + " to " + bounds);
+            mNewArea = bounds;
+            if (mNetworkStatusMonitor.isConnected())
+                update(true); /* true: on area change, force update */
+        }
 	}
 
 }
