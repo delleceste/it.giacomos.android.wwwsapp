@@ -1,0 +1,51 @@
+LEGENDA
+[R]: da rivedere
+[F] : in futuro
+
+- step
+  - sotto step relativi a step
+
+==>  N. si rimanda a un ramo di codice trattato al numero N piu` vicino.
+
+-> invocazione di metodi (pseudo codice/pseudo nome del metodo)
+
+
+
+
+
+
+
+
+
+
+
+========================
+Update Mappa
+========================
+
+Vengono aggiornati i dati all'interno del rettangolo di visualizzazione. Questo e` il parametro principale da inviare al server.
+Non e` richiesta la posizione dell'utente, perche' il rettangolo della mappa determina l'area da aggiornare.
+Quando
+- Ci deve essere un livello di zoom minimo per iniziare la visualizzazione
+  - Si possono stabilire delle priorita` per visualizzare segnaposti anche con livello di zoom molto piccolo.
+
+Non essendo richiesta la posizione, non e` necessario connettersi al servizio di geolocalizzazione.
+E` invece necessario essere in rete.
+
+I dati non vengono aggiornati ad ogni cambiamento dell'area, ma si aspetta tra uno e due secondi, cosicché non si generi
+troppo traffico inutile mentre l'utente si sposta sulla mappa. Timer: tra uno e due secondi.
+[R]: valutare in seguito l'opportunita` di un bottone di refresh piuttosto.
+
+Cambia rettangolo -> notifico Overlay -> notifico ReportUpdater, che salva newArea richesta (non cancella oldArea)
+    1. Online: scarico dati. Se va a buon fine, sovrascrivo oldArea precedente con newArea.
+    2. Offline: al momento prossima connessione se oldArea != newArea aggiorno (==> 1.)
+
+Per lo scaricamento, si usa un AsyncTask. Questo va cancellato (se ancora in esecuzione) quando:
+    - lo schermo viene ruotato;
+    - e` cambiata l'area di interesse sulla mappa;
+    - la rete ritorna disponibile ed e` passato un po' di tempo dall'ultimo scaricamento;
+    - [F] tasto refresh
+
+    Quando l'AsyncTask non va cancellato:
+    - un task con la stessa area e` in esecuzione [R] In realta` un task precedente potrebbe essere rimasto appeso e quindi da valutare
+      la cancellazione e un task nuovo
