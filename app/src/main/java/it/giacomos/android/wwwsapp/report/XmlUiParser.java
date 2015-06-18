@@ -97,9 +97,10 @@ public class XmlUiParser
                                             if (valnode.getNodeType() == Node.ELEMENT_NODE)
                                             {
                                                 Element val = (Element) valnode;
-                                                Log.e("Builder.build", " add value " + val.getAttribute("text"));
+//                                                Log.e("Builder.build", " add value " + val.getAttribute("text"));
                                                 setPropertyValueFromElement(val, xmlproperty, intl);
-                                            } else
+                                            }
+                                            else
                                                 Log.e("Builder.build", " valnode is not element node " + valnode);
                                         }
                                     }

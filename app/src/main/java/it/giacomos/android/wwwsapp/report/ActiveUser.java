@@ -3,6 +3,7 @@ package it.giacomos.android.wwwsapp.report;
 import it.giacomos.android.wwwsapp.R;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -17,7 +18,7 @@ public class ActiveUser extends DataInterface {
 	private Marker mMarker;
 	public int otherUsersInAreaCnt;
 	
-	public ActiveUser(String datet, double lat, double lon, 
+	public ActiveUser(String datet, double lat, double lon,
 			boolean recent, boolean quite_recent)
 	{
 		super("ActiveUser", lat, lon, datet, "ActiveUser");
@@ -128,9 +129,10 @@ public class ActiveUser extends DataInterface {
 	}
 
 	@Override
-	public boolean sameAs(DataInterface di)
+	public String getId()
 	{
-		return false;
+		String s = String.valueOf(TYPE_ACTIVE_USER) + ":" + getLayerName() + ":LatLon" + String.valueOf(getLatitude()) + ":" + String.valueOf(getLongitude()) + ":" + datetime;
+		return s;
 	}
 
 	@Override

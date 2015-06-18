@@ -18,30 +18,33 @@ public class ReportData extends DataInterface
 	public String  writable;
 	private Marker mMarker;
 	private MarkerOptions mMarkerOptions;
+	private long  mEventId;
 	
-	public ReportData(int userId, String layNam, double lat, double lon, String datet, String userDisplayNam)
+	public ReportData(int eventId, String layNam, double lat, double lon, String datet, String userDisplayNam)
 	{
-		super(userId, layNam, lat, lon, datet, userDisplayNam);
+		super(layNam, lat, lon, datet, userDisplayNam);
 		mMarker = null;
 		writable = "r";
+		mEventId = eventId;
 	}
 
     public boolean sameAs(DataInterface other)
     {
-        if(this.getType() != other.getType())
-            return false;
-        ReportData o = (ReportData) other;
-        return writable.compareTo(o.writable) == 0 && getLatitude() == o.getLatitude() &&
-                getLongitude() == o.getLongitude() &&
-                getDataRepr().compareTo(o.getDataRepr()) == 0 &&
-                getUserDisplayName().compareTo(o.getUserDisplayName()) == 0 &&
-                getLayerName().compareTo(o.getLayerName()) == 0 &&
-                getLocality().compareTo(o.getLocality() ) == 0;
+		if(other.getType() == DataInterface.TYPE_REPORT)
+			return ((ReportData) other).getEventId() == mEventId;
+		return false;
     }
 
 	public boolean isWritable()
 	{
 		return (writable.compareTo("w") == 0);
+	}
+
+	@Override
+	public  String getId()
+	{
+		/* event id is unique across all layers */
+		return String.valueOf(DataInterface.TYPE_REPORT) + ":eventId:" + String.valueOf(mEventId);
 	}
 
 	@Override
@@ -112,6 +115,10 @@ public class ReportData extends DataInterface
 		return true;
 	}
 
-	
+
+	public long getEventId()
+	{
+		return mEventId;
+	}
 	
 }

@@ -103,9 +103,9 @@ public class RequestData extends DataInterface
 	}
 
 	@Override
-	public boolean sameAs(DataInterface di)
+	public String getId()
 	{
-		return false;
+		return String.valueOf(TYPE_REQUEST) + ":" + getLayerName() + ":LatLon" + String.valueOf(getLatitude()) + ":" + String.valueOf(getLongitude()) + ":" + username;
 	}
 
 	@Override

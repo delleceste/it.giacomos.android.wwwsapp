@@ -42,17 +42,26 @@ public class DataParser
 				String datetime = o.getString("datetime");
 				double lat = o.getDouble("lat");
 				double lon = o.getDouble("lon");
-				String displayName = o.getString("display_name");
-				ReportData reportData = new ReportData(layer, lat, lon, datetime, displayName);
-                Iterator<String> keys = o.keys();
-                String key;
-                while(keys.hasNext())
-                {
-                    key = keys.next();
-                    reportData.add(key, o.getString(key));
-                }
-                Log.e("DataI.parse", "layer " + layer + " lat " + lat + " lon " + lon + " datet " + datetime + " disp name " + displayName);
-				ret[i] = reportData;
+				if(o.has("type") && o.getString("type").compareTo("report") == 0) /* it is a report */
+				{
+					int event_id = o.getInt("event_id");
+					String displayName = o.getString("display_name");
+					ReportData reportData = new ReportData(event_id, layer, lat, lon, datetime, displayName);
+					Iterator<String> keys = o.keys();
+					String key;
+					while (keys.hasNext())
+					{
+						key = keys.next();
+						reportData.add(key, o.getString(key));
+					}
+					Log.e("DataI.parse", "layer " + layer + " lat " + lat + " lon " + lon + " datet " + datetime + " disp name " + displayName);
+					ret[i] = reportData;
+				}
+				else if(o.has("type") && o.getString("type").compareTo("active_user") == 0)
+				{
+					ActiveUser activeUser = new ActiveUser(datetime, lat, lon, true, true, 0);
+					ret[i] = activeUser;
+				}
 			}
 		}
 		catch (JSONException e)

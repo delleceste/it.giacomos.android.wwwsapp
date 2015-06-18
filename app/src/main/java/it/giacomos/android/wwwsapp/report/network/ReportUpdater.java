@@ -98,11 +98,11 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 			else if(mReportUpdateTask == null || !mReportUpdateTask.isProcessingArea(mNewArea))
 			{
 				/* create and start a new task only if the interesting area is not currently being processed by a running task */
-				Log.e("ReportUpd.update", "creating new task for area " + mNewArea);
+				Log.e("ReportUpd.update", "creating new task for area " + mNewArea + " account " + mAccount + " layer " + mNewLayerName);
 				String [] task_data = new String[3];
 				task_data[0] = REPORT_URL;
 				task_data[1] = mNewLayerName;
-                task_data[2] = mAccount;
+                task_data[2] = "delleceste@gmail.com";
 				mReportUpdateTask = new ReportUpdateTask(this, mNewArea);
 				mReportUpdateTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, task_data);
 			}

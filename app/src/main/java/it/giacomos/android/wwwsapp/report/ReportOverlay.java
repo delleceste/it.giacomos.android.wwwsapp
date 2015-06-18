@@ -1,13 +1,10 @@
 package it.giacomos.android.wwwsapp.report;
 
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -21,10 +18,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -158,8 +155,12 @@ OnClickListener
 
 	private void mRemoveMarkers()
 	{
-		for(String markerId : mDataInterfaceMarkerIdHash.keySet())
-			mDataInterfaceMarkerIdHash.get(markerId).getMarker().remove();
+		for(String dataId : mDataInterfaceMarkerIdHash.keySet())
+        {
+            Marker m = mDataInterfaceMarkerIdHash.get(dataId).getMarker();
+            if(m != null)
+                m.remove();
+        }
 		mDataInterfaceMarkerIdHash.clear();
 	}
 
@@ -186,17 +187,17 @@ OnClickListener
 	@Override
 	public void hideInfoWindow() 
 	{
-		for(String id : mDataInterfaceMarkerIdHash.keySet())
-			mDataInterfaceMarkerIdHash.get(id).getMarker().hideInfoWindow();
+		for(String dataId  : mDataInterfaceMarkerIdHash.keySet())
+			mDataInterfaceMarkerIdHash.get(dataId).getMarker().hideInfoWindow();
 	}
 
 	@Override
 	public boolean isInfoWindowVisible()
 	{
-		for(String markerId : mDataInterfaceMarkerIdHash.keySet())
+		for(String dataId  : mDataInterfaceMarkerIdHash.keySet())
 		{
-			Marker m = mDataInterfaceMarkerIdHash.get(markerId).getMarker();
-			if(m.isInfoWindowShown())
+			Marker m = mDataInterfaceMarkerIdHash.get(dataId).getMarker();
+			if(m != null && m.isInfoWindowShown())
 				return true;
 		}
 		return false;
@@ -235,64 +236,70 @@ OnClickListener
 		
 	}
 
+	/** If called with newDataIfArray null, then the data interfaces held by the ReportOverlay
+	 * has not changed. Om this case, the task of this method is to show or hide the markers
+	 * according to the map tilt value.
+	 *
+	 * If newDataIfArray is non null, then it represents the most up to date set of data available
+	 * (from net or cache). We have to remove DataInterface objects no more present from the
+	 * mDataInterfaceMarkerIdHash and add new entries to the same hash container.
+	 * Then, proceed to showing the markers according to the tilt value.
+	 *
+	 * @param newDataIfArray the array of the updated DataInterface objects.
+	 */
 	private void mUpdateMarkers(DataInterface[] newDataIfArray)
 	{
-		HashSet<DataInterface> newDataSet = new HashSet<DataInterface>();
-
 		boolean showAll = (mMapTilt >= TILT_MARKERS_SHOW_ALL_THRESH &&
 				mMapTilt < TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
 		boolean showUsers = (mMapTilt >= TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
 		int usersCount = 0;
 		int markerCnt = 0;
-		
-	//	mDataInterfaceMarkerIdHash.clear();
 
-		Log.e("ReportOvarlay.updateMarkers", " data interface list size " + mDataInterfaceMarkerIdHash.size());
-		/* remove markers that are no more in view */
-		Iterator<Map.Entry<String, DataInterface> > existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
-			while (existingDIIter.hasNext())
-            {
-                boolean contains = false;
-                Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
-                DataInterface existingDI = existingDIMap.getValue();
-                for (DataInterface dataI : newDataIfArray)
-                {
-                    contains = dataI.sameAs(existingDI);
-                    if (contains)
-                    {
-                        Log.e("ReportOverlay.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getLayerName());
-                        break;
-                    }
-                }
-                if (!contains)
-                {
-                    existingDI.getMarker().remove();
-                    existingDIIter.remove();
-                }
-            }
-
-        for (DataInterface dataI : newDataIfArray)
-        {
-            boolean contains = false;
-            existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
-            while (existingDIIter.hasNext())
-            {
-                Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
-                DataInterface existingDI = existingDIMap.getValue();
-                if(existingDI.sameAs(dataI))
-                    contains = true;
-            }
-            if(!contains)
-                newDataSet.add(dataI);
-
-        }
-
-
-		for(DataInterface dataI : newDataSet)
+		Log.e("RepOv.updateMarkers", " data interface list size " + mDataInterfaceMarkerIdHash.size());
+		if(newDataIfArray != null)
 		{
+		/* remove markers that are no more in view */
+			Iterator<Map.Entry<String, DataInterface>> existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
+			while (existingDIIter.hasNext())
+			{
+				boolean contains = false;
+				Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
+				DataInterface existingDI = existingDIMap.getValue();
+				for (DataInterface dataI : newDataIfArray)
+				{
+					contains = dataI.sameAs(existingDI);
+                    Log.e("RepOv.updateMarkers", "comparin dataI " + dataI.getId() + " -> " + existingDI.getId() + " ===> " + contains);
+					if (contains)
+					{
+					/* avoid adding an already present marker and avoid making another cycle
+					 * to discover the new entries.
+					 */
+						dataI.markAlreadyPresent();
+						Log.e("RepOv.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getLayerName());
+						break;
+					}
+				}
+				if (!contains)
+				{
+                    Marker marker = existingDI.getMarker();
+                    if(marker != null)
+					    existingDI.getMarker().remove();
+					existingDIIter.remove();
+				}
+			}
+
+			for (DataInterface dataI : newDataIfArray)
+			{
+				if (!dataI.isMarkedAlreadyPresent())
+					mDataInterfaceMarkerIdHash.put(dataI.getId(), dataI);
+			}
+		}
 //			Log.e("reportOvarlay.mUpdateMarkers", " ty " + dataI.getType() + "showAll " + showAll
 //					+ " showUser " + showUsers + " tilt " + mMapTilt);
 
+			/* the data interface hash contains all the current data interfaces in the map */
+		for(DataInterface dataI : mDataInterfaceMarkerIdHash.values())
+		{
 			int typ = dataI.getType();
 			Marker marker = dataI.getMarker();
 			
@@ -314,14 +321,13 @@ OnClickListener
 					marker = mMapFrag.getMap().addMarker(dataI.getMarkerOptions());
 					/* store it into our data reference */
 					dataI.setMarker(marker);
-			Log.e("reportOvarlay.mUpdateMarkers", "setting marker " + marker.getTitle() +
+					Log.e("RepOv.mUpdateMarkers", "setting marker " + marker.getTitle() +
 							" id " + marker.getId() + " hash " + marker.hashCode());
-					mDataInterfaceMarkerIdHash.put(marker.getId(), dataI);
 				}
 				else
 				{
-//					Log.e("reportOvarlay.mUpdateMarkers", "marker " + marker.getTitle() +
-//							" should be visible already");
+					Log.e("RepOv.mUpdateMarkers", "marker " + marker.getTitle() +
+							" should be visible already");
 
 					/* if there was a not null marker in the data interface, then it
 					 * should be visible.
@@ -334,10 +340,8 @@ OnClickListener
 				/* marker must be hidden */
 				if(marker != null) /* is visible */
 				{
-					/* remove couple id, DataInterface from hash */
-					mDataInterfaceMarkerIdHash.remove(marker.getId());
-//					Log.e("reportOvarlay.mUpdateMarkers", "removing marker " + marker.getTitle() + 
-//							" id " + marker.getId());
+					Log.e("RepOv.mUpdateMarkers", "removing marker " + marker.getTitle() +
+							" id " + marker.getId());
 					marker.remove();
 					dataI.setMarker(null);
 				}
@@ -714,7 +718,7 @@ OnClickListener
 			 * touched but the active user/report/request markers are hidden or
 			 * shown according to the tilt value.
 			 */
-			mUpdateMarkers((DataInterface[]) mDataInterfaceMarkerIdHash.values().toArray());
+			mUpdateMarkers(null);
         }
 	}
 

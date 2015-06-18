@@ -83,7 +83,7 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
      */
     protected String[] doInBackground(String... task_data)
     {
-        Log.e("RepUpdTask.doInBg", " layer " + task_data[1] + " URL  " + task_data[0]);
+        Log.e("RepUpdTask.doInBg", "1. layer " + task_data[1] + " URL  " + task_data[0]);
         String[] document = new String[2];
         synchronized (mArea)
         {
@@ -106,17 +106,24 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
-                Log.e("PostDataS.onHandleInt", "url: " + url.toString() + " - data " + data);
+                Log.e("RepUpdTask.doInBg", "2. url: " + url.toString() + " - data " + data);
                 OutputStreamWriter wr;
                 wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(data);
+                Log.e("RepUpdTask.doInBg", "3. written " + data );
                 wr.flush();
-                wr.close();
+             //   wr.close();
+
+                Log.e("RepUpdTask.doInBg", "4. creating BufferedReader");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String currentLine;
+                Log.e("RepUpdTask.doInBg", "5. calling in.readline");
                 while ((currentLine = in.readLine()) != null)
+                {
+                    Log.e("RepUpdTask.doInBg", "6 [...] read : " + currentLine + " FROM NET");
                     document[1] += currentLine + "\n";
+                }
 
                 in.close();
                 Log.e("RepUpdateTask.doInBg", " response \"" + document[1] + "\"");

@@ -20,9 +20,9 @@ public abstract class DataInterface
 	private double latitude, longitude;
 	private String datetime, userDisplayName, layerName;
 	private HashMap<String, String> data;
-	private  int mUserId;
-	
-	
+	private boolean mAlreadyPresent;
+
+
 	public String getDateTime()
 	{
 		return datetime;
@@ -68,12 +68,14 @@ public abstract class DataInterface
 	
 	public abstract Marker getMarker();
 
+	public abstract String getId();
+
 	public void add(String key, String value)
 	{
 		data.put(key, value);
 	}
 	
-	public DataInterface(int user_id, String layNam, double lat, double lon, String datet, String userDisplayNam)
+	public DataInterface(String layNam, double lat, double lon, String datet, String userDisplayNam)
 	{
 		latitude = lat;
 		longitude = lon;
@@ -81,7 +83,7 @@ public abstract class DataInterface
 		userDisplayName = userDisplayNam;
 		layerName = layNam;
 		data = new HashMap<String, String>();
-		mUserId = user_id;
+		mAlreadyPresent = false;
 	}
 	
 	public abstract boolean isPublished();
@@ -136,23 +138,18 @@ public abstract class DataInterface
 		return s;
 	}
 
-	public byte[] getDigest()
+	public boolean sameAs(DataInterface other)
 	{
-		try
-		{
-			MessageDigest md = MessageDigest.getInstance("SHA");
-			md.update(String.valueOf(getLatitude()).getBytes());
-			md.update(String.valueOf(getLongitude()).getBytes());
-			md.update(datetime.getBytes());
-			md.update(layerName.getBytes());
-			md.update(String.valueOf(mUserId).getBytes());
-			return md.digest();
-
-		} catch (NoSuchAlgorithmException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
+		return this.getId().compareTo(other.getId()) == 0;
 	}
 
+	public boolean isMarkedAlreadyPresent()
+	{
+		return mAlreadyPresent;
+	}
+
+	public void markAlreadyPresent()
+	{
+		mAlreadyPresent = true;
+	}
 }

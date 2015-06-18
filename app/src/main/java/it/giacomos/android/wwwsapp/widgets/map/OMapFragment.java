@@ -375,6 +375,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 	public void run()
 	{
 		Log.e("OMapFrag.run", " would update layer ");
+		getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
         mReportOverlay.setArea(mMap.getProjection().getVisibleRegion().latLngBounds);
 	}
 

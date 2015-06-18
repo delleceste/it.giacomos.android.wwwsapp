@@ -2,6 +2,7 @@ package it.giacomos.android.wwwsapp.report;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class ReportOverlayTask extends AsyncTask<String, Integer, DataInterface[] >
 {
@@ -39,7 +40,8 @@ public class ReportOverlayTask extends AsyncTask<String, Integer, DataInterface[
 					break;
 
 				DataInterface dataInterface = dataList[i];
-				dataInterface.buildMarkerOptions(mContext, xmlUIDocumentRepr);
+				if(dataInterface != null)
+					dataInterface.buildMarkerOptions(mContext, xmlUIDocumentRepr);
 			}
 		}
 		return dataList;
