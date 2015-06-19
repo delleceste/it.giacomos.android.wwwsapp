@@ -207,28 +207,17 @@ OnClickListener
 	/** redraws all markers, the user report markers, my request marker and buddy request notification
 	 *  marker, if present.
 	 */
-	public void onReportProcessingTaskFinished(DataInterface[] dataInterfaceList)
+	public void onReportProcessingTaskFinished(HashMap<String , DataInterface> dataInterfaceList)
 	{
+		Log.e("RepOv.onRepProcTskFin", "entering");
         mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
+		mDataInterfaceMarkerIdHash = dataInterfaceList;
 
-        if(dataInterfaceList == null || dataInterfaceList.length == 0)
+        if(dataInterfaceList.size() == 0)
             Toast.makeText(mMapFrag.getActivity().getApplicationContext(), R.string.reportNoneAvailable, Toast.LENGTH_LONG).show();
-		if(dataInterfaceList != null) /* the task may return null */
-		{
-			/* store new data into mDataInterfaceList field */
-			/* save my request markers that haven't been published yet in order not to lose them
-			 * when the update takes place. Actually, mRemoveMarkers below clears all markers.
-			 */
-			ArrayList<DataInterface> myRequestsYetUnpublishedBackup = mSaveYetUnpublishedMyRequestData();
-	//		mRemoveMarkers();
-			/* creates markers on the map according to the tilt value. Populates mDataInterfaceMarkerIdHash */
-			mUpdateMarkers(dataInterfaceList);
 
-			/* do not need data interface list anymore, since it's been saved into hash */
-			dataInterfaceList = new DataInterface[0];
-			/* restore yet unpublished markers that the user was just placing into the map */
-			mRestoreYetUnpublishedMyRequestData(myRequestsYetUnpublishedBackup);
-		}
+		mUpdateMarkers();
+
 
 		mCheckForFreshNotifications();
 		
@@ -245,59 +234,85 @@ OnClickListener
 	 * mDataInterfaceMarkerIdHash and add new entries to the same hash container.
 	 * Then, proceed to showing the markers according to the tilt value.
 	 *
-	 * @param newDataIfArray the array of the updated DataInterface objects.
 	 */
-	private void mUpdateMarkers(DataInterface[] newDataIfArray)
+	private void mUpdateMarkers()
 	{
 		boolean showAll = (mMapTilt >= TILT_MARKERS_SHOW_ALL_THRESH &&
 				mMapTilt < TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
 		boolean showUsers = (mMapTilt >= TILT_MARKERS_SHOW_ONLY_USERS_THRESH);
 		int usersCount = 0;
 		int markerCnt = 0;
+		int alreadyPresent = 0, added = 0, removed= 0;
+		long start = System.currentTimeMillis();
+		int newDataSize = mDataInterfaceMarkerIdHash.size();
 
-		Log.e("RepOv.updateMarkers", " data interface list size " + mDataInterfaceMarkerIdHash.size());
-		if(newDataIfArray != null)
-		{
-		/* remove markers that are no more in view */
-			Iterator<Map.Entry<String, DataInterface>> existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
-			while (existingDIIter.hasNext())
-			{
-				boolean contains = false;
-				Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
-				DataInterface existingDI = existingDIMap.getValue();
-				for (DataInterface dataI : newDataIfArray)
-				{
-					contains = dataI.sameAs(existingDI);
-                    Log.e("RepOv.updateMarkers", "comparin dataI " + dataI.getId() + " -> " + existingDI.getId() + " ===> " + contains);
-					if (contains)
-					{
-					/* avoid adding an already present marker and avoid making another cycle
-					 * to discover the new entries.
-					 */
-						dataI.markAlreadyPresent();
-						Log.e("RepOv.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getLayerName());
-						break;
-					}
-				}
-				if (!contains)
-				{
-                    Marker marker = existingDI.getMarker();
-                    if(marker != null)
-					    existingDI.getMarker().remove();
-					existingDIIter.remove();
-				}
-			}
+		Log.e("RepOv.updateMarkers", " data interface list size " + mDataInterfaceMarkerIdHash.size() + " new data size " + newDataSize);
+	//	if(newDataIfArray != null)
 
-			for (DataInterface dataI : newDataIfArray)
-			{
-				if (!dataI.isMarkedAlreadyPresent())
-					mDataInterfaceMarkerIdHash.put(dataI.getId(), dataI);
-			}
-		}
+	//		if(newDataIfArray.length < 10 * mDataInterfaceMarkerIdHash.size())
+
+//            if(false)
+//			{
+//				Log.e("RepOv.mUpdateMarkers", "trying to recycle arrays");
+//				start = System.currentTimeMillis();
+//				/* remove markers that are no more in view */
+//				Iterator<Map.Entry<String, DataInterface>> existingDIIter = mDataInterfaceMarkerIdHash.entrySet().iterator();
+//				while (existingDIIter.hasNext())
+//				{
+//					boolean contains = false;
+//					Map.Entry<String, DataInterface> existingDIMap = existingDIIter.next();
+//					DataInterface existingDI = existingDIMap.getValue();
+//					for (DataInterface dataI : newDataIfArray)
+//					{
+//						contains = dataI.sameAs(existingDI);
+//						if (contains)
+//						{
+//							alreadyPresent++;
+//					/* avoid adding an already present marker and avoid making another cycle
+//					 * to discover the new entries.
+//					 */
+//							dataI.markAlreadyPresent();
+//							//	Log.e("RepOv.mUpdateMarkers", " Keeping " + dataI.getUserDisplayName() + ", " + dataI.getLayerName());
+//							break;
+//						}
+//					}
+//					if (!contains)
+//					{
+//						Marker marker = existingDI.getMarker();
+//						if (marker != null)
+//							existingDI.getMarker().remove();
+//						existingDIIter.remove();
+//						removed++;
+//					}
+//				}
+//			}
+//			else /* it's more convenient to remove all markers and replace them */
+//				mRemoveMarkers();
+//
+//			Log.e("RepOv.mUpdateMarkers", "Recycling and removing data took " + (System.currentTimeMillis() - start) + " ms. adding new data to set...");
+//			for (DataInterface dataI : newDataIfArray)
+//			{
+//				/* must check for containsKey otherwise old dataI is repleced by the new one and
+//				 * the old markers are lost
+//				 */
+//				if (!dataI.isMarkedAlreadyPresent()
+//						&& !mDataInterfaceMarkerIdHash.containsKey(dataI.getId()))
+//				{
+//					added++;
+//					mDataInterfaceMarkerIdHash.put(dataI.getId(), dataI);
+//				}
+//			}
+//
+//		}
 //			Log.e("reportOvarlay.mUpdateMarkers", " ty " + dataI.getType() + "showAll " + showAll
 //					+ " showUser " + showUsers + " tilt " + mMapTilt);
 
 			/* the data interface hash contains all the current data interfaces in the map */
+		int newMarkers = 0, recycledMarkers = 0, hiddenMarkers = 0;
+		Log.e("RepOv.mUpdateMarkers", "Starting to place " + mDataInterfaceMarkerIdHash.size() + " markers. " + added +
+			" were added, " + removed + " removed " + alreadyPresent + " kept. Took " + (System.currentTimeMillis() - start) + " ms");
+
+		start = System.currentTimeMillis();
 		for(DataInterface dataI : mDataInterfaceMarkerIdHash.values())
 		{
 			int typ = dataI.getType();
@@ -321,13 +336,15 @@ OnClickListener
 					marker = mMapFrag.getMap().addMarker(dataI.getMarkerOptions());
 					/* store it into our data reference */
 					dataI.setMarker(marker);
-					Log.e("RepOv.mUpdateMarkers", "setting marker " + marker.getTitle() +
-							" id " + marker.getId() + " hash " + marker.hashCode());
+					newMarkers++;
+			//		Log.e("RepOv.mUpdateMarkers", "setting marker " + marker.getTitle() +
+			//				" id " + marker.getId() + " hash " + marker.hashCode());
 				}
 				else
 				{
 					Log.e("RepOv.mUpdateMarkers", "marker " + marker.getTitle() +
 							" should be visible already");
+					recycledMarkers++;
 
 					/* if there was a not null marker in the data interface, then it
 					 * should be visible.
@@ -344,9 +361,13 @@ OnClickListener
 							" id " + marker.getId());
 					marker.remove();
 					dataI.setMarker(null);
+					hiddenMarkers++;
 				}
 			}
 		} /* end for DataInterface dataI : mDataInterfaceMarkerIdHash.values() */
+
+		Log.e("RepOv.mUpdateMarkers", "draw end: took " + (System.currentTimeMillis() - start) + "ms. Added " + newMarkers +
+				" recycled " + recycledMarkers + " hidden " + hiddenMarkers);
 
 //		Log.e("ReportOverlay.mUpdateMarkers", "from tilt change: hash size " + mDataInterfaceMarkerIdHash.size()
 //				+ " dataSize " + mDataInterfaceList.size());
@@ -434,8 +455,10 @@ OnClickListener
         String layerName = data[0];
          /* save data into cache */
         FileUtils fu = new FileUtils();
+        long start = System.currentTimeMillis();
 		Log.e("RepOv.onRepDownloaded", "layer " + layerName + " data " + data[1]);
         fu.saveToStorage(data[1].getBytes(), layerName + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext());
+        Log.e("RepOv.onRepDownloaded", "saved to storage cache in " + (System.currentTimeMillis() - start) + "ms");
 		mReportOverlayTask = new ReportOverlayTask(mMapFrag.getActivity().getApplicationContext(), this);
 		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, data);
 	}
@@ -718,7 +741,7 @@ OnClickListener
 			 * touched but the active user/report/request markers are hidden or
 			 * shown according to the tilt value.
 			 */
-			mUpdateMarkers(null);
+			mUpdateMarkers();
         }
 	}
 

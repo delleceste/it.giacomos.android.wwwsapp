@@ -1,7 +1,10 @@
 package it.giacomos.android.wwwsapp.report;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public interface ReportProcessingTaskListener
 {
-	void onReportProcessingTaskFinished(DataInterface[] dataI);
+	void onReportProcessingTaskFinished(HashMap<String , DataInterface> dataI);
 
 }

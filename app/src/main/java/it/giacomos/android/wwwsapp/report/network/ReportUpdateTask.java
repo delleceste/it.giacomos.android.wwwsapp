@@ -106,27 +106,21 @@ public class ReportUpdateTask extends AsyncTask<String, Integer, String[]>
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
-                Log.e("RepUpdTask.doInBg", "2. url: " + url.toString() + " - data " + data);
                 OutputStreamWriter wr;
                 wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(data);
-                Log.e("RepUpdTask.doInBg", "3. written " + data );
                 wr.flush();
-             //   wr.close();
+                wr.close();
 
-                Log.e("RepUpdTask.doInBg", "4. creating BufferedReader");
+                Log.e("RepUpdTask.doInBg", "2. waiting for result for " +url + "?" + data);
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String currentLine;
-                Log.e("RepUpdTask.doInBg", "5. calling in.readline");
                 while ((currentLine = in.readLine()) != null)
                 {
-                    Log.e("RepUpdTask.doInBg", "6 [...] read : " + currentLine + " FROM NET");
                     document[1] += currentLine + "\n";
                 }
-
                 in.close();
-                Log.e("RepUpdateTask.doInBg", " response \"" + document[1] + "\"");
 
             } catch (MalformedURLException e)
             {

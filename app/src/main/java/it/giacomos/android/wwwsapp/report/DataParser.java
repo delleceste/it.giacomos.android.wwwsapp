@@ -1,8 +1,10 @@
 package it.giacomos.android.wwwsapp.report;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -23,19 +25,20 @@ public class DataParser
 		return mErrorMsg;
 	}
 
-	public DataInterface[] parse(String txt)
+	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx)
 	{
-		DataInterface[] ret = null;
-
+		HashMap<String , DataInterface> ret = null;
 		try
 		{
+			XmlUiParser xmlUiParser = new XmlUiParser();
+			XmlUIDocumentRepr xmlUIDocumentRepr = xmlUiParser.parse(layerName, ctx);
 			JSONObject jso = new JSONObject(txt);
 			/* this is me!, not the account name of the other persons' publications */
 			String account = jso.getString("account");
 			String layer = jso.getString("layer");
 			JSONArray data = jso.getJSONArray("data");
 
-			ret = new DataInterface[data.length()];
+			ret = new HashMap<String , DataInterface>(data.length());
 			for(int i = 0; i < data.length(); i++)
 			{
 				JSONObject o = data.getJSONObject(i);
@@ -55,12 +58,14 @@ public class DataParser
 						reportData.add(key, o.getString(key));
 					}
 					Log.e("DataI.parse", "layer " + layer + " lat " + lat + " lon " + lon + " datet " + datetime + " disp name " + displayName);
-					ret[i] = reportData;
+					reportData.buildMarkerOptions(ctx, xmlUIDocumentRepr);
+					ret.put(reportData.getId(), reportData);
 				}
 				else if(o.has("type") && o.getString("type").compareTo("active_user") == 0)
 				{
 					ActiveUser activeUser = new ActiveUser(datetime, lat, lon, true, true, 0);
-					ret[i] = activeUser;
+					activeUser.buildMarkerOptions(ctx, xmlUIDocumentRepr);
+					ret.put(activeUser.getId(), activeUser);
 				}
 			}
 		}
@@ -70,7 +75,8 @@ public class DataParser
             mErrorMsg = e.getLocalizedMessage();
 		}
 
-
+		if(ret == null)
+			ret = new HashMap<String , DataInterface>();
 		return ret;
 	}
 
