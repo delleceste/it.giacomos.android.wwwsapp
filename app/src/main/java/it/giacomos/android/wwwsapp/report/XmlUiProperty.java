@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class XmlUiProperty
 {
     private HashMap<String, Bundle> mDataHash;
-    private String mName, mType, mText, mMarkerIcon;
+    private String mName, mType, mText;
     private boolean mIsMarkerIcon;
 
     public XmlUiProperty(String name, String text, String type)
@@ -31,14 +31,33 @@ public class XmlUiProperty
         return mIsMarkerIcon;
     }
 
-    public String getMarkerIcon()
-    {
-        return mMarkerIcon;
-    }
-
     public String getName()
     {
         return mName;
+    }
+
+    public boolean hasValue(String value)
+    {
+        return mDataHash.containsKey(value);
+    }
+
+    public String getValueText(String value)
+    {
+        if(mDataHash.containsKey(value))
+            return mDataHash.get(value).getString("text");
+        return "";
+    }
+
+    public String getValueIcon(String value)
+    {
+        if(mDataHash.containsKey(value))
+            return mDataHash.get(value).getString("icon");
+        return "";
+    }
+
+    public String getText()
+    {
+        return mText;
     }
 
     public void addValue(String value, String text, String icon)

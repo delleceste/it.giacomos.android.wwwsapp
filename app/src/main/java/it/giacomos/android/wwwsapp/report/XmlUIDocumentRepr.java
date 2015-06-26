@@ -9,8 +9,6 @@ public class XmlUIDocumentRepr
 {
     private String mLayerName, mTitle, mError;
 
-    private String mMarkerIcon;
-
     private HashMap<String, XmlUiProperty> mProperties;
 
     public XmlUIDocumentRepr(String layerName)
@@ -18,7 +16,6 @@ public class XmlUIDocumentRepr
         mLayerName = layerName;
         mProperties = new HashMap<String, XmlUiProperty>();
         mError = "";
-        mMarkerIcon = "";
     }
 
     public String getLayerName()
@@ -26,7 +23,7 @@ public class XmlUIDocumentRepr
         return mLayerName;
     }
 
-    public String getmTitle()
+    public String getTitle()
     {
         return mTitle;
     }
@@ -54,18 +51,11 @@ public class XmlUIDocumentRepr
     public void addProperty(String name, XmlUiProperty prop)
     {
         mProperties.put(name, prop);
-        if(prop.isMarkerIcon())
-            mMarkerIcon = prop.getMarkerIcon();
     }
 
-    public  String getMarkerIcon()
+    public boolean hasProperty(String propertyName)
     {
-        return mMarkerIcon;
-    }
-
-    public boolean hasMarkerIcon()
-    {
-        return mMarkerIcon.length() > 0;
+        return mProperties.containsKey(propertyName);
     }
 
     public XmlUiProperty get(String propertyName)

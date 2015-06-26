@@ -67,9 +67,11 @@ public class XmlUiParser
                         NodeList elements = ui.getElementsByTagName("property");
                         for (int i = 0; i < elements.getLength(); i++)
                         {
+                            marker_icon = "";
                             Node dnode = elements.item(i);
                             if (dnode.getNodeType() == Node.ELEMENT_NODE)
                             {
+                                XmlUiProperty xmlproperty = null;
                                 Element prop = (Element) elements.item(i);
                                 text = intl.tr(prop.getAttribute("text"));
                                 propertyName = prop.getAttribute("name");
@@ -77,7 +79,7 @@ public class XmlUiParser
                                 if(prop.hasAttribute("marker_icon"))
                                     marker_icon = prop.getAttribute("marker_icon");
 
-                                XmlUiProperty xmlproperty = new XmlUiProperty(propertyName, text, type);
+                                xmlproperty = new XmlUiProperty(propertyName, text, type);
                                 xmlproperty.setIsMarkerIcon(marker_icon.compareTo("true") == 0);
 
                                 NodeList values = prop.getElementsByTagName("values");

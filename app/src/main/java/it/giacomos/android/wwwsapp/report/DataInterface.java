@@ -125,6 +125,11 @@ public abstract class DataInterface
 		return "";
 	}
 
+	public HashMap<String, String> getData()
+	{
+		return data;
+	}
+
 	public String getDataRepr()
 	{
 		String s = "";

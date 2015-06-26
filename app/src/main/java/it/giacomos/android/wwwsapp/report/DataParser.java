@@ -28,6 +28,7 @@ public class DataParser
 	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx)
 	{
 		HashMap<String , DataInterface> ret = null;
+		String s;
 		try
 		{
 			XmlUiParser xmlUiParser = new XmlUiParser();
@@ -55,7 +56,9 @@ public class DataParser
 					while (keys.hasNext())
 					{
 						key = keys.next();
-						reportData.add(key, o.getString(key));
+						s = o.getString(key);
+						if(s != null && !s.isEmpty())
+							reportData.add(key, s);
 					}
 					Log.e("DataI.parse", "layer " + layer + " lat " + lat + " lon " + lon + " datet " + datetime + " disp name " + displayName);
 					reportData.buildMarkerOptions(ctx, xmlUIDocumentRepr);
