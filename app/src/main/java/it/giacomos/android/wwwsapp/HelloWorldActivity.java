@@ -13,8 +13,9 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.Person.Image;
 
+
 import it.giacomos.android.wwwsapp.floatingactionbutton.FloatingActionButton;
-import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
+import it.giacomos.android.wwwsapp.gcm.GcmRegistrationService;
 import it.giacomos.android.wwwsapp.layers.FileUtils;
 import it.giacomos.android.wwwsapp.layers.LayerItemData;
 import it.giacomos.android.wwwsapp.layers.LayerListActivity;
@@ -48,9 +49,12 @@ import it.giacomos.android.wwwsapp.report.network.PostActionResultListener;
 import it.giacomos.android.wwwsapp.report.network.PostType;
 import it.giacomos.android.wwwsapp.report.tutorialActivity.TutorialPresentationActivity;
 
+import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.app.Activity;
@@ -119,8 +123,7 @@ ConnectionCallbacks,
 OnConnectionFailedListener,
 ListView.OnItemClickListener,
 OnItemSelectedListener /* main spinner */,
-PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
-        NetworkStatusMonitorListener
+PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, NetworkStatusMonitorListener
 {
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
@@ -136,6 +139,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
     private PostDataServiceBroadcastReceiver mPostDataServiceBroadcastReceiver;
     private PersonData mPersonData;
     private NetworkStatusMonitor mNetworkStatusMonitor;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     public static final int REPORT_ACTIVITY_FOR_RESULT_ID = Activity.RESULT_FIRST_USER + 100;
     public static final int TUTORIAL_ACTIVITY_FOR_RESULT_ID = Activity.RESULT_FIRST_USER + 101;
@@ -171,7 +175,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
             if (mSettings.isFirstExecution())
             {
                 this.mStartSignInActivity();
-            } else
+            }
+            else
             {
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
                         .addConnectionCallbacks(this)
@@ -180,8 +185,10 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
                         .addScope(Plus.SCOPE_PLUS_PROFILE)
                         .build();
             }
-
             init();
+
+
+
         } else
         {
             mGoogleServicesAvailable = false;
@@ -235,6 +242,10 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         mPostDataServiceBroadcastReceiver = new PostDataServiceBroadcastReceiver(this);
         LocalBroadcastManager.getInstance(this).registerReceiver(mPostDataServiceBroadcastReceiver,
                 new IntentFilter(this.REPORT_DATA_SERVICE_INTENT));
+
+        /* GCM registration receiver */
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(GcmRegistrationService.REGISTRATION_COMPLETE));
 		/*
 		 * mAdsEnabled is true if
 		 * - not purchased, not first execution of the app
@@ -277,6 +288,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         mLocationService.disconnect();
 
         this.unregisterReceiver(mNetworkStatusMonitor);
+        /* unregister for GCM receiver */
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
 
         if (mNewsFetchTask != null && mNewsFetchTask.getStatus() != AsyncTask.Status.FINISHED)
             mNewsFetchTask.cancel(false);
@@ -546,15 +559,17 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener,
         mMyPendingAlertDialog = null;
         mReportConditionsAccepted = mSettings.reportConditionsAccepted();
 
-		/* if there is an application upgrade, the registration id must be regenerated.
-		 * The service may not be immediately restarted (the service also requests a new
-		 * registration id if necessary), and so it is better to generate a new one if 
-		 * the registrationId is empty.
-		 */
-        GcmRegistrationManager gcmRM = new GcmRegistrationManager();
-        String registrationId = gcmRM.getRegistrationId(getApplicationContext());
-        if (registrationId.isEmpty())
-            gcmRM.registerInBackground(this);
+        mRegistrationBroadcastReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                mSettings.saveRegistrationId(intent.getStringExtra("gcmToken"), context);
+            }
+        };
+        // Start IntentService to register this application with GCM.
+        Intent intent = new Intent(this, GcmRegistrationService.class);
+        startService(intent);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabNewReport);
         fab.setOnClickListener(this);

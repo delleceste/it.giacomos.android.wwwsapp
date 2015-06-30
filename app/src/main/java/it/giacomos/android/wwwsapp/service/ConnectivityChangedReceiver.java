@@ -45,14 +45,14 @@ public class ConnectivityChangedReceiver extends BroadcastReceiver
 		if(notificationServiceEnabled)
 			new ServiceManager().setEnabled(context, true);
 		else
-			Log.e("ConnectivityChangedReceiver.onReceive", "not starting service. (disabled)");
+			Log.e("ConnChangedReceiver", "not starting service. (disabled)");
 		
 		/* rain alert. Start radar image sync and image comparison */
 		if(s.rainNotificationEnabled() && netinfo != null && netinfo.isConnected())
 		{
-			Log.e("ConnectivityChangedReceiver", "starting radarSyncRainDetectIntentService");
+			Log.e("ConnChangedReceiver", "starting MyLocationUpdateService");
 		}
 		else
-			Log.e("ConnectivityChangedReceiver", "not starting radarSyncRainDetectIntentService " + netinfo);
+			Log.e("ConnChangedReceiver", "not starting MyLocationUpdateService " + netinfo);
 	}
 }

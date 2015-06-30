@@ -597,4 +597,16 @@ public class Settings
 	{
 		return mSharedPreferences.getString("CURRENT_LAYER_NAME", "");
 	}
+
+	public boolean isGCMTokenSentToServer()
+	{
+		return mSharedPreferences.getBoolean("GCM_TOKEN_SENT", false);
+	}
+
+	public void setGCMTokenSentToServer(boolean GCMTokenSentToServer)
+	{
+		SharedPreferences.Editor e = mSharedPreferences.edit();
+		e.putBoolean("GCM_TOKEN_SENT", GCMTokenSentToServer);
+		e.commit();
+	}
 }
