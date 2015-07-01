@@ -53,7 +53,7 @@ public class GcmRegistrationService extends IntentService
                 tokenChanged = true;
                 if(tokenChanged) /* token changed: update it on the server */
                 {
-                    Log.e("GcmRegServ.onHandleInt", " token changed from old " + oldToken + " to new " + token);
+                    Log.e("GcmRegServ.onHandleInt", "FORCED!!! FORCED!!! FORCED!!!  token changed from old " + oldToken + " to new " + token);
                     if (!sendRegistrationToServer(token, account, device_id))
                         token = ""; /* failure: invalidate token */
                     /* changed token is saved in HelloWorldActivity after REGISTRATION_COMPLETE intent is received */
