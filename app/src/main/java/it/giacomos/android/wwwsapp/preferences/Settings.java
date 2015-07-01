@@ -395,29 +395,6 @@ public class Settings
 		e.commit();
 	}
 
-	public void setTrialDaysLeft(int daysLeft) 
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putInt("TRIAL_DAYS_LEFT", daysLeft);
-		e.commit();
-	}
-
-	public void setApplicationPurchased(boolean purchaseth) 
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putBoolean("APPLICATION_PURCHASED", purchaseth);
-		e.commit();
-	}
-
-	public boolean rainNotificationEnabled() {
-		return mSharedPreferences.getBoolean("RAIN_NOTIFICATION_ENABLED", true);
-	}
-
-	public boolean useInternalRainDetection() {
-
-		return mSharedPreferences.getBoolean("USE_INTERNAL_RAIN_DETECTION", true);	
-	}
-
 	public boolean importantDialogToShow() {
 		return mSharedPreferences.getBoolean("IMPORTANT_DIALOG_TO_SHOW_2_6_7_alpha2", true);
 	}
@@ -425,24 +402,6 @@ public class Settings
 	public void setImportantDialogToShow(boolean show) {
 		SharedPreferences.Editor e = mSharedPreferences.edit();
 		e.putBoolean("IMPORTANT_DIALOG_TO_SHOW_2_6_7_alpha2", show);
-		e.commit();
-	}
-
-	public String getGcmRegistrationId() 
-	{
-		return mSharedPreferences.getString("GCM_REGISTRATION_ID", "");
-	}
-
-	public void saveRegistrationId(String regId, Context context)
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putString("GCM_REGISTRATION_ID", regId);
-		try {
-			e.putInt("LAST_GCM_REGISTERED_APP_VERSION", 
-					context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionCode);
-		} catch (NameNotFoundException e1) {
-
-		}
 		e.commit();
 	}
 
@@ -478,68 +437,6 @@ public class Settings
 		e.commit();
 	}
 
-	public long lastRadarImageSyncRequestTimestampMillis() {
-		return mSharedPreferences.getLong("LAST_RADAR_IMAGE_SYNC_REQUEST", 60 * 60 * 1000L);
-	}
-
-	public void setLastRadarImageSyncRequestedNow()
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putLong("LAST_RADAR_IMAGE_SYNC_REQUEST", System.currentTimeMillis());
-		e.commit();
-	}
-
-	public void setCurrentTouchedPoint(float x, float y) {
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putFloat("FORECAST_MAP_PRESSED_X", x);
-		e.putFloat("FORECAST_MAP_PRESSED_Y", y);
-		e.commit();
-	}
-
-	public void setOnLongPress(boolean longPress) {
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putBoolean("FORECAST_MAP_LONG_PRESS", longPress);
-		e.commit();
-	}
-
-	public float getCurrentXTouchedPointNormalized() {
-		return mSharedPreferences.getFloat("FORECAST_MAP_PRESSED_X", -1.0f);
-	}
-
-	public float getCurrentYTouchedPointNormalized() {
-		return mSharedPreferences.getFloat("FORECAST_MAP_PRESSED_Y", -1.0f);
-	}
-
-	public boolean getOnLongPressed() {
-		return mSharedPreferences.getBoolean("FORECAST_MAP_LONG_PRESS", false);
-	}
-
-	public void setCurrentDownPoint(float x, float y) 
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putFloat("FORECAST_MAP_DOWN_X", x);
-		e.putFloat("FORECAST_MAP_DOWN_Y", y);
-		e.commit();	
-	}
-	public float getCurrentXDownPointNormalized() {
-		return mSharedPreferences.getFloat("FORECAST_MAP_DOWN_X", -1.0f);
-	}
-
-	public float getCurrentYDownPointNormalized() {
-		return mSharedPreferences.getFloat("FORECAST_MAP_DOWN_Y", -1.0f);
-	}
-	
-	public void setLastDbz(float ldbz)
-	{
-		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putFloat("RAIN_DETECT_LAST_DBZ", ldbz);
-		e.commit();	
-	}
-
-	public float getLastDbz() {
-		return mSharedPreferences.getFloat("RAIN_DETECT_LAST_DBZ", 0.0f);
-	}
-	
 	public boolean timeToGetPersonalMessage()
 	{
 		long lastRead = mSharedPreferences.getLong("PERSONAL_MSG_CONF_READ_ON", 0L);
@@ -598,15 +495,20 @@ public class Settings
 		return mSharedPreferences.getString("CURRENT_LAYER_NAME", "");
 	}
 
-	public boolean isGCMTokenSentToServer()
+	public String getGcmToken()
 	{
-		return mSharedPreferences.getBoolean("GCM_TOKEN_SENT", false);
+		return mSharedPreferences.getString("GCM_TOKEN", "");
 	}
 
-	public void setGCMTokenSentToServer(boolean GCMTokenSentToServer)
+	public boolean isGCMTokenValid()
+	{
+		return mSharedPreferences.getString("GCM_TOKEN", "").length() > 0;
+	}
+
+	public void setGCMToken(String token)
 	{
 		SharedPreferences.Editor e = mSharedPreferences.edit();
-		e.putBoolean("GCM_TOKEN_SENT", GCMTokenSentToServer);
+		e.putString("GCM_TOKEN", token);
 		e.commit();
 	}
 }

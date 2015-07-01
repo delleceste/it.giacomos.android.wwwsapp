@@ -36,6 +36,7 @@
     <!-- GET_ACCOUNTS needed on versions lower than 4.0.4. 4.0.3 and 4.0.4 is 15 -->
 
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -72,8 +73,6 @@
             android:theme="@android:style/Theme.Holo.Light"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <meta-data
@@ -100,11 +99,6 @@
             android:launchMode="singleTop"
             android:parentActivityName=".HelloWorldActivity"
             android:windowSoftInputMode="stateHidden" >
-            <intent-filter>
-                <action android:name="android.intent.action.LAUNCHER" />
-
-               <category android:name="android.intent.category.MAIN" />
-            </intent-filter>
         </activity>
 
         <uses-library android:name="com.google.android.maps" />
@@ -137,14 +131,21 @@
             </intent-filter>
         </receiver>
 
+
+         <service android:name=".service.UpdateMyLocationService"
+             android:exported="false" >
+        </service>
+
          <service android:name=".service.PostDataService" >
         </service>
         
-            <service android:name=".layers.installService.LayerInstallService" >
+            <service android:name=".layers.installService.LayerInstallService"
+               android:exported="false"  >
         </service>
 
 
-            <service android:name=".layers.LayerListDownloadService" >
+            <service android:name=".layers.LayerListDownloadService"
+                android:exported="false" >
         </service>
 
         <meta-data
@@ -213,7 +214,6 @@
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
                 <category android:name="it.giacomos.android.wwwsapp" />
             </intent-filter>
         </service>

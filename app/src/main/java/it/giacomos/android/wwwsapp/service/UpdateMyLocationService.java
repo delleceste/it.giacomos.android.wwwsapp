@@ -1,14 +1,7 @@
 package it.giacomos.android.wwwsapp.service;
 
-import it.giacomos.android.wwwsapp.HelloWorldActivity;
-import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
 import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.preferences.Settings;
-import it.giacomos.android.wwwsapp.service.sharedData.NotificationData;
-import it.giacomos.android.wwwsapp.service.sharedData.NotificationDataFactory;
-import it.giacomos.android.wwwsapp.service.sharedData.RainNotification;
-import it.giacomos.android.wwwsapp.service.sharedData.ServiceSharedData;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,10 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +24,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings.Secure;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -41,7 +31,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
-public class ReportDataService extends Service
+public class UpdateMyLocationService extends Service
         implements FetchRequestsTaskListener, Runnable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
     private Location mLocation;
@@ -51,12 +41,12 @@ public class ReportDataService extends Service
     private long mSleepInterval;
     private boolean mIsStarted;
     private Settings mSettings;
-    private String mRegistrationId;
+    private String mGcmToken, mAccount;
     /* timestamp updated when the AsyncTask completes, successfully or not */
     private long mLastTaskStartedTimeMillis;
     private long mCheckIfNeedRunIntervalMillis;
 
-    public ReportDataService()
+    public UpdateMyLocationService()
     {
         super();
         mHandler = null;
@@ -65,7 +55,8 @@ public class ReportDataService extends Service
         mUpdateMyLocationTask = null;
         mIsStarted = false;
         mCheckIfNeedRunIntervalMillis = 20000;
-        mRegistrationId = "";
+        mGcmToken = "";
+        mAccount = "";
     }
 
     @Override
@@ -87,7 +78,7 @@ public class ReportDataService extends Service
         if (!mIsStarted)
         {
             mSettings = new Settings(this);
-            mRegistrationId = intent.getStringExtra("gcmToken");
+            mGcmToken = mSettings.getGcmToken();
             mSleepInterval = mSettings.getServiceSleepIntervalMillis();
             Log.e("RepoDataSrvc.onStartCmd", "service started sleep interval " + mSleepInterval);
             /* the last time the network was used is saved so that if the service is killed and
@@ -112,7 +103,8 @@ public class ReportDataService extends Service
             mHandler = new Handler();
             mHandler.postDelayed(this, 3000);
             mIsStarted = true;
-        } else
+        }
+        else
         {
             Log.e("RepoDataSrvc.onStartCmd", "* service is already running");
         }
@@ -135,11 +127,10 @@ public class ReportDataService extends Service
         if (currentTimeMillis - mLastTaskStartedTimeMillis >= mSleepInterval)
         {
 			/* wait for connection and then get location and update data */
-            //	log("I: run: connectin to loc cli");
             mGApiClient.connect();
-        } else /* check in a while */
+        }
+        else /* check in a while */
         {
-            // log("I: run: not yet time");
             mHandler.postDelayed(this, mCheckIfNeedRunIntervalMillis);
         }
     }
@@ -164,10 +155,8 @@ public class ReportDataService extends Service
         // Log.e("LayerInstallService.onConnected", "getting last location");
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGApiClient);
         Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGApiClient);
-        String personName = currentPerson.getDisplayName();
-        Person.Image personImage = currentPerson.getImage();
-        String account = Plus.AccountApi.getAccountName(mGApiClient);
-        if (mLocation != null && account != null)
+        mAccount = Plus.AccountApi.getAccountName(mGApiClient);
+        if (mLocation != null && mAccount != null && mGcmToken != null && !mGcmToken.isEmpty())
         {
             startTask();
 			/* mark the last execution complete timestamp */
@@ -176,7 +165,8 @@ public class ReportDataService extends Service
             mSettings.setLastReportDataServiceStartedTimeMillis(mLastTaskStartedTimeMillis);
 			/* when the task is started, we start the short time check */
             mHandler.postDelayed(this, mCheckIfNeedRunIntervalMillis);
-        } else/* wait an entire mSleepInterval before retrying */
+        }
+        else/* wait an entire mSleepInterval before retrying */
             mHandler.postDelayed(this, mSleepInterval);
 
         mGApiClient.disconnect(); /* immediately */
@@ -198,8 +188,9 @@ public class ReportDataService extends Service
 				/* start the service and execute it. When the thread finishes, onServiceDataTaskComplete()
 				 * will schedule the next task.
 				 */
-            mUpdateMyLocationTask = new UpdateMyLocationTask(this, deviceId,
-                    mRegistrationId,
+            mUpdateMyLocationTask = new UpdateMyLocationTask(this,
+                    mAccount,
+                    deviceId,
                     mLocation.getLatitude(),
                     mLocation.getLongitude());
 				/* 
@@ -239,96 +230,7 @@ public class ReportDataService extends Service
     {
         boolean notified = false;
         short requestsCount = 0;
-        boolean rainDetectionOnDevice = mSettings.useInternalRainDetection();
-        Log.e("RepDataSrvc.onSrvcDatTskCompl", "data: " + dataAsString);
-
-        ServiceSharedData sharedData = ServiceSharedData.Instance(this);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        ArrayList<NotificationData> notifications = new NotificationDataFactory().parse(dataAsString);
-        for (NotificationData notificationData : notifications)
-        {
-			/* ignore rain alerts coming from the server data if rain detection is made on the device,
-			 * because in that case it's the GCM service pushing a new radar image notification.
-			 */
-            if (notificationData.isRainAlert() && rainDetectionOnDevice)
-                continue;
-
-            if (notificationData.isValid() && notificationData.isRainAlert() &&
-                    !((RainNotification) notificationData).IsGoingToRain())
-            {
-                Log.e("onServiceDataTaskComplete", "rain alert notification to be cancelled");
-                RainNotification rainNotif = (RainNotification) notificationData;
-                RainNotification previousRainNotification = (RainNotification) sharedData.get(NotificationData.TYPE_RAIN);
-                if (previousRainNotification != null && previousRainNotification.IsGoingToRain())
-                    mNotificationManager.cancel(rainNotif.getTag(), rainNotif.getId());
-                Log.e("onServiceDataTaskComplete", "RAIN notification setting notified " + notificationData.getTag() + ", " + notified);
-                sharedData.updateCurrentRequest(notificationData, notified);
-            } else if (notificationData.isValid() && notificationData.isRainAlert())
-            {
-                boolean alreadyNotifiedEqual = sharedData.alreadyNotifiedEqual(notificationData);
-                if (!alreadyNotifiedEqual && !sharedData.arrivesTooEarly(notificationData, this))
-                {
-                    Log.e("onServiceDataTaskComplete", "notification can be considereth new " + notificationData.username);
-					/* and notify */
-                    int iconId;
-                    // Creates an explicit intent for an Activity in your app
-                    Intent resultIntent = new Intent(this, HelloWorldActivity.class);
-                    resultIntent.putExtra("ptLatitude", notificationData.latitude);
-                    resultIntent.putExtra("ptLongitude", notificationData.longitude);
-
-
-                    if (notificationData.isRequest())
-                    {
-                        requestsCount++;
-                    } else if (notificationData.isRainAlert())
-                    {
-                        RainNotification rainNotif = (RainNotification) notificationData;
-                        iconId = R.drawable.ic_launcher_statusbar_rain;
-                        float dbZ = rainNotif.getLastDbZ();
-
-                        //		RainNotificationBuilder rainNotifBuilder = new RainNotificationBuilder();
-                        //		Notification notification = rainNotifBuilder.build(this,  dbZ, iconId, rainNotif.latitude, rainNotif.longitude);
-                        //		mNotificationManager.notify(notificationData.getTag(), notificationData.getId(),  notification);
-                        //		notified = true;
-						/* update notification data */
-                        //		Log.e("onServiceDataTaskComplete", "notification setting notified " + notificationData.getTag() + ", " + notified);
-                        //		sharedData.updateCurrentRequest(notificationData, notified);
-                    }
-                } else
-                {
-                    //   Logger.log("RDS task ok. notif not new " + notificationData.username);
-                    // log("task ok. notif not new " + notificationData.username);
-                    Log.e("onServiceDataTaskComplete", "notification IS NOT NEW " + notificationData.getType());
-                }
-            } else if (!notificationData.isValid())
-            {
-                // log("service task: notification not valid: " + dataAsString);
-                Toast.makeText(this, "Notification not valid! " +
-                        dataAsString, Toast.LENGTH_LONG).show();
-            }
-        } /* for(NotificationData notificationData : notifications) */
-
-		/* a request has been withdrawn, remove notification, if present */
-        if (requestsCount == 0)
-        {
-			/* remove notification, if present */
-            NotificationData currentNotification = sharedData.getNotificationData(NotificationData.TYPE_REQUEST);
-            if (currentNotification != null) /* a notification is present */
-            {
-                // Log.e("LayerInstallService.onServiceDataTaskComplete", " removing notification with id " + currentNotification.makeId());
-                mNotificationManager.cancel(currentNotification.getTag(), currentNotification.getId());
-
-				/* mark as consumed. The currentNotification is not removed from sharedData because sharedData
-				 * keeps it there in order not to bother us with possibly new notifications incoming in a near
-				 * future. currentNotification thus needs to be stored in order to be used by 
-				 * canBeConsideredNew() sharedData method.
-				 * On the other hand, the map view tests this variable in order to show or not a marker.
-				 */
-                currentNotification.setConsumed(true);
-            }
-        }
+        Log.e("RepDataSrvc.onSrvcDatTskCompl", "UpdateMyLocationService complete: data: " + dataAsString);
     }
 
     @Override

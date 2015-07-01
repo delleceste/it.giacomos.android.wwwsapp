@@ -11,6 +11,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.network.HttpPostParametrizer;
+import it.giacomos.android.wwwsapp.network.HttpWriteRead;
+import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.preferences.Settings;
 
 /**
@@ -29,44 +32,62 @@ public class GcmRegistrationService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        Settings settings = new Settings(this);
-        boolean tokenSentToServer = false;
+        String token = "";
+        boolean tokenChanged = false;
+        String account = intent.getStringExtra("account");
+        String device_id = intent.getStringExtra("device_id");
+        String oldToken = intent.getStringExtra("old_token");
 
         try {
             // In the (unlikely) event that multiple refresh operations occur simultaneously,
             // ensure that they are processed sequentially.
             synchronized (TAG) {
-                // [START register_for_gcm]
                 // Initially this call goes out to the network to retrieve the token, subsequent calls
                 // are local.
-                // [START get_token]
                 InstanceID instanceID = InstanceID.getInstance(this);
-                String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
-                        GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+                token = instanceID.getToken(getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 // [END get_token]
-                Log.i(TAG, "GCM Registration Token: " + token);
+                Log.e(TAG, "GCM Registration Token: " + token);
 
-                // TODO: Implement this method to send any registration to your app's servers.
-                sendRegistrationToServer(token);
-
-                // You should store a boolean that indicates whether the generated token has been
-                // sent to your server. If the boolean is false, send the token to your server,
-                // otherwise your server should have already received the token.
-                tokenSentToServer = true;
-                // [END register_for_gcm]
+                tokenChanged = (oldToken.compareTo(token) != 0);
+                tokenChanged = true;
+                if(tokenChanged) /* token changed: update it on the server */
+                {
+                    Log.e("GcmRegServ.onHandleInt", " token changed from old " + oldToken + " to new " + token);
+                    if (!sendRegistrationToServer(token, account, device_id))
+                        token = ""; /* failure: invalidate token */
+                    /* changed token is saved in HelloWorldActivity after REGISTRATION_COMPLETE intent is received */
+                }
+                else
+                    Log.e("GcmRegServ.onHandleInt", " token unchanged, not sending to server!");
             }
-        } catch (Exception e) {
-            Log.d(TAG, "Failed to complete token refresh", e);
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
         }
-        settings.setGCMTokenSentToServer(tokenSentToServer);
-        // Notify UI that registration has completed, so the progress indicator can be hidden.
+
+        // Notify UI that registration has completed, so that the gcmToken is updated in the settings if necessary. */
         Intent registrationComplete = new Intent(REGISTRATION_COMPLETE);
+        registrationComplete.putExtra("gcmTokenChanged", tokenChanged);
+        registrationComplete.putExtra("gcmToken", token);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 
-    private void sendRegistrationToServer(String token)
+    private boolean sendRegistrationToServer(String token, String account, String device_id)
     {
+        boolean success = false;
+        Log.e("GcmRegServ.sendRegToSer", " Sending new token into server");
+        HttpWriteRead httpWriteRead = new HttpWriteRead("GcmRegistrationService");
+        HttpPostParametrizer p = new HttpPostParametrizer();
+        p.add("account", account);
+        p.add("token", token);
+        p.add("device_id", device_id);
+        httpWriteRead.setValidityMode(HttpWriteRead.ValidityMode.MODE_RESPONSE_VALID_IF_ZERO);
+        success = httpWriteRead.read(new Urls().getRegisterGCMTokenUrl(), p.toString());
+        if(!success)
+            Log.e("GcmRegServ.sendRegToSer", "error " + httpWriteRead.getError());
+        return success;
     }
 }

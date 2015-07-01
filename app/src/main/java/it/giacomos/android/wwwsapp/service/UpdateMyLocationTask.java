@@ -20,27 +20,31 @@ import org.apache.http.util.EntityUtils;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import it.giacomos.android.wwwsapp.network.HttpPostParametrizer;
+import it.giacomos.android.wwwsapp.network.HttpWriteRead;
+import it.giacomos.android.wwwsapp.network.Urls;
+
 public class UpdateMyLocationTask extends AsyncTask<String, Integer, String> {
 
 	private String mErrorMsg;
-	String mDeviceId, mRegistrationId;
+	String mDeviceId, mAccount;
 	private FetchRequestsTaskListener mServiceDataTaskListener;
 	double mLatitude, mLongitude;
 
 	private static String CLI = "afe0983der38819073rxc1900lksjd";
 
-	public UpdateMyLocationTask(FetchRequestsTaskListener sdtl, 
+	public UpdateMyLocationTask(FetchRequestsTaskListener sdtl,
+								String account,
 			String deviceId, 
-			String registrationId,
-			double lat, 
+			double lat,
 			double longit)
 	{
 		mErrorMsg = "";
 		mServiceDataTaskListener = sdtl;
 		mDeviceId = deviceId;
-		mRegistrationId = registrationId;
 		mLatitude = lat;
 		mLongitude = longit;
+		mAccount = account;
 	}
 
 	public void removeFetchRequestTaskListener()
@@ -53,53 +57,21 @@ public class UpdateMyLocationTask extends AsyncTask<String, Integer, String> {
 	{
 		String data = "";
 		mErrorMsg = "";
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpPost request = new HttpPost(urls[0]);
-		List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-		postParameters.add(new BasicNameValuePair("cli", CLI));
-		postParameters.add(new BasicNameValuePair("d", mDeviceId));
-		postParameters.add(new BasicNameValuePair("rid", mRegistrationId));
-		postParameters.add(new BasicNameValuePair("la", String.valueOf(mLatitude)));
-		postParameters.add(new BasicNameValuePair("lo", String.valueOf(mLongitude)));
-//	postParameters.add(new BasicNameValuePair("account", mGPlusUInfo.account));
-//		postParameters.add(new BasicNameValuePair("display_name", mGPlusUInfo.displayName));
-//		postParameters.add(new BasicNameValuePair("gplus_url", mGPlusUInfo.url));
-		
-	//	Log.e("UpdateMyLocationTask", "rid " + mRegistrationId + ", d " + mDeviceId);
-		UrlEncodedFormEntity form;
-		try {
-			form = new UrlEncodedFormEntity(postParameters);
-			request.setEntity(form);
-			HttpResponse response = httpClient.execute(request);
-			StatusLine statusLine = response.getStatusLine();
-			if(statusLine.getStatusCode() < 200 || statusLine.getStatusCode() >= 300)
-				mErrorMsg = statusLine.getReasonPhrase();
-			else if(statusLine.getStatusCode() < 0)
-				mErrorMsg = "Server error";
-			else /* ok */
-			{
-				HttpEntity entity = response.getEntity();
-				data = EntityUtils.toString(entity);
-				if(data.compareTo("0") != 0)
-					mErrorMsg = data;
-			}
-		} 
-		catch (UnsupportedEncodingException e) 
+		String url = new Urls().getUpdateMyLocationUrl();
+		String serviceName = "RegisterUserService";
+		HttpPostParametrizer parametrizer = new HttpPostParametrizer();
+		parametrizer.add("account", mAccount);
+		parametrizer.add("d", mDeviceId);
+		parametrizer.add("la", mLatitude);
+		parametrizer.add("lo", mLongitude);
+		String params = parametrizer.toString();
+
+		HttpWriteRead httpWriteRead = new HttpWriteRead("UpdateMyLocationTask");
+		httpWriteRead.setValidityMode(HttpWriteRead.ValidityMode.MODE_RESPONSE_VALID_IF_ZERO);
+		if(!httpWriteRead.read(url, params))
 		{
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
-		} catch (IOException e) {
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
-		}
-		catch (SecurityException se)
-		{
-			/* sometimes signaled as ANR.. strange. */
-			mErrorMsg = se.getLocalizedMessage();
-			se.printStackTrace();
+			mErrorMsg = httpWriteRead.getError();
+			Log.e("UpdMyLocaTask.doInBg", "Error updating my location: " + httpWriteRead.getError());
 		}
 		return data;
 	}

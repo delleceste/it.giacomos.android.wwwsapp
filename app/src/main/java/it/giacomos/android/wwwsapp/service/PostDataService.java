@@ -16,6 +16,7 @@ import java.net.URL;
 
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
+import it.giacomos.android.wwwsapp.network.HttpWriteRead;
 import it.giacomos.android.wwwsapp.network.Urls;
 
 /**
@@ -40,41 +41,19 @@ public class PostDataService extends IntentService
         Urls myUrls = new Urls();
         URL url = null;
         String serviceName = "Generic PostDataService";
+
         if(intent.hasExtra("params") && intent.hasExtra("url") && intent.hasExtra("serviceName"))
         {
+            boolean ok;
             serviceName = intent.getStringExtra("serviceName");
-            try
-            {
-                url = new URL(intent.getStringExtra("url"));
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setDoOutput(true);
-                data = intent.getStringExtra("params");
-                Log.e("PostDataS.onHandleInt", "url: " + url.toString() + " - data " + data);
-                OutputStreamWriter wr;
-                wr = new OutputStreamWriter(conn.getOutputStream());
-                wr.write(data);
-                wr.flush();
-                wr.close();
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String currentLine;
-                while((currentLine = in.readLine()) != null)
-                    response += currentLine + "\n";
-                if(response.trim().compareTo("0") != 0) /* trim trailing \n */
-                    error = response;
-                in.close();
-                Log.e("PostDataS.onHandleI", " response \"" + response + "\"");
-
-            } catch (MalformedURLException e)
-            {
-                error = e.getLocalizedMessage();
-            } catch (UnsupportedEncodingException e)
-            {
-                error = e.getLocalizedMessage();
-            } catch (IOException e)
-            {
-                error = e.getLocalizedMessage();
-            }
+            HttpWriteRead httpWriteRead = new HttpWriteRead(serviceName);
+            /* require that response is "0" for this request */
+            httpWriteRead.setValidityMode(HttpWriteRead.ValidityMode.MODE_RESPONSE_VALID_IF_ZERO);
+            ok = httpWriteRead.read(intent.getStringExtra("url"), intent.getStringExtra("params"));
+            if(ok) /* response is simply "0" */
+                httpWriteRead.getResponse();
+            else
+                error = httpWriteRead.getError();
         }
         else
             error = getString(R.string.post_data_service_missing_params);

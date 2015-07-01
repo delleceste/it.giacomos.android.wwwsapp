@@ -45,8 +45,7 @@ public class Urls {
 	}
 
 	public String getUpdateMyLocationUrl() {
-		// TODO Auto-generated method stub
-		return null;
+		return "http://www.giacomos.it/wwwsapp/update_my_location.php";
 	}
 
 	public String layerDownloadUrl() {
@@ -57,5 +56,10 @@ public class Urls {
 	public String getRegisterUserUrl()
 	{
 		return "http://www.giacomos.it/wwwsapp/register_user.php";
+	}
+
+	public String getRegisterGCMTokenUrl()
+	{
+		return "http://www.giacomos.it/wwwsapp/register_gcm.php";
 	}
 }

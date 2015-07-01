@@ -1,7 +1,6 @@
 package it.giacomos.android.wwwsapp.report;
 
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.gcm.GcmRegistrationManager;
 import it.giacomos.android.wwwsapp.network.Urls;
 import it.giacomos.android.wwwsapp.service.PostDataService;
 
@@ -80,9 +79,7 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
         if (view.getId() == R.id.buttonOk)
         {
             /* get device id and registration id */
-            GcmRegistrationManager gcmRM = new GcmRegistrationManager();
             String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-            String registrationId = gcmRM.getRegistrationId(getApplicationContext());
 
             /* Get data from the UI and place it on a HashMap key/value */
             ReportDataBuilder reportDataBuilder = new ReportDataBuilder();
@@ -92,7 +89,6 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
             reportDataBuilder.add("latitude", mLatitude);
             reportDataBuilder.add("longitude", mLongitude);
             reportDataBuilder.add("device_id", deviceId);
-            reportDataBuilder.add("registration_id", registrationId);
 
             Intent service_intent = new Intent(this, PostDataService.class);
             service_intent.putExtra("serviceName", "PublishPostService");

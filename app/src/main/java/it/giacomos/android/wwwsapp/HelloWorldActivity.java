@@ -362,16 +362,24 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
             Image personImage = currentPerson.getImage();
             String gplusUrl = currentPerson.getUrl();
             String account = Plus.AccountApi.getAccountName(mGoogleApiClient);
+            String device_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
             mPersonData = new PersonData(account, personName, gplusUrl);
             boolean dataChanged = mPersonData.dataChanged(this);
             if((dataChanged || !mPersonData.userRegistered(this) ) && mNetworkStatusMonitor.isConnected())
             {
                 Log.e("HelloWorldA.onConnected", " starting RegisterUserService if connection is available -> "  + mNetworkStatusMonitor.isConnected() +
                         " dtaChange: " + dataChanged + " user registered " + mPersonData.userRegistered(this));
-                new RegisterUserService(mPersonData, Secure.getString(getContentResolver(), Secure.ANDROID_ID), this);
+                new RegisterUserService(mPersonData, device_id, this);
             }
             else
                 Log.e("HelloWorldA.onConnected", "not registering user: datachanged " + dataChanged + " user registered " + mPersonData.userRegistered(this));
+
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, GcmRegistrationService.class);
+            intent.putExtra("account", account);
+            intent.putExtra("device_id", device_id);
+            intent.putExtra("old_token", mSettings.getGcmToken());
+            startService(intent);
 
             Log.e("onConnected", "name: " + personName + " img " + personImage + " mail " + account);
         }
@@ -564,12 +572,13 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
             @Override
             public void onReceive(Context context, Intent intent)
             {
-                mSettings.saveRegistrationId(intent.getStringExtra("gcmToken"), context);
+                if(intent.getBooleanExtra("gcmTokenChanged", true))
+                {
+                    Log.e("HelloWAct.RegBroRec", "TOKEN CHANGE! SAVING");
+                    mSettings.setGCMToken(intent.getStringExtra("gcmToken"));
+                }
             }
         };
-        // Start IntentService to register this application with GCM.
-        Intent intent = new Intent(this, GcmRegistrationService.class);
-        startService(intent);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabNewReport);
         fab.setOnClickListener(this);

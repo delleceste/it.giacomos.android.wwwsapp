@@ -20,7 +20,7 @@ public class ServiceManager
 		ActivityManager manager = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) 
 		{
-			if (ReportDataService.class.getName().equals(service.service.getClassName())) 
+			if (UpdateMyLocationService.class.getName().equals(service.service.getClassName()))
 				return true;
 		}
 		return false;
@@ -30,27 +30,26 @@ public class ServiceManager
 	{
 		final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-//		Intent myIntent = new Intent(context, LayerInstallService.class);
-//		NetworkInfo netinfo = connMgr.getActiveNetworkInfo();
-//		
-//		if(enabled && netinfo != null && netinfo.isConnected())
-//		{
-////			Log.e(" ServiceManager", "enabled "  + enabled + " starting service LayerInstallService");
-//			ComponentName cn = context.startService(myIntent);
-//			return cn.getClassName().endsWith("LayerInstallService");
-//		}
-//		else
-//		{
-////			if(netinfo != null)
-////				Log.e("ServiceManager.setEnabled", "enabled "  + enabled + 
-////						" net up " +  connMgr.getActiveNetworkInfo().isConnectedOrConnecting() + " stopping service LayerInstallService");
-////			else
-////				Log.e("ServiceManager.setEnabled", "enabled "  + enabled + 
-////						" net info null: stopping service LayerInstallService");
-//			return context.stopService(myIntent);
-//		}
+		Intent myIntent = new Intent(context, UpdateMyLocationService.class);
+		NetworkInfo netinfo = connMgr.getActiveNetworkInfo();
+
+		if(enabled && netinfo != null && netinfo.isConnected())
+		{
+			Log.e(" ServiceManager", "enabled " + enabled + " starting service UpdateMyLocationService");
+		    context.startService(myIntent);
+			return true;
+		}
+		else
+		{
+			if(netinfo != null)
+				Log.e("ServiceMan.setEnabled", "enabled "  + enabled +
+						" net up " +  connMgr.getActiveNetworkInfo().isConnectedOrConnecting() + " stopping service UpdateMyLocationService");
+			else
+				Log.e("ServiceMan.setEnabled", "enabled "  + enabled + " net info null: stopping service LayerInstallService");
+			return context.stopService(myIntent);
+		}
 		
-		return false;
+		// return false;
 	}
 
 }
