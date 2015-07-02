@@ -28,11 +28,13 @@ public class ReportRequestDialogFragment extends DialogFragment
 	private String mLocality;
 	private LatLng mLatLng;
 
-	public static final ReportRequestDialogFragment newInstance(String locality)
+	public static final ReportRequestDialogFragment newInstance(String layer, String locality, String userDisplayName)
 	{
 		ReportRequestDialogFragment f = new ReportRequestDialogFragment();
 	    Bundle bdl = new Bundle(1);
+		bdl.putString("layer", layer);
 	    bdl.putString("locality", locality);
+		bdl.putString("displayName", userDisplayName);
 	    f.setArguments(bdl);
 	    return f;
 	}
@@ -50,7 +52,7 @@ public class ReportRequestDialogFragment extends DialogFragment
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		// Inflate and set the layout for the dialog
 		// Pass null as the parent view because its going in the dialog layout
-		mDialogView = inflater.inflate(R.layout.report_request_dialog, null);
+		mDialogView = inflater.inflate(R.layout.request_dialog, null);
 		builder = builder.setView(mDialogView);
 
 		/* Report! and Cangel buttons */
@@ -68,33 +70,29 @@ public class ReportRequestDialogFragment extends DialogFragment
 		Settings s = new Settings(getActivity().getApplicationContext());
 		String userName = s.getReporterUserName();
 
-		EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
-		et.setText(userName);
-		et.addTextChangedListener(new TextWatcher() {
+//		EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
+//		et.setText(userName);
+//		et.addTextChangedListener(new TextWatcher() {
+//
+//			public void onTextChanged(CharSequence cs, int start, int before, int count) {}
+//
+//			@Override
+//			public void afterTextChanged(Editable ed) {
+//				Log.e("TextWatcher.afterTextChanged", "afterTextChangeth");
+//				mCheckUsernameNotEmpty(alertDialog);
+//			}
+//
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start,
+//					int count, int after) {}
+//
+//		});
 
-			public void onTextChanged(CharSequence cs, int start, int before, int count) {}
 
-			@Override
-			public void afterTextChanged(Editable ed) {
-				Log.e("TextWatcher.afterTextChanged", "afterTextChangeth");
-				mCheckUsernameNotEmpty(alertDialog);
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start,
-					int count, int after) {}
-
-		});
-
-		mLocality = getArguments().getString("locality");
-		setLocality(mLocality);
-
-		CheckBox cb = (CheckBox) mDialogView.findViewById(R.id.cbIncludeLocationName);
-		cb.requestFocus();
-		if(userName.isEmpty())
-			Toast.makeText(getActivity(), R.string.reportMustInsertUserName, Toast.LENGTH_LONG).show();
-
-		mCheckUsernameNotEmpty(alertDialog);
+//		if(userName.isEmpty())
+//			Toast.makeText(getActivity(), R.string.reportMustInsertUserName, Toast.LENGTH_LONG).show();
+//
+//		mCheckUsernameNotEmpty(alertDialog);
 		return alertDialog;
 	}
 
@@ -116,30 +114,30 @@ public class ReportRequestDialogFragment extends DialogFragment
 
 	public void setLocality(String locality) 
 	{
-		if(mDialogView != null && mDialogView.getContext() != null)
-		{
-			TextView textView = (TextView) mDialogView.findViewById(R.id.tvDialogRequestTitle);
-			textView.setText(mDialogView.getContext().getString(R.string.reportDialogRequestTitle) + " " + locality);
-			textView = (TextView) mDialogView.findViewById(R.id.tvRequestLocationName);
-			if(!locality.isEmpty())
-				textView.setText(locality);
-			else
-				textView.setText(this.getResources().getString(R.string.reportDialogRequestLocationUnavailable));
-		}
+//		if(mDialogView != null && mDialogView.getContext() != null)
+//		{
+//			TextView textView = (TextView) mDialogView.findViewById(R.id.tvDialogRequestTitle);
+//			textView.setText(mDialogView.getContext().getString(R.string.reportDialogRequestTitle) + " " + locality);
+//			textView = (TextView) mDialogView.findViewById(R.id.tvRequestLocationName);
+//			if(!locality.isEmpty())
+//				textView.setText(locality);
+//			else
+//				textView.setText(this.getResources().getString(R.string.reportDialogRequestLocationUnavailable));
+//		}
 	}
 
-	private void mCheckUsernameNotEmpty(AlertDialog ad)
-	{
-		Button positiveButton = ad.getButton(Dialog.BUTTON_POSITIVE);
-		if(positiveButton != null)
-		{
-			EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
-			positiveButton.setEnabled(et.getText().toString().length() > 0);
-			Log.e("mCheckUsernameNotEmpty", "dialog button is NOT null! --> no scandalo");
-		}
-		else
-			Log.e("mCheckUsernameNotEmpty", "dialog is null! scandalo");
-	}
+//	private void mCheckUsernameNotEmpty(AlertDialog ad)
+//	{
+//		Button positiveButton = ad.getButton(Dialog.BUTTON_POSITIVE);
+//		if(positiveButton != null)
+//		{
+//			EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
+//			positiveButton.setEnabled(et.getText().toString().length() > 0);
+//			Log.e("mCheckUsernameNotEmpty", "dialog button is NOT null! --> no scandalo");
+//		}
+//		else
+//			Log.e("mCheckUsernameNotEmpty", "dialog is null! scandalo");
+//	}
 
 	public LatLng getLatLng()
 	{

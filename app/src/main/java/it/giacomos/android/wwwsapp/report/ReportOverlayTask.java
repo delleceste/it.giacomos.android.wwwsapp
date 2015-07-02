@@ -35,7 +35,7 @@ public class ReportOverlayTask extends AsyncTask<String, Integer, HashMap<String
 		 * XmlUIDocumentRepr to select the relevant fields
 		 */
 		DataParser reportDataFactory = new DataParser();
-		HashMap<String, DataInterface> dataList = reportDataFactory.parse(layerName, data[1], mContext);
+		HashMap<String, DataInterface> dataList = reportDataFactory.parse(layerName, data[1], mContext, XmlUiParser.UI_TYPE_REPORT);
 		return dataList;
 	}
 	

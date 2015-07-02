@@ -21,7 +21,7 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
 {
     private String mLayerName, mAccount;
     private double mLatitude, mLongitude;
-    private ReportUiHelper mReportUIHelper;
+    private XmlUiHelper mXmlUIHelper;
 
     public ReportActivity()
     {
@@ -51,10 +51,11 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
             if (layer != null && mLatitude >= 0 && mLongitude >= 0 && mAccount != null && !mAccount.isEmpty())
             {
                 mLayerName = layer;
-                mReportUIHelper = new ReportUiHelper(this);
-                mReportUIHelper.addTextPlaceHolder("#locality", locality);
-                mReportUIHelper.build(layer, locality);
-                setTitle(mReportUIHelper.getTitle());
+                mXmlUIHelper = new XmlUiHelper(this);
+                mXmlUIHelper.addTextPlaceHolder("#locality", locality);
+                mXmlUIHelper.build(layer, locality, XmlUiHelper.UI_TYPE_REPORT);
+
+                setTitle(mXmlUIHelper.getTitle());
                 Button b = (Button) findViewById(R.id.buttonOk);
                 b.setOnClickListener(this);
                 b = (Button) findViewById(R.id.buttonCancel);
@@ -83,7 +84,7 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
 
             /* Get data from the UI and place it on a HashMap key/value */
             ReportDataBuilder reportDataBuilder = new ReportDataBuilder();
-            reportDataBuilder.build(mReportUIHelper.getData(), this);
+            reportDataBuilder.build(mXmlUIHelper.getData(), this);
             reportDataBuilder.add("account", mAccount);
             reportDataBuilder.add("layer", mLayerName);
             reportDataBuilder.add("latitude", mLatitude);

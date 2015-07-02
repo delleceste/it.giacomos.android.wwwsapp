@@ -20,12 +20,12 @@ import it.giacomos.android.wwwsapp.report.WidgetValue;
 public class DataValuesSpinnerAdapter extends ArrayAdapter<WidgetValue>
 {
 
-    private Activity mActivity;
+    private Context mContext;
     public DataValuesSpinnerAdapter(Context context, int resource,
-                                    ArrayList<WidgetValue> data, Activity activity)
+                                    ArrayList<WidgetValue> data)
     {
         super(context, resource);
-        mActivity = activity;
+        mContext = context;
         this.addAll(data);
     }
 
@@ -43,7 +43,7 @@ public class DataValuesSpinnerAdapter extends ArrayAdapter<WidgetValue>
 
     public View getCustomView(int position, View convertView, ViewGroup parent)
     {
-        LayoutInflater inflater = mActivity.getLayoutInflater();
+        LayoutInflater inflater = (LayoutInflater)  mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         View row = inflater.inflate(R.layout.post_icon_text_spinner, parent, false);
         TextView label = (TextView) row.findViewById(R.id.text);
         if (position < this.getCount())

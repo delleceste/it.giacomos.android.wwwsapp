@@ -28,7 +28,10 @@ import it.giacomos.android.wwwsapp.layers.FileUtils;
  */
 public class XmlUiParser
 {
-    public XmlUIDocumentRepr parse(String layer, Context ctx)
+    public static final String UI_TYPE_REPORT = "report";
+    public static final String UI_TYPE_REQUEST = "request";
+
+    public XmlUIDocumentRepr parse(String layer, Context ctx, String ui_type)
     {
         String text, propertyName, type, marker_icon = "";
         Intl intl = new Intl(ctx, Locale.getDefault().getLanguage());
@@ -52,87 +55,100 @@ public class XmlUiParser
                 try
                 {
                     dom = builder.parse(is);
-                    Element ui = dom.getDocumentElement();
-                    String layername = ui.getAttribute("name");
+                    Element uis = dom.getDocumentElement();
+                    String layername = uis.getAttribute("name");
                     if (layername.compareTo(layer) == 0)
                     {
-                        ui.normalize();
-                        NodeList titleElements = ui.getElementsByTagName("title");
-                        if (titleElements.getLength() == 1)
+                        Element ui = null;
+                        NodeList uiElements = uis.getElementsByTagName("ui");
+
+                    /* find the ui elements with attribute type equal to the ui_type
+                     * we want to parse (report, request)
+                     */
+                        for (int i = 0; i < uiElements.getLength(); i++)
                         {
-                            Element title = (Element) titleElements.item(0);
-                            if(title.hasAttribute("text"))
-                                documentRepr.setTitle(intl.tr(title.getAttribute("text")));
+                            Element uiEl = (Element) uiElements.item(i);
+                            if (uiEl.getAttribute("type").compareTo(ui_type) == 0)
+                                ui = uiEl;
                         }
-                        NodeList elements = ui.getElementsByTagName("property");
-                        for (int i = 0; i < elements.getLength(); i++)
+                        if (ui != null)
                         {
-                            marker_icon = "";
-                            Node dnode = elements.item(i);
-                            if (dnode.getNodeType() == Node.ELEMENT_NODE)
+
+                            ui.normalize();
+                            NodeList titleElements = ui.getElementsByTagName("title");
+                            if (titleElements.getLength() == 1)
                             {
-                                XmlUiProperty xmlproperty = null;
-                                Element prop = (Element) elements.item(i);
-                                text = intl.tr(prop.getAttribute("text"));
-                                propertyName = prop.getAttribute("name");
-                                type = prop.getAttribute("type");
-                                if(prop.hasAttribute("marker_icon"))
-                                    marker_icon = prop.getAttribute("marker_icon");
-
-                                xmlproperty = new XmlUiProperty(propertyName, text, type);
-                                xmlproperty.setIsMarkerIcon(marker_icon.compareTo("true") == 0);
-
-                                NodeList values = prop.getElementsByTagName("values");
-                                Log.e("XmlUiParser.parse", " gettubg avlues " + values.getLength());
-                                if (values.getLength() == 1)
+                                Element title = (Element) titleElements.item(0);
+                                if (title.hasAttribute("text"))
+                                    documentRepr.setTitle(intl.tr(title.getAttribute("text")));
+                            }
+                            NodeList elements = ui.getElementsByTagName("property");
+                            for (int i = 0; i < elements.getLength(); i++)
+                            {
+                                marker_icon = "";
+                                Node dnode = elements.item(i);
+                                if (dnode.getNodeType() == Node.ELEMENT_NODE)
                                 {
-                                    NodeList valuelist = prop.getElementsByTagName("value");
-                                    if (valuelist.getLength() == 0)
+                                    XmlUiProperty xmlproperty = null;
+                                    Element prop = (Element) elements.item(i);
+                                    text = intl.tr(prop.getAttribute("text"));
+                                    propertyName = prop.getAttribute("name");
+                                    type = prop.getAttribute("type");
+                                    if (prop.hasAttribute("marker_icon"))
+                                        marker_icon = prop.getAttribute("marker_icon");
+
+                                    xmlproperty = new XmlUiProperty(propertyName, text, type);
+                                    xmlproperty.setIsMarkerIcon(marker_icon.compareTo("true") == 0);
+
+                                    NodeList values = prop.getElementsByTagName("values");
+                                    Log.e("XmlUiParser.parse", " gettubg avlues " + values.getLength());
+                                    if (values.getLength() == 1)
                                     {
-                                        documentRepr.setError("Error in " + layerRelativePath + ": empty \"values\" tag");
-                                    }
-                                    else
-                                    {
-                                        for (int n = 0; n < valuelist.getLength(); n++)
+                                        NodeList valuelist = prop.getElementsByTagName("value");
+                                        if (valuelist.getLength() == 0)
                                         {
-                                            Node valnode = valuelist.item(n);
-                                            if (valnode.getNodeType() == Node.ELEMENT_NODE)
+                                            documentRepr.setError("Error in " + layerRelativePath + ": empty \"values\" tag");
+                                        } else
+                                        {
+                                            for (int n = 0; n < valuelist.getLength(); n++)
                                             {
-                                                Element val = (Element) valnode;
+                                                Node valnode = valuelist.item(n);
+                                                if (valnode.getNodeType() == Node.ELEMENT_NODE)
+                                                {
+                                                    Element val = (Element) valnode;
 //                                                Log.e("Builder.build", " add value " + val.getAttribute("text"));
+                                                    setPropertyValueFromElement(val, xmlproperty, intl);
+                                                } else
+                                                    Log.e("Builder.build", " valnode is not element node " + valnode);
+                                            }
+                                        }
+                                    } else
+                                    {
+                                        NodeList valueNode = prop.getElementsByTagName("value");
+                                        if (valueNode.getLength() == 1)
+                                        {
+                                            if (valueNode.item(0).getNodeType() == Node.ELEMENT_NODE)
+                                            {
+                                                Element val = (Element) valueNode.item(0);
                                                 setPropertyValueFromElement(val, xmlproperty, intl);
                                             }
-                                            else
-                                                Log.e("Builder.build", " valnode is not element node " + valnode);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    NodeList valueNode = prop.getElementsByTagName("value");
-                                    if (valueNode.getLength() == 1)
-                                    {
-                                        if (valueNode.item(0).getNodeType() == Node.ELEMENT_NODE)
+                                        } else
                                         {
-                                            Element val = (Element) valueNode.item(0);
-                                            setPropertyValueFromElement(val, xmlproperty, intl);
+                                            documentRepr.setError("Error in " + layerRelativePath + ": multiple value elements without \"values\" parent");
                                         }
                                     }
-                                    else
-                                    {
-                                        documentRepr.setError("Error in " + layerRelativePath + ": multiple value elements without \"values\" parent");
-                                    }
-                                }
 
-                                documentRepr.addProperty(propertyName, xmlproperty);
+                                    documentRepr.addProperty(propertyName, xmlproperty);
 
-                            } /* if node is element node */
+                                } /* if node is element node */
 
-                            if(documentRepr.hasError())
-                                break;
+                                if (documentRepr.hasError())
+                                    break;
 
-                        } /* for each property  */
-                    }
+                            }
+
+                        } /* if there's a ui element with the desired type */
+                    } /* layer name as expected */
 
                 }
                 catch (SAXException e)

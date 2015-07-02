@@ -25,14 +25,14 @@ public class DataParser
 		return mErrorMsg;
 	}
 
-	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx)
+	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx, String ui_type)
 	{
 		HashMap<String , DataInterface> ret = null;
 		String s;
 		try
 		{
 			XmlUiParser xmlUiParser = new XmlUiParser();
-			XmlUIDocumentRepr xmlUIDocumentRepr = xmlUiParser.parse(layerName, ctx);
+			XmlUIDocumentRepr xmlUIDocumentRepr = xmlUiParser.parse(layerName, ctx, ui_type);
 			JSONObject jso = new JSONObject(txt);
 			/* this is me!, not the account name of the other persons' publications */
 			String account = jso.getString("account");

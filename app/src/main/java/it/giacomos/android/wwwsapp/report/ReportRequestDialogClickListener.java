@@ -39,39 +39,14 @@ public class ReportRequestDialogClickListener implements OnClickListener {
 		{
 			String user;
 			String locality = "";
-			CheckBox cb = (CheckBox) d.findViewById(R.id.cbIncludeLocationName);
-			EditText editText = (EditText) d.findViewById(R.id.etRequestName);
-			if(cb.isChecked()) /* send locality */
-				locality = mReportRequestDialogFragment.getLocality();
-			user = editText.getText().toString();
 
-			/* save the reporter user name if changed */
-			Settings se = new Settings(mReportRequestDialogFragment.getActivity().getApplicationContext());
-			if(se.getReporterUserName().compareTo(editText.getText().toString()) != 0)
-				se.setReporterUserName(editText.getText().toString());
-			String gcmToken = se.getGcmToken();
 
-			if(!user.isEmpty() && !gcmToken.isEmpty())
-			{
-				//Log.e("ReportRequestDialogClickListener.onClick", " locality " + locality);
-				PostReportRequestTask postReportRequestTask = new PostReportRequestTask(user, locality, llng.latitude, llng.longitude, oActivity);
-				String deviceId = Secure.getString(mReportRequestDialogFragment.getActivity().getContentResolver(), Secure.ANDROID_ID);
-				postReportRequestTask.setDeviceId(deviceId);
-				postReportRequestTask.setRegistrationId(gcmToken);
-				postReportRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Urls().getPostReportRequestUrl());
-			}
-			else if(user.isEmpty())
-			{
-				oActivity.onPostActionResult(true, oActivity.getResources().getString(R.string.reportMustInsertUserName), PostType.REQUEST);
-			}
-			else if(gcmToken.isEmpty())
-				oActivity.onPostActionResult(true, oActivity.getString(R.string.user_not_registered_with_gcm__please_start_service), PostType.REQUEST);
+
 		}
 		else
 		{
-			EditText et = (EditText) d.findViewById(R.id.etRequestName);
-			Settings s = new Settings(oActivity);
-			s.setReporterUserName(et.getText().toString());
+
+
 			oActivity.onMyReportRequestDialogCancelled(llng);
 		}
 	}

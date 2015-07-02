@@ -1,5 +1,6 @@
 package it.giacomos.android.wwwsapp.report;
 
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -41,21 +42,26 @@ import it.giacomos.android.wwwsapp.report.widgets.TextValueInterface;
 /**
  * Created by giacomo on 3/06/15.
  */
-public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
+public class XmlUiHelper implements RSpinner.OnItemSelectedListener,
         RCheckBox.OnCheckedChangeListener, TextWatcher
 
 {
+    public static final String UI_TYPE_REPORT = "report";
+    public static final String UI_TYPE_REQUEST = "request";
+
     private HashMap<String, String> mPlaceholders;
-    private ReportActivity mActivity;
+    private ViewGroup mContainerViewGroup;
+    private Context mContext;
     private int mOptionCheckBoxCount;
     private final int OPTION_CB_ID = 1126332445;
     private HashMap<Integer, Integer> mOptionViewsHash = new HashMap<Integer, Integer>();
     private ArrayList<WidgetData> mData;
     private String mTitle;
 
-    public ReportUiHelper(ReportActivity a)
+    public XmlUiHelper(Context ctx, ViewGroup vg)
     {
-        mActivity = a;
+        mContainerViewGroup = vg;
+        mContext = ctx;
         mOptionCheckBoxCount = 0;
         mData = new ArrayList<WidgetData>();
         mTitle = "No title";
@@ -70,7 +76,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         {
             isValid = true;
             TextValueInterface textValueInterface = null;
-            View view = mActivity.findViewById(d.id);
+            View view = mContainerViewGroup.findViewById(d.id);
             try
             {
                 textValueInterface = (TextValueInterface) view;
@@ -96,7 +102,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         return mTitle;
     }
 
-    public void build(String layer, String locality)
+    public void build(String layer, String locality, String ui_type)
     {
         int id = 100;
         String uixml = "";
@@ -105,7 +111,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         String layerRelativePath = "layers/" + layer + "/" + layer + "_ui.xml";
         String repr, text, name, type;
         boolean validate = false, category = false;
-        uixml = fu.loadFromStorage(layerRelativePath, mActivity);
+        uixml = fu.loadFromStorage(layerRelativePath, mContext);
 
         Document dom;
         DocumentBuilderFactory factory;
@@ -121,80 +127,99 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
                 try
                 {
                     dom = builder.parse(is);
-                    Element ui = dom.getDocumentElement();
-                    String layername = ui.getAttribute("name");
+                    Element uis = dom.getDocumentElement();
+                    Element ui = null;
+                    NodeList uiElements = uis.getElementsByTagName("ui");
+                    String layername = uis.getAttribute("name");
                     if (layername.compareTo(layer) == 0)
                     {
-                        ui.normalize();
-                        NodeList titleElements = ui.getElementsByTagName("title");
-                        if(titleElements.getLength() == 1)
+                    /* find the ui elements with attribute type equal to the ui_type
+                     * we want to parse (report, request)
+                     */
+                        for (int i = 0; i < uiElements.getLength(); i++)
                         {
-                            Element title = (Element) titleElements.item(0);
-                            if(title.hasAttribute("text"))
-                                mTitle = title.getAttribute("text");
+                            Element uiEl = (Element) uiElements.item(i);
+                            Log.e("XmlUiHelper.build", " seeing if element ui has attribute type " + uiEl.getAttribute("type")
+                                    + " and equals " + ui_type);
+                            if (uiEl.getAttribute("type").compareTo(ui_type) == 0)
+                                ui = uiEl;
                         }
-                        NodeList elements = ui.getElementsByTagName("property");
-                        for (int i = 0; i < elements.getLength(); i++)
+                        if (ui != null)
                         {
-                            Node dnode = elements.item(i);
-                            if (dnode.getNodeType() == Node.ELEMENT_NODE)
+
+
+                            ui.normalize();
+                            NodeList titleElements = ui.getElementsByTagName("title");
+                            if (titleElements.getLength() == 1)
                             {
-                                Element prop = (Element) elements.item(i);
-                                repr = prop.getAttribute("repr");
-                                text = prop.getAttribute("text");
-                                name = prop.getAttribute("name");
-                                type = prop.getAttribute("type");
-
-                                WidgetData widgetData = new WidgetData(id + i, name, type, text, repr);
-                                widgetData.isCategory = prop.hasAttribute("category") && prop.getAttribute("category").compareTo("true") == 0;
-                                widgetData.isOption = prop.hasAttribute("is_option") && prop.getAttribute("is_option").compareTo("true") == 0;
-
-                                NodeList values = prop.getElementsByTagName("values");
-                                Log.e("Builder.build", " gettubg avlues " + values.getLength());
-                                if (values.getLength() == 1)
+                                Element title = (Element) titleElements.item(0);
+                                if (title.hasAttribute("text"))
+                                    mTitle = title.getAttribute("text");
+                            }
+                            NodeList elements = ui.getElementsByTagName("property");
+                            for (int i = 0; i < elements.getLength(); i++)
+                            {
+                                Node dnode = elements.item(i);
+                                if (dnode.getNodeType() == Node.ELEMENT_NODE)
                                 {
-                                    NodeList valuelist = prop.getElementsByTagName("value");
-                                    if (valuelist.getLength() == 0)
+                                    Element prop = (Element) elements.item(i);
+                                    repr = prop.getAttribute("repr");
+                                    text = prop.getAttribute("text");
+                                    name = prop.getAttribute("name");
+                                    type = prop.getAttribute("type");
+
+                                    WidgetData widgetData = new WidgetData(id + i, name, type, text, repr);
+                                    widgetData.isCategory = prop.hasAttribute("category") && prop.getAttribute("category").compareTo("true") == 0;
+                                    widgetData.isOption = prop.hasAttribute("is_option") && prop.getAttribute("is_option").compareTo("true") == 0;
+
+                                    NodeList values = prop.getElementsByTagName("values");
+                                    Log.e("Builder.build", " gettubg avlues " + values.getLength());
+                                    if (values.getLength() == 1)
                                     {
-                                        MyAlertDialogFragment.MakeGenericError("Error in " + layerRelativePath + ": empty \"values\" tag", mActivity);
-                                    } else
-                                    {
-                                        for (int n = 0; n < valuelist.getLength(); n++)
+                                        NodeList valuelist = prop.getElementsByTagName("value");
+                                        if (valuelist.getLength() == 0)
                                         {
-                                            Node valnode = valuelist.item(n);
-                                            if (valnode.getNodeType() == Node.ELEMENT_NODE)
+                                            Log.e("XmlUiHelper.build", "Error in " + layerRelativePath + ": empty \"values\" tag");
+                                        } else
+                                        {
+                                            for (int n = 0; n < valuelist.getLength(); n++)
                                             {
-                                                Element val = (Element) valnode;
-                                                Log.e("Builder.build", " add value " + val.getAttribute("text"));
-                                                widgetData.addValue(getWidgetValueFromElement(val, layer));
-                                            } else
-                                                Log.e("Builder.build", " valnode is not element node " + valnode);
-                                        }
-                                    }
-                                } else
-                                {
-                                    NodeList valueNode = prop.getElementsByTagName("value");
-                                    if (valueNode.getLength() == 1)
-                                    {
-                                        if (valueNode.item(0).getNodeType() == Node.ELEMENT_NODE)
-                                        {
-                                            Element val = (Element) valueNode.item(0);
-                                            widgetData.addValue(getWidgetValueFromElement(val, layer));
+                                                Node valnode = valuelist.item(n);
+                                                if (valnode.getNodeType() == Node.ELEMENT_NODE)
+                                                {
+                                                    Element val = (Element) valnode;
+                                                    Log.e("Builder.build", " add value " + val.getAttribute("text"));
+                                                    widgetData.addValue(getWidgetValueFromElement(val, layer));
+                                                } else
+                                                    Log.e("Builder.build", " valnode is not element node " + valnode);
+                                            }
                                         }
                                     } else
                                     {
-                                        MyAlertDialogFragment.MakeGenericError("Error in " + layerRelativePath + ": multiple value elements without \"values\" parent", mActivity);
+                                        NodeList valueNode = prop.getElementsByTagName("value");
+                                        if (valueNode.getLength() == 1)
+                                        {
+                                            if (valueNode.item(0).getNodeType() == Node.ELEMENT_NODE)
+                                            {
+                                                Element val = (Element) valueNode.item(0);
+                                                widgetData.addValue(getWidgetValueFromElement(val, layer));
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Log.e("XmlUiHelper.build", "Error in " + layerRelativePath + ": multiple value elements without \"values\" parent");
+                                        }
                                     }
-                                }
 
-                                int checkboxId = addElement(widgetData);
-                                mData.add(widgetData);
-                                if (checkboxId > 0)
-                                    mOptionViewsHash.put(checkboxId, widgetData.id);
+                                    int checkboxId = addElement(widgetData);
+                                    mData.add(widgetData);
+                                    if (checkboxId > 0)
+                                        mOptionViewsHash.put(checkboxId, widgetData.id);
 
-                            } /* if node is element node */
-                        } /* for each property  */
-                    }
+                                } /* if node is element node */
+                            } /* for elements */
+                        } /* if ui != null */
+                    } /* if (layername.compareTo(layer) == 0) */
 
                 } catch (SAXException e)
                 {
@@ -228,7 +253,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         WidgetValue wval = new WidgetValue(text, value);
         wval.isValid = !val.hasAttribute("valid") || (val.hasAttribute("valid") && val.getAttribute("valid").compareTo("true") == 0);
         if (val.hasAttribute("icon") && val.getAttribute("icon").length() > 0)
-            wval.icon = fu.loadBitmapFromStorage("layers/" + layerName + "/bmps/" + val.getAttribute("icon") + ".bmp", mActivity);
+            wval.icon = fu.loadBitmapFromStorage("layers/" + layerName + "/bmps/" + val.getAttribute("icon") + ".bmp", mContext);
         return wval;
     }
 
@@ -259,8 +284,8 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
 
         Log.e("Builder.addElement", " adding element " + name + " id " + id + " repr " + repr);
 
-        LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.containerLayout);
-        LinearLayout lo = new LinearLayout(mActivity);
+        LinearLayout container = (LinearLayout) mContainerViewGroup.findViewById(R.id.containerLayout);
+        LinearLayout lo = new LinearLayout(mContext);
         lo.setOrientation(LinearLayout.HORIZONTAL); /* items displayed in a row */
         lo.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -272,7 +297,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         View nameView = null;
         if (isOption)
         {
-            cb = new CheckBox(mActivity);
+            cb = new CheckBox(mContext);
             checkboxId = OPTION_CB_ID + mOptionCheckBoxCount;
             cb.setId(checkboxId);
             cb.setText(name);
@@ -284,7 +309,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         }
         else
         {
-            TextView label = new TextView(mActivity);
+            TextView label = new TextView(mContext);
             label.setText(name);
             lo.addView(label);
             nameView = label;
@@ -298,7 +323,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
 		/* widget */
         if (repr.compareTo("EditText") == 0)
         {
-            REditText editText = new REditText(mActivity);
+            REditText editText = new REditText(mContext);
             editText.setId(id);
             if (data.values.size() > 0)
                 editText.setText(mFilterText(data.values.get(0).text));
@@ -308,31 +333,21 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         }
         else if (repr.compareTo("Spinner") == 0)
         {
-            RSpinner spin = new RSpinner(mActivity);
+            RSpinner spin = new RSpinner(mContext);
             spin.setId(id);
             if (data.values.size() > 0)
             {
                 DataValuesSpinnerAdapter adapter =
-                        new DataValuesSpinnerAdapter(mActivity, R.layout.post_icon_text_spinner, data.values, mActivity);
+                        new DataValuesSpinnerAdapter(mContext, R.layout.post_icon_text_spinner, data.values);
                 spin.setAdapter(adapter);
                 spin.setOnItemSelectedListener(this);
             }
             spin.setLayoutParams(lp2);
             lo.addView(spin);
         }
-        else if (repr.compareTo("Button") == 0 && data.values.size() == 1)
-        {
-            Button b = new Button(mActivity);
-            WidgetValue v = data.values.get(0);
-            b.setText(v.text);
-            b.setOnClickListener(mActivity);
-            b.setId(id);
-            b.setLayoutParams(lp2);
-            lo.addView(b);
-        }
         else if (repr.compareTo("Checkbox") == 0)
         {
-            RCheckBox rcb = new RCheckBox(mActivity);
+            RCheckBox rcb = new RCheckBox(mContext);
             if (data.values.size() > 0)
             {
                 WidgetValue v = data.values.get(0);
@@ -347,7 +362,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         }
 
         if (cb != null)
-            mActivity.findViewById(id).setEnabled(cb.isChecked());
+            mContainerViewGroup.findViewById(id).setEnabled(cb.isChecked());
 
 
         return checkboxId;
@@ -381,7 +396,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
-        mActivity.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+        mContainerViewGroup.findViewById(R.id.buttonOk).setEnabled(inputsValid());
     }
 
     @Override
@@ -398,8 +413,8 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
         {
             /* An "option" checkbox has been checked. Enable or disable the corresponding element */
             int viewId = this.mOptionViewsHash.get(buttonView.getId());
-            mActivity.findViewById(viewId).setEnabled(isChecked);
-            mActivity.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+            mContainerViewGroup.findViewById(viewId).setEnabled(isChecked);
+            mContainerViewGroup.findViewById(R.id.buttonOk).setEnabled(inputsValid());
         }
         /* else the checkbox is a property element */
     }
@@ -413,7 +428,7 @@ public class ReportUiHelper implements RSpinner.OnItemSelectedListener,
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
-        mActivity.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+        mContainerViewGroup.findViewById(R.id.buttonOk).setEnabled(inputsValid());
 
     }
 

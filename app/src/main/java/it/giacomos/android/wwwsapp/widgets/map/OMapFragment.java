@@ -10,7 +10,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 
 import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.LayerChangedListener;
@@ -18,23 +17,26 @@ import it.giacomos.android.wwwsapp.R;
 import it.giacomos.android.wwwsapp.locationUtils.GeoCoordinates;
 import it.giacomos.android.wwwsapp.preferences.Settings;
 import it.giacomos.android.wwwsapp.report.ReportOverlay;
-import it.giacomos.android.wwwsapp.widgets.OAnimatedTextView;
+import it.giacomos.android.wwwsapp.widgets.AnimatedView;
 import it.giacomos.android.wwwsapp.report.OnTiltChangeListener;
 
-import android.app.Activity;
+import android.graphics.Point;
 import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.location.Location;
 import android.os.Bundle;
 
 public class OMapFragment extends SupportMapFragment implements
 GoogleMap.OnCameraChangeListener,
-OnMapReadyCallback, Runnable, LayerChangedListener
+OnMapReadyCallback, Runnable, LayerChangedListener,
+		GoogleMap.OnMapLongClickListener,
+		GoogleMap.OnMapClickListener
 {
     private final int UPDATE_DELAY = 1500;
 
@@ -51,6 +53,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 	private ArrayList <OOverlayInterface> mOverlays;
 	private Settings mSettings;
     private ReportOverlay mReportOverlay;
+	private ContextualMenu mContextualMenu;
 
 	/* MapFragmentListener: the activity must implement this in order to be notified when 
 	 * the GoogleMap is ready.
@@ -76,10 +79,10 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 	public void onMapReady(GoogleMap googleMap) 
 	{
         mReportOverlay.setMapTilt(googleMap.getCameraPosition().tilt);
-        googleMap.setOnMapLongClickListener(mReportOverlay);
+        googleMap.setOnMapLongClickListener(this);
+        googleMap.setOnMapClickListener(this);
         googleMap.setOnInfoWindowClickListener(mReportOverlay);
         googleMap.setOnMarkerDragListener(mReportOverlay);
-        googleMap.setOnMapClickListener(mReportOverlay);
         googleMap.setOnMarkerClickListener(mReportOverlay);
 	}
 	
@@ -95,13 +98,6 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 			mCenterOnUpdate = false;
 			CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(GeoCoordinates.regionBounds, 20);
 			mMap.animateCamera(cu);
-		}
-
-		if(getActivity() != null && getActivity().findViewById(R.id.mapMessageTextView) != null)
-		{
-			OAnimatedTextView radarUpdateTimestampText = (OAnimatedTextView) getActivity().findViewById(R.id.mapMessageTextView);
-			if(mMapReady && radarUpdateTimestampText.getVisibility() == View.VISIBLE && !radarUpdateTimestampText.animationHasStarted())
-				radarUpdateTimestampText.animateHide();	
 		}
 
 		if(mSavedCameraPosition != null)
@@ -137,8 +133,6 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 		
 		if(mOnTiltChangeListener != null)
 			mOnTiltChangeListener.onTiltChanged(cameraPosition.tilt);
-
-
 	} 
 
 	public void onStart()
@@ -227,7 +221,6 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 		
 		/* when the activity creates us, it passes the initialization stuff through arguments */
 		mSetMode(mMode);
-		oActivity.findViewById(R.id.mapMessageTextView).setVisibility(View.GONE);
 
         mReportOverlay = new ReportOverlay(this, oActivity.getAccount());
         mOnTiltChangeListener = mReportOverlay;
@@ -352,11 +345,9 @@ OnMapReadyCallback, Runnable, LayerChangedListener
 		if(mMap != null)
 		{
 			mMap.setInfoWindowAdapter(null);
-			mMap.setOnMapClickListener(null);
 			mMap.setOnMarkerClickListener(null);
 			mMap.setOnMarkerDragListener(null);
 			mMap.setOnInfoWindowClickListener(null);
-			mMap.setOnMapLongClickListener(null);
 			mMap.setOnMarkerDragListener(null);
 		}
 		setOnZoomChangeListener(null);
@@ -379,4 +370,20 @@ OnMapReadyCallback, Runnable, LayerChangedListener
         mReportOverlay.setArea(mMap.getProjection().getVisibleRegion().latLngBounds);
 	}
 
+	@Override
+	public void onMapLongClick(LatLng latLng)
+	{
+		mReportOverlay.onMapLongClicked(latLng);
+		if(mContextualMenu == null)
+			mContextualMenu = new ContextualMenu(getActivity(), (RelativeLayout) getActivity().findViewById(R.id.mapRelativeLayout));
+		mContextualMenu.show();
+	}
+
+	@Override
+	public void onMapClick(LatLng latLng)
+	{
+		mReportOverlay.onMapClicked();
+		if(mContextualMenu != null)
+			mContextualMenu.hide();
+	}
 }

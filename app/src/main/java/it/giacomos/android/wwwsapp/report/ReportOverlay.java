@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,7 +16,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -50,7 +47,7 @@ import it.giacomos.android.wwwsapp.report.network.ReportDownloadListener;
 
 public class ReportOverlay implements OOverlayInterface,
         ReportProcessingTaskListener, OnMarkerClickListener,
-OnMapClickListener, OnMapLongClickListener, OnInfoWindowClickListener, 
+OnInfoWindowClickListener,
 OnMarkerDragListener, GeocodeAddressUpdateListener, ReportDownloadListener,
 OnTiltChangeListener,
 OnClickListener
@@ -463,15 +460,9 @@ OnClickListener
 		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, data);
 	}
 
-	@Override
-	public void onMapLongClick(LatLng point) 
-	{
-		mStartRequestProcedure(point);
-	}
-	
 	private void mStartRequestProcedure(LatLng point)
 	{
-		mRemoveUnpublishedMyRequestMarkers();
+		removeUnpublishedMyRequestMarkers();
 		Marker myRequestMarker = mCreateMyRequestMarker(point);
 		mStartGeocodeAddressTask(myRequestMarker);
 		myRequestMarker.showInfoWindow();
@@ -612,6 +603,19 @@ OnClickListener
 
 	}
 
+	public void onMapLongClicked(LatLng point)
+	{
+		mStartRequestProcedure(point);
+	}
+
+	public void onMapClicked()
+	{
+		if(this.isInfoWindowVisible())
+			this.hideInfoWindow();
+		else
+			removeUnpublishedMyRequestMarkers();
+	}
+
 	public void removeMyPendingReportRequestMarker(LatLng position) 
 	{
 		for(Iterator<Map.Entry<String, DataInterface>> it = mDataInterfaceMarkerIdHash.entrySet().iterator(); it.hasNext(); ) 
@@ -664,17 +668,7 @@ OnClickListener
 		return myRequestsYetUnpublished;
 	}
 
-	@Override
-	public void onMapClick(LatLng arg0) 
-	{
-		if(this.isInfoWindowVisible())
-			this.hideInfoWindow();
-		else
-			mRemoveUnpublishedMyRequestMarkers();
-
-	}
-
-	private void mRemoveUnpublishedMyRequestMarkers() 
+	public void removeUnpublishedMyRequestMarkers()
 	{
 		for(Iterator<Map.Entry<String, DataInterface>> it = mDataInterfaceMarkerIdHash.entrySet().iterator(); it.hasNext(); ) 
 		{
