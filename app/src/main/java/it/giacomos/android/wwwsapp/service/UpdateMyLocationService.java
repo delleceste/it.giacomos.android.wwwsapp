@@ -198,7 +198,6 @@ public class UpdateMyLocationService extends Service
 				 */
             mUpdateMyLocationTask.execute(new Urls().getUpdateMyLocationUrl());
         }
-
     }
 
     @Override

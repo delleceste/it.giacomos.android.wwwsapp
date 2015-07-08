@@ -62,4 +62,9 @@ public class Urls {
 	{
 		return "http://www.giacomos.it/wwwsapp/register_gcm.php";
 	}
+
+	public String  requestServiceUrl()
+	{
+		return "http://www.giacomos.it/wwwsapp/request.php";
+	}
 }

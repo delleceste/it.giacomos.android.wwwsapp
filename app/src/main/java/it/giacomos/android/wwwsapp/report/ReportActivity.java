@@ -13,7 +13,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -34,13 +36,14 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
         boolean error = true;
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.post_activity_layout);
+        setContentView(R.layout.report_activity_layout);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent i = this.getIntent();
         if (i != null)
         {
+            LinearLayout container = (LinearLayout) this.findViewById(R.id.containerLayout);
             String layer = i.getStringExtra("layer");
             String locality = i.getStringExtra("locality");
             if (locality == null)
@@ -51,7 +54,7 @@ public class ReportActivity extends AppCompatActivity implements OnClickListener
             if (layer != null && mLatitude >= 0 && mLongitude >= 0 && mAccount != null && !mAccount.isEmpty())
             {
                 mLayerName = layer;
-                mXmlUIHelper = new XmlUiHelper(this);
+                mXmlUIHelper = new XmlUiHelper(this, container);
                 mXmlUIHelper.addTextPlaceHolder("#locality", locality);
                 mXmlUIHelper.build(layer, locality, XmlUiHelper.UI_TYPE_REPORT);
 

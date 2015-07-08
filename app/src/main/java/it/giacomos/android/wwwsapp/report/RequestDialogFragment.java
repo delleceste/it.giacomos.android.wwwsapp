@@ -1,40 +1,45 @@
 package it.giacomos.android.wwwsapp.report;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import it.giacomos.android.wwwsapp.HelloWorldActivity;
 import it.giacomos.android.wwwsapp.R;
-import it.giacomos.android.wwwsapp.preferences.Settings;
+import it.giacomos.android.wwwsapp.network.Urls;
+import it.giacomos.android.wwwsapp.service.PostDataService;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-public class ReportRequestDialogFragment extends DialogFragment 
+public class RequestDialogFragment extends DialogFragment implements DialogInterface.OnClickListener
 {
 	private View mDialogView;
-	private String mLocality;
+	private String mLocality, mAccount, mLayer;
 	private LatLng mLatLng;
+	private XmlUiHelper mXmlUIHelper;
 
-	public static final ReportRequestDialogFragment newInstance(String layer, String locality, String userDisplayName)
+	public static final RequestDialogFragment newInstance(String layer,
+																String locality,
+																String userDisplayName,
+																String account)
 	{
-		ReportRequestDialogFragment f = new ReportRequestDialogFragment();
+		RequestDialogFragment f = new RequestDialogFragment();
 	    Bundle bdl = new Bundle(1);
 		bdl.putString("layer", layer);
 	    bdl.putString("locality", locality);
 		bdl.putString("displayName", userDisplayName);
+		bdl.putString("account", account);
 	    f.setArguments(bdl);
 	    return f;
 	}
@@ -42,7 +47,11 @@ public class ReportRequestDialogFragment extends DialogFragment
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) 
 	{
-		Log.e("ReportRequestDialogFragment", "onCreateDialog");
+		Log.e("ReqDialogFragment", "onCreateDialog");
+		Bundle args = getArguments();
+		mAccount = args.getString("account");
+		mLocality = args.getString("locality");
+		mLayer = args.getString("layer");
 		this.setStyle(STYLE_NO_FRAME, android.R.style.Theme_Holo_Light);
 		// Use the Builder class for convenient dialog construction
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -53,25 +62,29 @@ public class ReportRequestDialogFragment extends DialogFragment
 		// Inflate and set the layout for the dialog
 		// Pass null as the parent view because its going in the dialog layout
 		mDialogView = inflater.inflate(R.layout.request_dialog, null);
+		LinearLayout container = (LinearLayout) getActivity().findViewById(R.id.requestContainerLayout);
+		mXmlUIHelper = new XmlUiHelper(getActivity(), container);
+		mXmlUIHelper.addTextPlaceHolder("#locality", mLocality);
+		mXmlUIHelper.build(mLayer, mLocality, XmlUiHelper.UI_TYPE_REQUEST);
+
+		builder.setTitle(mXmlUIHelper.getTitle());
 		builder = builder.setView(mDialogView);
 
 		/* Report! and Cangel buttons */
-		builder = builder.setPositiveButton(R.string.reportDialogRequestSendButton, new ReportRequestDialogClickListener(this));
+		builder = builder.setPositiveButton(R.string.reportDialogRequestSendButton, this);
 
 		/* negative button: save the user name */
-		builder = builder.setNegativeButton(R.string.reportDialogCancelButton, new ReportRequestDialogClickListener(this));
-
+		builder = builder.setNegativeButton(R.string.reportDialogCancelButton, this);
 		// Create the AlertDialog object and return it
 		final AlertDialog alertDialog = builder.create();
 		alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		//dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Light);
 		/* populate Name field with last value */
-		Settings s = new Settings(getActivity().getApplicationContext());
-		String userName = s.getReporterUserName();
+		String userName = args.getString("displayName");
 
-//		EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
-//		et.setText(userName);
+		TextView tv = (TextView) mDialogView.findViewById(R.id.tvName);
+		tv.setText(userName);
 //		et.addTextChangedListener(new TextWatcher() {
 //
 //			public void onTextChanged(CharSequence cs, int start, int before, int count) {}
@@ -99,7 +112,7 @@ public class ReportRequestDialogFragment extends DialogFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
-		Log.e("ReportRequestDialogFragment", "onActivityCreated");
+		Log.e("RequestDialogFragment", "onActivityCreated");
 		super.onActivityCreated(savedInstanceState);
 		/* register for locality name updates and location updates */
 	}
@@ -126,18 +139,6 @@ public class ReportRequestDialogFragment extends DialogFragment
 //		}
 	}
 
-//	private void mCheckUsernameNotEmpty(AlertDialog ad)
-//	{
-//		Button positiveButton = ad.getButton(Dialog.BUTTON_POSITIVE);
-//		if(positiveButton != null)
-//		{
-//			EditText et = (EditText) mDialogView.findViewById(R.id.etRequestName);
-//			positiveButton.setEnabled(et.getText().toString().length() > 0);
-//			Log.e("mCheckUsernameNotEmpty", "dialog button is NOT null! --> no scandalo");
-//		}
-//		else
-//			Log.e("mCheckUsernameNotEmpty", "dialog is null! scandalo");
-//	}
 
 	public LatLng getLatLng()
 	{
@@ -147,6 +148,42 @@ public class ReportRequestDialogFragment extends DialogFragment
 	public String getLocality()
 	{
 		return mLocality;
+	}
+
+	@Override
+	public void onClick(DialogInterface dialogI, int whichButton)
+	{
+		Dialog d = (Dialog) dialogI;
+		HelloWorldActivity oActivity = (HelloWorldActivity) getActivity();
+		LatLng llng = getLatLng();
+		if(mLatLng == null) /* should not be null since the dialog waits for location before enabling the ok button */
+			return;
+
+		if(whichButton == AlertDialog.BUTTON_POSITIVE)
+		{
+			String user;
+			String locality = "";
+
+            /* Get data from the UI and place it on a HashMap key/value */
+            ReportDataBuilder reportDataBuilder = new ReportDataBuilder();
+            reportDataBuilder.build(mXmlUIHelper.getData(), getActivity());
+            reportDataBuilder.add("account", mAccount);
+            reportDataBuilder.add("layer", mLayer);
+            reportDataBuilder.add("latitude", mLatLng.latitude);
+            reportDataBuilder.add("longitude", mLatLng.longitude);
+
+            Intent service_intent = new Intent(getActivity(), PostDataService.class);
+            service_intent.putExtra("serviceName", "RequestService");
+            service_intent.putExtra("params", reportDataBuilder.toString());
+            service_intent.putExtra("url", new Urls().requestServiceUrl());
+
+            Log.e("RequestDiaFrag.onClick", "starting service PostDataService");
+			oActivity.startService(service_intent);
+		}
+		else
+		{
+			oActivity.onMyReportRequestDialogCancelled(llng);
+		}
 	}
 }
 

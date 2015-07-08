@@ -34,27 +34,26 @@ import it.giacomos.android.wwwsapp.personalMessageActivity.PersonalMessageDataFe
 import it.giacomos.android.wwwsapp.personalMessageActivity.PersonalMessageManager;
 import it.giacomos.android.wwwsapp.personalMessageActivity.PersonalMessageUpdateListener;
 import it.giacomos.android.wwwsapp.preferences.*;
+import it.giacomos.android.wwwsapp.report.RequestDialogFragment;
 import it.giacomos.android.wwwsapp.service.RegisterUserService;
 import it.giacomos.android.wwwsapp.service.ServiceManager;
 import it.giacomos.android.wwwsapp.service.sharedData.ReportNotification;
 import it.giacomos.android.wwwsapp.service.sharedData.ReportRequestNotification;
 import it.giacomos.android.wwwsapp.widgets.AnimatedImageView;
+import it.giacomos.android.wwwsapp.widgets.map.ContextualMenu;
 import it.giacomos.android.wwwsapp.widgets.map.MapFragmentListener;
 import it.giacomos.android.wwwsapp.widgets.map.OMapFragment;
 import it.giacomos.android.wwwsapp.widgets.map.ReportRequestListener;
 import it.giacomos.android.wwwsapp.report.RemovePostConfirmDialog;
 import it.giacomos.android.wwwsapp.report.ReportActivity;
-import it.giacomos.android.wwwsapp.report.ReportRequestDialogFragment;
 import it.giacomos.android.wwwsapp.report.network.PostActionResultListener;
 import it.giacomos.android.wwwsapp.report.network.PostType;
 import it.giacomos.android.wwwsapp.report.tutorialActivity.TutorialPresentationActivity;
 
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
-import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.app.Activity;
@@ -123,7 +122,8 @@ ConnectionCallbacks,
 OnConnectionFailedListener,
 ListView.OnItemClickListener,
 OnItemSelectedListener /* main spinner */,
-PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, NetworkStatusMonitorListener
+PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, NetworkStatusMonitorListener,
+        ContextualMenu.ContextualMenuListener
 {
     /* Request code used to invoke sign in user interactions. */
     private static final int RC_SIGN_IN = 0;
@@ -692,8 +692,15 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
 
     public String getAccount()
     {
-        if (mGoogleApiClient.isConnected() && Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null)
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null)
             return Plus.AccountApi.getAccountName(mGoogleApiClient);
+        return "";
+    }
+
+    public String getUserDisplayName()
+    {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null)
+            return Plus.PeopleApi.getCurrentPerson(mGoogleApiClient).getDisplayName();
         return "";
     }
 
@@ -729,8 +736,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     @Override
     public void onMyReportLocalityChanged(String locality)
     {
-        ReportRequestDialogFragment rrdf = (ReportRequestDialogFragment)
-                getSupportFragmentManager().findFragmentByTag("ReportRequestDialogFragment");
+        RequestDialogFragment rrdf = (RequestDialogFragment)
+                getSupportFragmentManager().findFragmentByTag("RequestDialogFragment");
         if (rrdf != null)
             rrdf.setLocality(locality);
     }
@@ -748,9 +755,9 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
             MyAlertDialogFragment.MakeGenericError(R.string.reportPointTooCloseToMyLocation, this);
         } else
         {
-            ReportRequestDialogFragment rrdf = ReportRequestDialogFragment.newInstance(locality);
+            RequestDialogFragment rrdf = RequestDialogFragment.newInstance(mCurrentLayerName, locality, getUserDisplayName(), getAccount());
             rrdf.setData(pointOnMap, locality);
-            rrdf.show(getSupportFragmentManager(), "ReportRequestDialogFragment");
+            rrdf.show(getSupportFragmentManager(), "RequestDialogFragment");
         }
     }
 
@@ -828,11 +835,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
                 omv.setTerrainEnabled(menuItem.isChecked());
                 break;
             case R.id.radarInfoButton:
-                View radarInfoTextView = findViewById(R.id.radarInfoTextView);
-                if (menuItem.isChecked())
-                    radarInfoTextView.setVisibility(View.VISIBLE);
-                else
-                    radarInfoTextView.setVisibility(View.GONE);
+
                 break;
             case R.id.reportHelpAction:
 			/* show map tilt transparent overlay next time too */
@@ -868,7 +871,8 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
         if (v.getId() == R.id.actionOverflow)
         {
             mCreateMapOptionsPopupMenu(true);
-        } else if (v.getId() == R.id.fabNewReport)
+        }
+        else if (v.getId() == R.id.fabNewReport)
         {
             mReportConditionsAccepted = mSettings.reportConditionsAccepted();
             mReportConditionsAccepted = true;
@@ -1313,6 +1317,33 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     }
 
 
+    @Override
+    public void onContextMenuButtonClicked(Type type)
+    {
+        mReportConditionsAccepted = mSettings.reportConditionsAccepted();
+        mReportConditionsAccepted = true;
+        if(type == Type.REPORT && mReportConditionsAccepted)
+        {
+            startReportActivity();
+        }
+        else if(mReportConditionsAccepted)
+        {
+            OMapFragment omf = getMapFragment();
+            LatLng pointOnMap = getMapFragment().longClickPoint();
+            String locality = "unknown locality. To be implemented";
+            Location myLocation = getLocationService().getCurrentLocation();
+            if (myLocation == null || omf.pointTooCloseToMyLocation(myLocation, pointOnMap))
+            {
+                MyAlertDialogFragment.MakeGenericError(R.string.reportPointTooCloseToMyLocation, this);
+            } else
+            {
+                RequestDialogFragment rrdf = RequestDialogFragment.newInstance(mCurrentLayerName, locality, getUserDisplayName(), getAccount());
+                rrdf.setData(pointOnMap, locality);
+                rrdf.show(getSupportFragmentManager(), "RequestDialogFragment");
+            }
+        }
+    }
+
     /* private members */
     private Location mCurrentLocation;
     private Settings mSettings;
@@ -1346,6 +1377,5 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     private float mFloatingActionButtonHideYThreshold;
 
     private ProgressBar mProgressBar;
-
 
 }

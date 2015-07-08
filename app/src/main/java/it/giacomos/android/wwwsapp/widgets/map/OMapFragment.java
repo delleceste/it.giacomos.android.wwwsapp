@@ -54,6 +54,7 @@ OnMapReadyCallback, Runnable, LayerChangedListener,
 	private Settings mSettings;
     private ReportOverlay mReportOverlay;
 	private ContextualMenu mContextualMenu;
+	private LatLng mLongClickPoint;
 
 	/* MapFragmentListener: the activity must implement this in order to be notified when 
 	 * the GoogleMap is ready.
@@ -213,11 +214,6 @@ OnMapReadyCallback, Runnable, LayerChangedListener,
 		if(mSavedCameraPosition == null) /* never saved */
 			mCenterOnUpdate = true;
 		mMap.setOnCameraChangeListener(this);
-
-		/* set html text on Radar info text view */
-		TextView radarInfoTextView = (TextView) getActivity().findViewById(R.id.radarInfoTextView);
-		radarInfoTextView.setText(Html.fromHtml(getResources().getString(R.string.radar_info)));
-		radarInfoTextView.setVisibility(View.GONE);
 		
 		/* when the activity creates us, it passes the initialization stuff through arguments */
 		mSetMode(mMode);
@@ -373,9 +369,14 @@ OnMapReadyCallback, Runnable, LayerChangedListener,
 	@Override
 	public void onMapLongClick(LatLng latLng)
 	{
+		mLongClickPoint = latLng;
 		mReportOverlay.onMapLongClicked(latLng);
+        HelloWorldActivity hwa = (HelloWorldActivity) getActivity();
 		if(mContextualMenu == null)
-			mContextualMenu = new ContextualMenu(getActivity(), (RelativeLayout) getActivity().findViewById(R.id.mapRelativeLayout));
+        {
+            mContextualMenu = new ContextualMenu(hwa, (RelativeLayout) getActivity().findViewById(R.id.mapRelativeLayout));
+            mContextualMenu.setContextualManuListener(hwa);
+        }
 		mContextualMenu.show();
 	}
 
@@ -385,5 +386,10 @@ OnMapReadyCallback, Runnable, LayerChangedListener,
 		mReportOverlay.onMapClicked();
 		if(mContextualMenu != null)
 			mContextualMenu.hide();
+	}
+
+	public LatLng longClickPoint()
+	{
+		return mLongClickPoint;
 	}
 }

@@ -1,5 +1,6 @@
 package it.giacomos.android.wwwsapp.report;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
@@ -18,7 +19,7 @@ public class ReportDataBuilder
     private String mString;
     private HashMap<String, String> mData;
 
-    public void build(ArrayList<WidgetData> data, ReportActivity activity)
+    public void build(ArrayList<WidgetData> data, Activity activity)
     {
         String value, param;
         mData = new HashMap<String, String>();
