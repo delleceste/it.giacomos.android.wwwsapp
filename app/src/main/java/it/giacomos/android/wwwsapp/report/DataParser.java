@@ -70,6 +70,16 @@ public class DataParser
 					activeUser.buildMarkerOptions(ctx, xmlUIDocumentRepr);
 					ret.put(activeUser.getId(), activeUser);
 				}
+				else if(o.has("type") && o.getString("type").compareTo("request") == 0)
+				{
+					String displayName = o.getString("display_name");
+					Log.e("DataI.parse", " PROCESSING A REQUEST for " + displayName);
+					boolean writable = o.getBoolean("writable");
+					boolean isPublished = true;
+					RequestData requestData = new RequestData(datetime, displayName, "", lat, lon, writable, isPublished);
+					requestData.buildMarkerOptions(ctx, xmlUIDocumentRepr);
+					ret.put(requestData.getId(), requestData);
+				}
 			}
 		}
 		catch (JSONException e)

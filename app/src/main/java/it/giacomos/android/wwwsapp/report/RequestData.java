@@ -12,8 +12,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class RequestData extends DataInterface
 {
-	private String writable;
-	public String username, locality;
+	private boolean writable;
+	public String display_name, locality;
 	private Marker mMarker;
 	private MarkerOptions mMarkerOptions;
 	private boolean mIsPublished;
@@ -26,21 +26,21 @@ public class RequestData extends DataInterface
 	 * @param la the latitude
 	 * @param lo the longitude
 	 * @param wri writable attribute: if true: the user owns the request.
-	 * @param isSatisfied if true: the request has been published on the database
+	 * @param isPublished if true: the request has been published on the database
 	 */
 	public RequestData(String datetime, String user, String local,
-			double la, double lo, String wri, boolean isPublished)
+			double la, double lo, boolean wri, boolean isPublished)
 	{
 		super("RequestData", la, lo, datetime, user);
 		writable = wri;
-		username = user;
+		display_name = user;
 		locality = local;
 		mIsPublished = isPublished;
 	}
 
 	public boolean isWritable()
 	{
-		return (writable.compareTo("w") == 0);
+		return writable;
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public class RequestData extends DataInterface
 	@Override
 	public String getId()
 	{
-		return String.valueOf(TYPE_REQUEST) + ":" + getLayerName() + ":LatLon" + String.valueOf(getLatitude()) + ":" + String.valueOf(getLongitude()) + ":" + username;
+		return String.valueOf(TYPE_REQUEST) + ":" + getLayerName() + ":LatLon" + String.valueOf(getLatitude()) + ":" + String.valueOf(getLongitude()) + ":" + display_name;
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class RequestData extends DataInterface
 	private String mMakeSnippet(String locality, Context ctx)
 	{
 		Resources res = ctx.getResources();
-		String snippet = username;
+		String snippet = display_name;
 		if(locality.length() > 0)
 			snippet += "\n" + res.getString(R.string.reportLocality) + ": " + locality;
 		//snippet += "\nlat. " + latitude + ", long. " + longitude;
@@ -152,7 +152,7 @@ public class RequestData extends DataInterface
 		else
 		{
 			snippet += "\n" + res.getString(R.string.reportRequestPublishedOn) + " " + getDateTime();
-			snippet += "\n* " + res.getString(R.string.reportTouchBaloonToReport) + " " + username;
+			snippet += "\n* " + res.getString(R.string.reportTouchBaloonToReport) + " " + display_name;
  		}
 		return snippet;
 	}

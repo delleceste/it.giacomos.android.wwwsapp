@@ -391,7 +391,7 @@ OnClickListener
 				// ReportRequestNotification(String datet, String user, double lat, double lon, String loc)
 				RequestData rd = (RequestData) di;
 				ReportRequestNotification repReqN = new ReportRequestNotification(rd.getDateTime(),
-						rd.username, rd.getLatitude(), rd.getLongitude(), rd.locality);
+						rd.display_name, rd.getLatitude(), rd.getLongitude(), rd.locality);
 				/* put the report request notification into the data shared with the service,
 				 * so that the service does not trigger a notification.
 				 */
@@ -406,8 +406,8 @@ OnClickListener
 					// put into the updateCurrentRequest through the boolean parameter.
 					// ssd.setWasNotified(repReqN);
 					/* animate camera to new request */
-					mMapFrag.moveTo(rd.getLatitude(), rd.getLongitude());
-					rd.getMarker().showInfoWindow();
+				//	mMapFrag.moveTo(rd.getLatitude(), rd.getLongitude());
+				//	rd.getMarker().showInfoWindow();
 				}	
 			}
 		}
@@ -479,7 +479,7 @@ OnClickListener
 		Date date = Calendar.getInstance().getTime();
 		DateFormat df = DateFormat.getDateInstance();
 		/* RequestData(String d, String user, String local, double la, double lo, String wri, boolean isPublished) */
-		RequestData myRequestData = new RequestData(df.format(date), userName, "-", point.latitude, point.longitude, "w", false);
+		RequestData myRequestData = new RequestData(df.format(date), userName, "-", point.latitude, point.longitude, true, false);
 		myRequestData.buildMarkerOptions(ctx, null);
 		Marker myRequestMarker = mMapFrag.getMap().addMarker(myRequestData.getMarkerOptions());
 		myRequestData.setMarker(myRequestMarker);
@@ -523,6 +523,18 @@ OnClickListener
 		}
 	}
 
+	public DataInterface findDataByMarker(Marker marker)
+	{
+		String mid = marker.getId();
+		for(DataInterface di : 	mDataInterfaceMarkerIdHash.values())
+		{
+			Marker m = di.getMarker();
+			if (m != null && m.getId().compareTo(mid) == 0)
+				return di;
+		}
+		return null;
+	}
+
 	/** HelloWorldActivity implements ReportRequestListener.
 	 *  onInfoWindowClick invokes HelloWorldActivity callbacks in order to perform
 	 *  specific actions such as show dialog fragments which are appropriate for
@@ -531,7 +543,8 @@ OnClickListener
 	@Override
 	public void onInfoWindowClick(Marker marker) 
 	{
-		DataInterface dataI = mDataInterfaceMarkerIdHash.get(marker.getId());
+		DataInterface dataI = findDataByMarker(marker);
+		Log.e("ReportOv.onInfoWinClick", " clicked on marker " + marker.getTitle() + " dataI " + dataI + " Conteins " + mDataInterfaceMarkerIdHash.containsKey(marker.getId()));
 		/* retrieve my request marker, if present. If it's mine and not published, trigger the request dialog
 		 * execution.
 		 */

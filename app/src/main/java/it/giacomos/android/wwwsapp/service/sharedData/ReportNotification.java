@@ -58,7 +58,7 @@ public class ReportNotification extends NotificationData
 	@Override
 	public String toString() 
 	{
-		/* N::datetime::username::latitude::longitude */
+		/* N::datetime::display_name::latitude::longitude */
 		
 		String ret = "N::";
 		ret += datetime + "::" + username + "::" + String.valueOf(latitude) + "::";
