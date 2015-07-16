@@ -310,6 +310,10 @@ OnClickListener
 			" were added, " + removed + " removed " + alreadyPresent + " kept. Took " + (System.currentTimeMillis() - start) + " ms");
 
 		start = System.currentTimeMillis();
+
+	//
+	// 	mRemoveMarkers();
+
 		for(DataInterface dataI : mDataInterfaceMarkerIdHash.values())
 		{
 			int typ = dataI.getType();
@@ -328,14 +332,15 @@ OnClickListener
 					usersCount += ((ActiveUser) dataI).otherUsersInAreaCnt + 1;
 				
 				if(marker == null)
+		//		if(true)
 				{
 					/* must generate marker for that data interface */
 					marker = mMapFrag.getMap().addMarker(dataI.getMarkerOptions());
 					/* store it into our data reference */
 					dataI.setMarker(marker);
 					newMarkers++;
-			//		Log.e("RepOv.mUpdateMarkers", "setting marker " + marker.getTitle() +
-			//				" id " + marker.getId() + " hash " + marker.hashCode());
+					Log.e("RepOv.mUpdateMarkers", "setting marker " + marker.getTitle() +
+							" id " + marker.getId() + " hash " + marker.hashCode());
 				}
 				else
 				{
@@ -456,7 +461,7 @@ OnClickListener
 		Log.e("RepOv.onRepDownloaded", "layer " + layerName + " data " + data[1]);
         fu.saveToStorage(data[1].getBytes(), layerName + CACHE_FILE_SUFFIX, mMapFrag.getActivity().getApplicationContext());
         Log.e("RepOv.onRepDownloaded", "saved to storage cache in " + (System.currentTimeMillis() - start) + "ms");
-		mReportOverlayTask = new ReportOverlayTask(mMapFrag.getActivity().getApplicationContext(), this);
+		mReportOverlayTask = new ReportOverlayTask(mMapFrag.getActivity().getApplicationContext(), this, mDataInterfaceMarkerIdHash);
 		mReportOverlayTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, data);
 	}
 
@@ -529,6 +534,8 @@ OnClickListener
 		for(DataInterface di : 	mDataInterfaceMarkerIdHash.values())
 		{
 			Marker m = di.getMarker();
+            if(m != null)
+			    Log.e("findDataByMNarker", " got " + m.getTitle() + "," + m.getId() + " / " + marker.getTitle() + " id " + marker.getId());
 			if (m != null && m.getId().compareTo(mid) == 0)
 				return di;
 		}

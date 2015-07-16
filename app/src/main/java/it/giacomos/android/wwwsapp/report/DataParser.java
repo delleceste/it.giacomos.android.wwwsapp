@@ -25,10 +25,11 @@ public class DataParser
 		return mErrorMsg;
 	}
 
-	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx, String ui_type)
+	public HashMap<String , DataInterface> parse(String layerName, String txt, Context ctx, String ui_type, HashMap<String, DataInterface>  currentData)
 	{
 		HashMap<String , DataInterface> ret = null;
-		String s;
+		String s, id;
+		DataInterface dataI = null;
 		try
 		{
 			XmlUiParser xmlUiParser = new XmlUiParser();
@@ -61,14 +62,12 @@ public class DataParser
 							reportData.add(key, s);
 					}
 					Log.e("DataI.parse", "layer " + layer + " lat " + lat + " lon " + lon + " datet " + datetime + " disp name " + displayName);
-					reportData.buildMarkerOptions(ctx, xmlUIDocumentRepr);
-					ret.put(reportData.getId(), reportData);
+					dataI = reportData;
 				}
 				else if(o.has("type") && o.getString("type").compareTo("active_user") == 0)
 				{
 					ActiveUser activeUser = new ActiveUser(datetime, lat, lon, true, true, 0);
-					activeUser.buildMarkerOptions(ctx, xmlUIDocumentRepr);
-					ret.put(activeUser.getId(), activeUser);
+					dataI = activeUser;
 				}
 				else if(o.has("type") && o.getString("type").compareTo("request") == 0)
 				{
@@ -77,8 +76,17 @@ public class DataParser
 					boolean writable = o.getBoolean("writable");
 					boolean isPublished = true;
 					RequestData requestData = new RequestData(datetime, displayName, "", lat, lon, writable, isPublished);
-					requestData.buildMarkerOptions(ctx, xmlUIDocumentRepr);
-					ret.put(requestData.getId(), requestData);
+					dataI = requestData;
+				}
+				/* recycle marker if already created for the id */
+				if(dataI != null)
+				{
+					id = dataI.getId();
+					if(currentData.containsKey(id)) /* recycle marker */
+						dataI.setMarker(currentData.get(id).getMarker());
+					else
+						dataI.buildMarkerOptions(ctx, xmlUIDocumentRepr);
+					ret.put(id, dataI);
 				}
 			}
 		}
