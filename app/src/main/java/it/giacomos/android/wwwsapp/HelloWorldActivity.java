@@ -774,8 +774,10 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
 		 */
         rrccd.setPostActionResultListener(this);
         rrccd.setLatLng(position);
+        rrccd.setAccount(getAccount());
         rrccd.setType(type);
-        rrccd.setDeviceId(Secure.getString(getContentResolver(), Secure.ANDROID_ID));
+        rrccd.setLayer(mCurrentLayerName);
+        Log.e("onMPsotRemove", "acc " + getAccount() + ", layer " + mCurrentLayerName );
         rrccd.show(getSupportFragmentManager(), "RemovePostConfirmDialog");
     }
 
@@ -1252,15 +1254,15 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
     {
         Log.e("HWActivity", "spinner selection " + position + " view " + view);
-        String layerName = mLayersSpinnerAdapter.getItem(position);
+        mCurrentLayerName = mLayersSpinnerAdapter.getItem(position);
         for (LayerChangedListener l : mLayerChangedListeners)
-            l.onLayerChanged(layerName);
-        switchToLayer(layerName);
+            l.onLayerChanged(mCurrentLayerName);
+        switchToLayer(mCurrentLayerName);
     }
 
     public void switchToLayer(String layerName)
     {
-
+        mSettings.setLayerName(layerName);
     }
 
     @Override

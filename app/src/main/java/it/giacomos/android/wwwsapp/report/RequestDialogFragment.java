@@ -175,7 +175,7 @@ public class RequestDialogFragment extends DialogFragment implements DialogInter
             Intent service_intent = new Intent(getActivity(), PostDataService.class);
             service_intent.putExtra("serviceName", "RequestService");
             service_intent.putExtra("params", reportDataBuilder.toString());
-            service_intent.putExtra("url", new Urls().requestServiceUrl());
+            service_intent.putExtra("url", new Urls().requestUrl());
 
             Log.e("RequestDiaFrag.onClick", "starting service PostDataService");
 			oActivity.startService(service_intent);

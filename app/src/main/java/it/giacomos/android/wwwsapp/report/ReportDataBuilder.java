@@ -10,19 +10,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.giacomos.android.wwwsapp.report.widgets.TextValueInterface;
+import it.giacomos.android.wwwsapp.service.PostDataServiceParamsBuilder;
 
 /**
  * Created by giacomo on 5/06/15.
  */
-public class ReportDataBuilder
+public class ReportDataBuilder extends PostDataServiceParamsBuilder
 {
-    private String mString;
-    private HashMap<String, String> mData;
-
     public void build(ArrayList<WidgetData> data, Activity activity)
     {
         String value, param;
-        mData = new HashMap<String, String>();
         for(WidgetData d : data)
         {
             int id = d.id;
@@ -44,33 +41,4 @@ public class ReportDataBuilder
         }
     }
 
-    public void add(String key, double value)
-    {
-        mData.put(key, String.valueOf(value));
-    }
-
-    public void add(String key, String value)
-    {
-        mData.put(key, value);
-    }
-
-    public String toString()
-    {
-        String s = "";
-        if(mData != null)
-        {
-            for (String k : mData.keySet())
-                try
-                {
-                    if(!s.isEmpty())
-                        s += "&";
-                    s += URLEncoder.encode(k, "UTF-8") + "=" + URLEncoder.encode(mData.get(k), "UTF-8");
-                } catch (UnsupportedEncodingException e)
-                {
-                    e.printStackTrace();
-                }
-        }
-
-        return s;
-    }
 }

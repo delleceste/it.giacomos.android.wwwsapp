@@ -511,4 +511,11 @@ public class Settings
 		e.putString("GCM_TOKEN", token);
 		e.commit();
 	}
+
+	public void setLayerName(String layerName)
+	{
+		SharedPreferences.Editor e = mSharedPreferences.edit();
+		e.putString("CURRENT_LAYER_NAME", layerName);
+		e.commit();
+	}
 }
