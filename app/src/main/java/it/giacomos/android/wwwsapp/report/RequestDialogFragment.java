@@ -62,7 +62,8 @@ public class RequestDialogFragment extends DialogFragment implements DialogInter
 		// Inflate and set the layout for the dialog
 		// Pass null as the parent view because its going in the dialog layout
 		mDialogView = inflater.inflate(R.layout.request_dialog, null);
-		LinearLayout container = (LinearLayout) getActivity().findViewById(R.id.requestContainerLayout);
+		LinearLayout container = (LinearLayout) mDialogView.findViewById(R.id.requestContainerLayout);
+		Log.e("onCreateDialog", "searchig container " + container);
 		mXmlUIHelper = new XmlUiHelper(getActivity(), container);
 		mXmlUIHelper.addTextPlaceHolder("#locality", mLocality);
 		mXmlUIHelper.build(mLayer, mLocality, XmlUiHelper.UI_TYPE_REQUEST);
@@ -153,6 +154,7 @@ public class RequestDialogFragment extends DialogFragment implements DialogInter
 	@Override
 	public void onClick(DialogInterface dialogI, int whichButton)
 	{
+		boolean cancelled = true;
 		Dialog d = (Dialog) dialogI;
 		HelloWorldActivity oActivity = (HelloWorldActivity) getActivity();
 		LatLng llng = getLatLng();
@@ -179,11 +181,10 @@ public class RequestDialogFragment extends DialogFragment implements DialogInter
 
             Log.e("RequestDiaFrag.onClick", "starting service PostDataService");
 			oActivity.startService(service_intent);
+			cancelled = false;
 		}
-		else
-		{
-			oActivity.onMyReportRequestDialogCancelled(llng);
-		}
+
+		oActivity.onRequestDialogClosed(llng, cancelled);
 	}
 }
 

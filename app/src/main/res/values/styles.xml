@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- your theme inherits from the material theme -->
-  <style name="OsmerActivityTheme" parent="@style/Theme.AppCompat.Light">
+  <style name="OsmerActivityTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
 
     <item name="colorPrimary">@color/primary</item>
     <item name="colorPrimaryDark">@color/primary_dark</item>

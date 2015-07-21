@@ -358,6 +358,18 @@ OnMapReadyCallback, Runnable, LayerChangedListener,
 		return myLocation.distanceTo(pt) < 500;
 	}
 
+	public void update()
+	{
+		getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.VISIBLE);
+		mReportOverlay.setArea(null); /* null forces full refresh */
+	}
+
+	public void hideContextualMenu()
+	{
+		if(mContextualMenu != null)
+			mContextualMenu.hide();
+	}
+
 	@Override
 	public void run()
 	{

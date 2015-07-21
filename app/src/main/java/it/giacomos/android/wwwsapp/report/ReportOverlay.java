@@ -208,6 +208,13 @@ OnClickListener
 	{
 		Log.e("RepOv.onRepProcTskFin", "entering");
         mMapFrag.getActivity().findViewById(R.id.mapProgressBar).setVisibility(View.GONE);
+
+		/* before updating mDataInterfaceMarkerIdHash, remove unused markers */
+		for(String key : mDataInterfaceMarkerIdHash.keySet())
+		{
+			if(!dataInterfaceList.containsKey(key) )
+				mDataInterfaceMarkerIdHash.get(key).getMarker().remove();
+		}
 		mDataInterfaceMarkerIdHash = dataInterfaceList;
 
         if(dataInterfaceList.size() == 0)

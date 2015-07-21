@@ -791,12 +791,12 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     }
 
     /**
-     * implements ReportRequestListener.onMyReportRequestDialogCancelled method interface
+     * implements ReportRequestListener.onRequestDialogClosed method interface
      */
     @Override
-    public void onMyReportRequestDialogCancelled(LatLng position)
+    public void onRequestDialogClosed(LatLng position, boolean cancelled)
     {
-
+        getMapFragment().hideContextualMenu();
     }
 
     private void mStartSignInActivity()
@@ -1292,7 +1292,17 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
                 mPersonData.saveData(this);
                 mPersonData.setUserRegistered(this, true);
             }
+            else if(serviceName.compareTo("RequestService") == 0 || serviceName.compareTo("RemoveRequestService") == 0 )
+            {
+                Log.e("HelloWorldAct.onBroad", "RequestService reply successful. Updating");
+                getMapFragment().update();
+            }
         }
+    }
+
+    public void update()
+    {
+        getMapFragment().update();
     }
 
     @Override

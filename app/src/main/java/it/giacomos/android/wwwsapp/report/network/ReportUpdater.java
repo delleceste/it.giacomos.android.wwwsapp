@@ -154,7 +154,7 @@ implements NetworkStatusMonitorListener, ReportUpdateTaskListener
 
 	public void areaChanged(LatLngBounds bounds)
 	{
-        if(mNewArea == null ||
+        if(mNewArea == null || bounds == null ||
                 bounds.northeast.latitude != mNewArea.northeast.latitude ||
                 bounds.northeast.longitude != mNewArea.northeast.longitude ||
                 bounds.southwest.latitude != mNewArea.southwest.latitude ||

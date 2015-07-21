@@ -284,7 +284,7 @@ public class XmlUiHelper implements RSpinner.OnItemSelectedListener,
 
         Log.e("Builder.addElement", " adding element " + name + " id " + id + " repr " + repr);
 
-        LinearLayout container = (LinearLayout) mContainerViewGroup.findViewById(R.id.containerLayout);
+        LinearLayout container = (LinearLayout) mContainerViewGroup.findViewById(R.id.requestContainerLayout);
         LinearLayout lo = new LinearLayout(mContext);
         lo.setOrientation(LinearLayout.HORIZONTAL); /* items displayed in a row */
         lo.setLayoutParams(new ViewGroup.LayoutParams(

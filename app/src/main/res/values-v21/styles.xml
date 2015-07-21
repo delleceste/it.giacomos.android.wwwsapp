@@ -3,7 +3,7 @@
     <!--  values/colors.xml defines the colours used here -->
     
     <!-- your theme inherits from the material theme -->
-  <style name="OsmerActivityTheme" parent="style/Theme.AppCompat.Light">
+  <style name="OsmerActivityTheme" parent="style/Theme.AppCompat.Light.NoActionBar">
     <item name="windowActionBar">false</item> <!--  needed since rev. 22 -->
    
    <item name="windowNoTitle">true</item>
