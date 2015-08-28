@@ -1,20 +1,32 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debugconfig {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('/home/giacomo/.android/debug_wwwsapp.keystore')
+            storePassword 'android'
+        }
+    }
     compileSdkVersion 'Google Inc.:Google APIs:22'
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "it.giacomos.android.wwwsapp"
         minSdkVersion 14
         targetSdkVersion 21
+        signingConfig signingConfigs.debugconfig
     }
-
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard.cfg'
         }
+        debug {
+            signingConfig signingConfigs.debugconfig
+        }
+    }
+    productFlavors {
     }
 }
 

@@ -38,6 +38,8 @@ public class GcmRegistrationService extends IntentService
         String device_id = intent.getStringExtra("device_id");
         String oldToken = intent.getStringExtra("old_token");
 
+        Log.e("GcmRegS.onHandleIntent" , " intent " + intent.getDataString());
+
         try {
             // In the (unlikely) event that multiple refresh operations occur simultaneously,
             // ensure that they are processed sequentially.
@@ -49,7 +51,7 @@ public class GcmRegistrationService extends IntentService
                 // [END get_token]
                 Log.e(TAG, "GCM Registration Token: " + token);
 
-                tokenChanged = (oldToken.compareTo(token) != 0);
+                tokenChanged = oldToken == null || (oldToken.compareTo(token) != 0);
                 tokenChanged = true;
                 if(tokenChanged) /* token changed: update it on the server */
                 {
@@ -78,7 +80,7 @@ public class GcmRegistrationService extends IntentService
     private boolean sendRegistrationToServer(String token, String account, String device_id)
     {
         boolean success = false;
-        Log.e("GcmRegServ.sendRegToSer", " Sending new token into server");
+        Log.e("GcmRegServ.sendRegToSer", " Sending new token into server: " + token + " account " + account + " device id " + device_id);
         HttpWriteRead httpWriteRead = new HttpWriteRead("GcmRegistrationService");
         HttpPostParametrizer p = new HttpPostParametrizer();
         p.add("account", account);

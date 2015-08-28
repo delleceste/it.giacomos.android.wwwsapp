@@ -2,6 +2,7 @@ package it.giacomos.android.wwwsapp.report;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -173,6 +174,8 @@ public class RequestDialogFragment extends DialogFragment implements DialogInter
             reportDataBuilder.add("layer", mLayer);
             reportDataBuilder.add("latitude", mLatLng.latitude);
             reportDataBuilder.add("longitude", mLatLng.longitude);
+			/* device id */
+			reportDataBuilder.add("d", Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID));
 
             Intent service_intent = new Intent(getActivity(), PostDataService.class);
             service_intent.putExtra("serviceName", "RequestService");

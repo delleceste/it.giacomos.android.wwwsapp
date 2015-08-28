@@ -428,7 +428,7 @@ public class XmlUiHelper implements RSpinner.OnItemSelectedListener,
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
-        mContainerViewGroup.findViewById(R.id.buttonOk).setEnabled(inputsValid());
+        // mContainerViewGroup.findViewById(R.id.buttonOk).setEnabled(inputsValid());
 
     }
 

@@ -379,6 +379,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
             intent.putExtra("account", account);
             intent.putExtra("device_id", device_id);
             intent.putExtra("old_token", mSettings.getGcmToken());
+            Log.e("onConnected", "starting GcmRegistrationService with account " + account + " dev id " + device_id + " old tok "  + mSettings.getGcmToken());
             startService(intent);
 
             Log.e("onConnected", "name: " + personName + " img " + personImage + " mail " + account);
