@@ -27,6 +27,11 @@ android {
         }
     }
     productFlavors {
+        ConfigurazioneDebug {
+            minSdkVersion 20
+            signingConfig signingConfigs.debugconfig
+            targetSdkVersion 23
+        }
     }
 }
 

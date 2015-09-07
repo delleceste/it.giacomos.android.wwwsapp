@@ -1,13 +1,17 @@
 package it.giacomos.android.wwwsapp.service.sharedData;
 
+import android.os.Bundle;
+import android.util.Log;
+
 public class ReportRequestNotification extends NotificationData
 {
 	public static int REQUEST_NOTIFICATION_ID = 10988;
 	
-    public String locality;
+    public String locality, comment;
 	public boolean isRequest;
-	private boolean mValidString;
-	private boolean mIsReadable;
+	private boolean mIsValid;
+	private boolean mIsReadOnly;
+
 
 	public String getTag()
 	{
@@ -21,19 +25,19 @@ public class ReportRequestNotification extends NotificationData
 	
 	public boolean isValid()
 	{
-		return mValidString && latitude > 0 && longitude > 0 && getDate() != null;
+		return mIsValid && latitude > 0 && longitude > 0 && getDate() != null;
 	}
 	
 	public ReportRequestNotification(String input)
 	{
 		super();
-		
+
 		String parts[] = input.split("::", -1);
-		mValidString = (parts.length == 7 || parts.length == 8);
-		if(mValidString)
+		mIsValid = (parts.length == 7 || parts.length == 8);
+		if(mIsValid)
 		{
 			isRequest = (parts[0].compareTo("Q") == 0);
-			mIsReadable = (parts[1].compareTo("r") == 0);
+			mIsReadOnly = (parts[1].compareTo("r") == 0);
 			datetime = parts[2];
 			username = parts[3];
 			try
@@ -52,7 +56,33 @@ public class ReportRequestNotification extends NotificationData
 			/* otherwise mIsConsumed remains false */
 		}
 	}
-	
+public ReportRequestNotification(Bundle input) {
+	super();
+	mIsValid = input.containsKey("sender") && input.containsKey("latitude") && input.containsKey("longitude")
+			&& input.containsKey("layer") && input.containsKey("read_only");
+
+	if (mIsValid) {
+		isRequest = true;
+		mIsReadOnly = (input.getString("read_only").compareTo("true") == 0);
+		datetime = input.getString("datetime");
+		username = input.getString("sender");
+		try {
+			latitude = Double.parseDouble(input.getString("latitude"));
+			longitude = Double.parseDouble(input.getString("longitude"));
+		} catch (NumberFormatException e) {
+
+		}
+		makeDate(datetime);
+		Log.e("ReportRequestNotification", " made data");
+//			if(parts.length > 7)
+//				mIsConsumed = (parts[7].compareTo("consumed") == 0);
+			/* otherwise mIsConsumed remains false */
+		if(input.containsKey("comment"))
+			comment = input.getString("comment");
+	}
+
+}
+
 	public ReportRequestNotification(String datet, String user, double lat, double lon, String loc)
 	{
 		super();
@@ -61,9 +91,9 @@ public class ReportRequestNotification extends NotificationData
 		latitude = lat;
 		longitude = lon;
 		locality = loc;
-		mValidString = true; /* for is valid */
+		mIsValid = true; /* for is valid */
 		isRequest = true;
-		mIsReadable = true;
+		mIsReadOnly = true;
 		makeDate(datetime);
 	}
 
@@ -77,7 +107,7 @@ public class ReportRequestNotification extends NotificationData
 	public String toString() 
 	{
 		String ret = "Q::";
-		if(mIsReadable)
+		if(mIsReadOnly)
 			ret += "r::";
 		else
 			ret += "w::";

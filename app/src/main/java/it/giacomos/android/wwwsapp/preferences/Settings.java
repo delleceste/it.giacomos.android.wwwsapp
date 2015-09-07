@@ -518,4 +518,16 @@ public class Settings
 		e.putString("CURRENT_LAYER_NAME", layerName);
 		e.commit();
 	}
+
+	/* stores the current account used to log in */
+	public void setAccountName(String account) {
+		SharedPreferences.Editor e = mSharedPreferences.edit();
+		e.putString("ACCOUNT_NAME", account);
+		e.commit();
+	}
+
+	public String getAccountName()
+	{
+		return mSharedPreferences.getString("ACCOUNT_NAME", "");
+	}
 }

@@ -1,5 +1,7 @@
 package it.giacomos.android.wwwsapp.service.sharedData;
 
+import android.os.Bundle;
+
 public class ReportNotification extends NotificationData
 {
 	public static int REPORT_NOTIFICATION_ID = 10987;

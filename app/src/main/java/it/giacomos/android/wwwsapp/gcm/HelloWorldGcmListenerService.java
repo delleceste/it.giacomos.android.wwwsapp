@@ -26,9 +26,9 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
-public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerService
+public class HelloWorldGcmListenerService extends com.google.android.gms.gcm.GcmListenerService
 {
-    private static final String TAG = "GcmListenerService";
+    private static final String TAG = "HelloWorldGcmLisService";
 
     /**
      * Called when message is received.
@@ -42,7 +42,8 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
     public void onMessageReceived(String from, Bundle data)
     {
         String message = data.getString("message");
-        Log.e(TAG, "From: " + from);
+        String fromName = data.getString("sender");
+        Log.e(TAG, "From: " + fromName);
         Log.e(TAG, "Message: " + message);
 
         /**
@@ -67,8 +68,9 @@ public class GcmListenerService extends com.google.android.gms.gcm.GcmListenerSe
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         NotificationDataFactory notificationDataFactory = new NotificationDataFactory();
-        NotificationData notificationData = notificationDataFactory.parse(dataAsString);
-        int iconId = -1, ledColor = 0;
+        NotificationData notificationData = notificationDataFactory.parse(data);
+        Log.e("HWGCMListenerService", "notif data valid " + notificationData.isValid() + " ty " + data.getString("type"));
+        int iconId = R.drawable.ic_launcher_statusbar_request_new, ledColor = 0;
         if (notificationData.isValid())
         {
             // Creates an explicit intent for an Activity in your app

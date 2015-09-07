@@ -212,8 +212,11 @@ OnClickListener
 		/* before updating mDataInterfaceMarkerIdHash, remove unused markers */
 		for(String key : mDataInterfaceMarkerIdHash.keySet())
 		{
-			if(!dataInterfaceList.containsKey(key) )
-				mDataInterfaceMarkerIdHash.get(key).getMarker().remove();
+			if(!dataInterfaceList.containsKey(key) ) {
+				Marker m = mDataInterfaceMarkerIdHash.get(key).getMarker();
+				if(m != null)
+					m.remove();
+			}
 		}
 		mDataInterfaceMarkerIdHash = dataInterfaceList;
 

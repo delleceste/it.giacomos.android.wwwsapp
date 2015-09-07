@@ -32,11 +32,12 @@ public class GcmRegistrationService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
+        Settings settings = new Settings(this);
         String token = "";
         boolean tokenChanged = false;
-        String account = intent.getStringExtra("account");
-        String device_id = intent.getStringExtra("device_id");
-        String oldToken = intent.getStringExtra("old_token");
+        String account = settings.getAccountName();
+        String device_id = android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+        String oldToken = settings.getGcmToken();
 
         Log.e("GcmRegS.onHandleIntent" , " intent " + intent.getDataString());
 
@@ -52,7 +53,7 @@ public class GcmRegistrationService extends IntentService
                 Log.e(TAG, "GCM Registration Token: " + token);
 
                 tokenChanged = oldToken == null || (oldToken.compareTo(token) != 0);
-                tokenChanged = true;
+        //        tokenChanged = true;
                 if(tokenChanged) /* token changed: update it on the server */
                 {
                     Log.e("GcmRegServ.onHandleInt", "FORCED!!! FORCED!!! FORCED!!!  token changed from old " + oldToken + " to new " + token);
@@ -74,6 +75,7 @@ public class GcmRegistrationService extends IntentService
         Intent registrationComplete = new Intent(REGISTRATION_COMPLETE);
         registrationComplete.putExtra("gcmTokenChanged", tokenChanged);
         registrationComplete.putExtra("gcmToken", token);
+        /* token is saved in activity upon broadcast receive */
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 

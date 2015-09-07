@@ -364,6 +364,7 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
             String account = Plus.AccountApi.getAccountName(mGoogleApiClient);
             String device_id = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
             mPersonData = new PersonData(account, personName, gplusUrl);
+            mSettings.setAccountName(account);
             boolean dataChanged = mPersonData.dataChanged(this);
             if((dataChanged || !mPersonData.userRegistered(this) ) && mNetworkStatusMonitor.isConnected())
             {
@@ -1270,7 +1271,6 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     public void onNothingSelected(AdapterView<?> parent)
     {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -1328,7 +1328,6 @@ PostDataServiceBroadcastReceiver.PostDataServiceBroadcastReceiverListener, Netwo
     {
 
     }
-
 
     @Override
     public void onContextMenuButtonClicked(Type type)

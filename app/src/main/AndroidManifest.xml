@@ -103,24 +103,9 @@
 
         <uses-library android:name="com.google.android.maps" />
 
-        <!--
-              starting from versionCode > 231 I created a map key with release and debug SHA1 together.
-        	  This way, the key below applies both to release and debug builds.
-        -->
-
-
-        <!--
-              Meteo.FVG package (old and alpha/beta versions) 
-			it.giacomos.android.wwwsapp package name
-        -->
-
-
-        <!-- ============================================= Meteo.FVG ========================================= -->
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyChM0jeUuXoEwQOzL0XVfB1GEKCoTt_lkk" />
-        <!-- ========================================== end Meteo.FVG API KEY ============================== -->
 
         <receiver
             android:name=".service.ConnectivityChangedReceiver"
@@ -151,17 +136,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <!--
-        activity
-            android:name="it.giacomos.android.wwwsapp.trial.BuyProActivity"
-            android:label="@string/title_activity_buy_pro"
-            android:parentActivityName="it.giacomos.android.wwwsapp.PostDataServiceWorldActivityldActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.giacomos.android.wwwsapp.PostDataServiceWorldActivityldActivity" />
-        </activity
-        -->
 
         <activity
             android:name=".report.tutorialActivity.TutorialPresentationActivity"
@@ -204,7 +178,7 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <!-- If you want to support pre-4.4 KitKat devices, add the following action to the intent filter declaration for the receiver: -->
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-                <category android:name="com.example.gcm" />
+                <category android:name="it.giacomos.android.wwwsapp" />
             </intent-filter>
         </receiver>
 
@@ -212,10 +186,6 @@
         <service
             android:name=".gcm.GcmRegistrationService"
             android:exported="false" >
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="it.giacomos.android.wwwsapp" />
-            </intent-filter>
         </service>
 
         <!--
@@ -224,11 +194,10 @@
         -->
 
         <service
-            android:name=".gcm.GcmListenerService"
+            android:name=".gcm.HelloWorldGcmListenerService"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
                 <category android:name="it.giacomos.android.wwwsapp" />
             </intent-filter>
         </service>
