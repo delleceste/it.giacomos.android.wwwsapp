@@ -11,17 +11,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -31,6 +20,9 @@ import org.xml.sax.SAXException;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import it.giacomos.android.wwwsapp.network.HttpPostParametrizer;
+import it.giacomos.android.wwwsapp.network.HttpWriteRead;
 
 public class NewsFetchTask extends AsyncTask<String, Integer, String> 
 {
@@ -47,109 +39,91 @@ public class NewsFetchTask extends AsyncTask<String, Integer, String>
 	}
 	
 	@Override
-	protected String doInBackground(String... urls) 
+	protected String doInBackground(String... urls)
 	{
 		mNewsData = null; /* to use if nothing to do or on error */
 		mErrorMsg = "";
-		HttpClient httpClient = new DefaultHttpClient();
-        HttpPost request = new HttpPost(urls[0]);
-        List<NameValuePair> postParameters = new ArrayList<NameValuePair>();
-        postParameters.add(new BasicNameValuePair("cli", CLI));
-        postParameters.add(new BasicNameValuePair("last_read_on", String.valueOf(mLastNewsReadTimestamp)));
-        Log.e("PersonalMessageDataFetchTask", "timestamp last was " + mLastNewsReadTimestamp);
-        UrlEncodedFormEntity form;
-		try {
-			form = new UrlEncodedFormEntity(postParameters);
-	        request.setEntity(form);
-	        HttpResponse response = httpClient.execute(request);
-	        StatusLine statusLine = response.getStatusLine();
-	        if(statusLine.getStatusCode() < 200 || statusLine.getStatusCode() >= 300)
-	        	mErrorMsg = statusLine.getReasonPhrase();
-	        else if(statusLine.getStatusCode() < 0)
-	        	mErrorMsg = "Server error";
-	        /* check the echo result */
-	        HttpEntity entity = response.getEntity();
-	        String document = EntityUtils.toString(entity);
-	        if(document.compareTo("-1") == 0)
-	        	mErrorMsg = "Server error: the server returned " + document;
-	        else if(document.compareTo("0") == 0)
-	        {
-	        	/* nothing to do */
-	        }
-	        else
-	        {
-	        	/* parse xml and get parameters for news data */
-	        	Document dom;
-	    		DocumentBuilderFactory factory;
-	    		DocumentBuilder builder;
-	    		InputStream is;
-	    		factory = DocumentBuilderFactory.newInstance();
-	    		try {
-	    			builder = factory.newDocumentBuilder();
-	    			try 
-	    			{
-	    				is = new ByteArrayInputStream(document.getBytes("UTF-8"));
-	    				try 
-	    				{
-	    					dom = builder.parse(is);
-	    					NodeList newsNodes = dom.getElementsByTagName("news");
-	    					NodeList urlNodes = dom.getElementsByTagName("a");
-	    					if(newsNodes.getLength() == 1 && urlNodes.getLength() ==1)
-	    					{
-	    						Element news = (Element) newsNodes.item(0);
-	    						Element a = (Element) urlNodes.item(0);
-	    						if(news != null && a != null)
-	    						{
-	    							String date = news.getAttribute("date");
-	    							String time = news.getAttribute("time"); /* not compulsory */
-	    							String url = a.getAttribute("href");
-	    							Node aNode = a.getFirstChild();
-	    							String text = "";
-	    							if(aNode instanceof CharacterData)
-	    								text = ((CharacterData) aNode).getData();
-	    							Log.e("PersonalMessageDataFetchTask", "date " + date + ", url " + url + ", text " + text);
-	    							if(date != null && url != null && !date.isEmpty() && !url.isEmpty() && !text.isEmpty())
-	    							{
-	    								mNewsData = new NewsData(date, time, text, url);
-	    							}
-	    						}
-	    					}
-	    				} 
-	    				catch (SAXException e) 
-	    				{
-	    					Log.e("PersonalMessageDataFetchTask SAXException: doInBackground()", e.getLocalizedMessage());
-	    				} 
-	    				catch (IOException e) 
-	    				{	
-	    					Log.e("PersonalMessageDataFetchTask: doInBackground()", e.getLocalizedMessage());
-	    				}
-	    			} 
-	    			catch (UnsupportedEncodingException e) 
-	    			{
-	    				Log.e("PersonalMessageDataFetchTask: doInBackground()", e.getLocalizedMessage());
-	    			}
-	    		} 
-	    		catch (ParserConfigurationException e1) 
-	    		{
-	    			Log.e("PersonalMessageDataFetchTask: doInBackground()", e1.getLocalizedMessage());
-	    		}		
-	        }
-		}
-		catch(IllegalArgumentException e) /* ANR fix: hostname may not be null */
+
+		HttpPostParametrizer parametrizer = new HttpPostParametrizer();
+		parametrizer.add("cli", CLI);
+		parametrizer.add("last_read_on", String.valueOf(mLastNewsReadTimestamp));
+		/*  test */
+		// postParameters.add(new BasicNameValuePair("before_datetime", "2014-08-23 21:11:00"));
+		String params = parametrizer.toString();
+		HttpWriteRead httpWriteRead = new HttpWriteRead("UpdateMyLocationTask");
+		httpWriteRead.setValidityMode(HttpWriteRead.ValidityMode.MODE_ANY_RESPONSE_VALID);
+		if(!httpWriteRead.read(urls[0], params))
 		{
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
+			mErrorMsg = httpWriteRead.getError();
+			Log.e("UpdMyLocaTask.doInBg", "Error updating my location: " + httpWriteRead.getError());
 		}
-		catch (UnsupportedEncodingException e) 
+		else
 		{
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
-		} catch (IOException e) {
-			mErrorMsg = e.getLocalizedMessage();
-			e.printStackTrace();
+			String document = httpWriteRead.getResponse();
+			if(document.compareTo("-1") == 0)
+				mErrorMsg = "Server error: the server returned " + document;
+			else if(document.compareTo("0") == 0)
+			{
+				/* nothing to do */
+			}
+			else
+			{
+				/* parse xml and get parameters for news data */
+				Document dom;
+				DocumentBuilderFactory factory;
+				DocumentBuilder builder;
+				InputStream is;
+				factory = DocumentBuilderFactory.newInstance();
+				try {
+					builder = factory.newDocumentBuilder();
+					try
+					{
+						is = new ByteArrayInputStream(document.getBytes("UTF-8"));
+						try
+						{
+							dom = builder.parse(is);
+							NodeList newsNodes = dom.getElementsByTagName("news");
+							NodeList urlNodes = dom.getElementsByTagName("a");
+							if(newsNodes.getLength() == 1 && urlNodes.getLength() ==1)
+							{
+								Element news = (Element) newsNodes.item(0);
+								Element a = (Element) urlNodes.item(0);
+								if(news != null && a != null)
+								{
+									String date = news.getAttribute("date");
+									String time = news.getAttribute("time"); /* not compulsory */
+									String url = a.getAttribute("href");
+									Node aNode = a.getFirstChild();
+									String text = "";
+									if(aNode instanceof CharacterData)
+										text = ((CharacterData) aNode).getData();
+									Log.e("PerMessDataFetchTsk", "date " + date + ", url " + url + ", text " + text);
+									if(date != null && url != null && !date.isEmpty() && !url.isEmpty() && !text.isEmpty())
+									{
+										mNewsData = new NewsData(date, time, text, url);
+									}
+								}
+							}
+						}
+						catch (SAXException e)
+						{
+							Log.e("PerMDataFetTsk: doInBg", e.getLocalizedMessage());
+						}
+						catch (IOException e)
+						{
+							Log.e("PerMDataFetTsk: doInBg", e.getLocalizedMessage());
+						}
+					}
+					catch (UnsupportedEncodingException e)
+					{
+						Log.e("PerMDataFetTsk: doInBg", e.getLocalizedMessage());
+					}
+				}
+				catch (ParserConfigurationException e1)
+				{
+					Log.e("PerMDataFetTsk: doInBg", e1.getLocalizedMessage());
+				}
+			}
 		}
 		return null;
 	}
@@ -162,7 +136,7 @@ public class NewsFetchTask extends AsyncTask<String, Integer, String>
 
 	public void onCancelled(String doc)
 	{
-		Log.e("PersonalMessageDataFetchTask", "task cancelled");
+		Log.e("PerMessDataFetchTsk", "task cancelled");
 		if(doc != null)
 			doc = null;
 	}

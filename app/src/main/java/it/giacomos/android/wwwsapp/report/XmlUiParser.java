@@ -73,7 +73,6 @@ public class XmlUiParser
                         }
                         if (ui != null)
                         {
-
                             ui.normalize();
                             NodeList titleElements = ui.getElementsByTagName("title");
                             if (titleElements.getLength() == 1)
